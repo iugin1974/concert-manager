@@ -11,4 +11,4 @@
 // e quindi il musicista può essere salveto
 bool runMusicianForm(const Musician* existing, Musician&);
 
-int runDeleteMusicianForm(std::vector<Musician>&);
+int runChoiceMusicianForm(std::vector<Musician>&);

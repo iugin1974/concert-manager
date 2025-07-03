@@ -1,6 +1,5 @@
 #include "Concert.h"
 #include "Musician.h"       
-
 #include "MusicalPiece.h"
 Concert::Concert() : title("Untitled") {}
 

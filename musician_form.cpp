@@ -1,28 +1,43 @@
 #include "musician_form.h"
+#include "PopupMenu.h"
+#include "logMessage.h"
 #include "Utils.h"
 #include <form.h>
 #include <string>
 #include <locale.h>
 
-int runDeleteMusicianForm(std::vector<Musician>& musicians) {
+int runChoiceMusicianForm(std::vector<Musician>& musicians) {
     clear();
     refresh();
-int l = musicians.size();
-if (l == 0) {
-    mvprintw(0, 0, "No musicians in Concert");
-    refresh();
-    getch();
-    return -1;
+
+    int l = musicians.size();
+    if (l == 0) {
+        mvprintw(0, 0, "No musicians in Concert");
+        refresh();
+        getch();
+        return -1;
+    }
+
+    // Mostra lista
+    for (int i = 0; i < l; i++) {
+        mvprintw(i, 3, "%d. %s", i + 1, musicians.at(i).getName().c_str()); // numeri da 1
+    }
+
+    mvprintw(l + 2, 3, "Quale musicista scegli?");
+
+    // Leggi scelta con promptNumber
+    int choice = promptNumber(stdscr, l + 3, 3, 1, l);
+	if (choice == 0) return -1;
+    if (choice < 1 || choice > l) {
+        mvprintw(l + 4, 3, "Scelta non valida");
+        refresh();
+        getch();
+        return -1;
+    }
+
+    return choice - 1;  // ritorna indice cancellato
 }
-for (int i = 0; i < l; i++) {
-    mvprintw(i, 3, "%d. %s", i, musicians.at(i).getName().c_str());
-}
-mvprintw(l+2 , 3, "Quale musicista cancellare?");
-int choice = getch();
-choice = choice - 49;
-int mus_number = promptNumber(stdscr, l + 3, 3, 1, choice);
-// TODO
-}
+
 
 bool runMusicianForm(const Musician* existing, Musician& musician) {
     FIELD* fields[7];  // 6 campi + nullptr
@@ -71,8 +86,61 @@ bool runMusicianForm(const Musician* existing, Musician& musician) {
     form_driver(form, REQ_FIRST_FIELD);
 
     int ch;
-    while ((ch = getch()) != '\n') {
+    while (true) {
+ch = getch();
         switch (ch) {
+			case KEY_F(2): { // 🔧 MENU AZIONI
+						    std::vector<std::string> actions = {
+				"Save and Exit",
+				"Exit without saving"
+			};
+                PopupMenu popup(stdscr, actions, 10, 12);
+                int selected = popup.show();
+					switch (selected) {
+						case 0: { // save and exit
+								form_driver(form, REQ_VALIDATION);
+
+								// Estrai i dati
+								auto trim = [](std::string s) {
+									s.erase(s.find_last_not_of(" \n") + 1);
+									s.erase(0, s.find_first_not_of(" "));
+									return s;
+								};
+
+								std::string name     = trim(field_buffer(fields[0], 0));
+								std::string phone    = trim(field_buffer(fields[1], 0));
+								std::string instr    = trim(field_buffer(fields[2], 0));
+								std::string mail     = trim(field_buffer(fields[3], 0));
+								std::string address  = trim(field_buffer(fields[4], 0));
+								std::string gage_str = trim(field_buffer(fields[5], 0));
+								double gage = std::stod(gage_str.empty() ? "0" : gage_str);
+
+								// Se vuoto, non salvare
+								if (name.empty()) return false;
+
+								// Imposta il musicista
+								musician.setName(name);
+								musician.setPhone(phone);
+								musician.setInstrument(instr);
+								musician.setMail(mail);
+								musician.setAddress(address);
+								musician.setGage(gage);
+
+								// Pulizia
+								unpost_form(form);
+								free_form(form);
+								for (int i = 0; i < 6; ++i)
+									free_field(fields[i]);
+
+								return true;
+								}
+case 1: // exit without saving
+return false;
+}
+break;
+}
+
+			case 10: // Enter
             case KEY_DOWN:
             case 9: // TAB
                 form_driver(form, REQ_NEXT_FIELD);
@@ -98,39 +166,5 @@ bool runMusicianForm(const Musician* existing, Musician& musician) {
         refresh();  // Aggiorna stdscr dopo ogni input
     }
 
-    form_driver(form, REQ_VALIDATION);
-
-    // Estrai i dati
-    auto trim = [](std::string s) {
-        s.erase(s.find_last_not_of(" \n") + 1);
-        s.erase(0, s.find_first_not_of(" "));
-        return s;
-    };
-
-    std::string name     = trim(field_buffer(fields[0], 0));
-    std::string phone    = trim(field_buffer(fields[1], 0));
-    std::string instr    = trim(field_buffer(fields[2], 0));
-    std::string mail     = trim(field_buffer(fields[3], 0));
-    std::string address  = trim(field_buffer(fields[4], 0));
-    std::string gage_str = trim(field_buffer(fields[5], 0));
-    double gage = std::stod(gage_str.empty() ? "0" : gage_str);
-
-    // Se vuoto, non salvare
-    if (name.empty()) return false;
-
-    // Imposta il musicista
-    musician.setName(name);
-    musician.setPhone(phone);
-    musician.setInstrument(instr);
-    musician.setMail(mail);
-    musician.setAddress(address);
-    musician.setGage(gage);
-
-    // Pulizia
-    unpost_form(form);
-    free_form(form);
-    for (int i = 0; i < 6; ++i)
-        free_field(fields[i]);
-
-return true;
+    
 }

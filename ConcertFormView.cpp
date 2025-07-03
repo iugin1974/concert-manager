@@ -1,22 +1,27 @@
 #include "ConcertFormView.h"
 #include "musician_form.h"
+#include "pieceForm.h"
+#include "PopupMenu.h"
+#include "logMessage.h"
 #include <form.h>
 #include <ncurses.h>
 #include <cstring>
 #include <sstream>
 
+// Costruttori
 ConcertFormView::ConcertFormView() {}
 
-ConcertFormView::ConcertFormView(const Concert& c) {
-    // Inizializza i tuoi campi interni con i dati del concerto esistente
-    this->title = c.getTitle();
-    this->dates = c.getDates();
-    this->places = c.getPlaces();
-    // ... altri campi se servono
+ConcertFormView::ConcertFormView(const Concert &c)
+{
+    title = c.getTitle();
+    dates = c.getDates();
+    places = c.getPlaces();
+    musicians = c.getMusicians();
 }
 
-// Helper: rimuove spazi laterali
-static std::string trim(const char* buffer) {
+// Helper: trim
+static std::string trim(const char *buffer)
+{
     std::string s(buffer);
     size_t start = s.find_first_not_of(" \t");
     size_t end = s.find_last_not_of(" \t");
@@ -24,67 +29,59 @@ static std::string trim(const char* buffer) {
 }
 
 // Helper: split da stringa separata da virgole
-static std::vector<std::string> split(const std::string& input, char sep = ',') {
+static std::vector<std::string> split(const std::string &input, char sep = ',')
+{
     std::stringstream ss(input);
     std::string item;
     std::vector<std::string> result;
-    while (std::getline(ss, item, sep)) {
+    while (std::getline(ss, item, sep))
+    {
         result.push_back(trim(item.c_str()));
     }
     return result;
 }
 
-struct FormComponents {
-    FIELD* fields[7];  // 3 input + 3 pulsanti + nullptr
-    FORM* form;
+struct FormComponents
+{
+    FIELD *fields[4]; // 3 input + nullptr
+    FORM *form;
 };
 
-FormComponents drawForm(const Concert* existing) {
+// Disegna il form
+FormComponents drawForm(const Concert *existing)
+{
     FormComponents fc;
-
-    const int NUM_FIELDS = 3;
-    const int NUM_BUTTONS = 4;
 
     fc.fields[0] = new_field(1, 40, 2, 30, 0, 0); // Title
     fc.fields[1] = new_field(1, 40, 4, 30, 0, 0); // Places
     fc.fields[2] = new_field(1, 40, 6, 30, 0, 0); // Dates
-    fc.fields[3] = new_field(1, 10, 10, 10, 0, 0); // OK
-    fc.fields[4] = new_field(3, 12, 10, 20, 0, 0); // CANCEL
-    fc.fields[5] = new_field(1, 18, 10, 36, 0, 0); // Add Musician
-    fc.fields[6] = new_field(1, 18, 10, 52, 0, 0); // Delete Musician
-    fc.fields[7] = nullptr;
+    fc.fields[3] = nullptr;
 
-    for (int i = 0; i < NUM_FIELDS; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         set_field_back(fc.fields[i], A_UNDERLINE);
         field_opts_off(fc.fields[i], O_AUTOSKIP);
     }
 
-    for (int i = NUM_FIELDS; i < NUM_FIELDS + NUM_BUTTONS; ++i) {
-        field_opts_off(fc.fields[i], O_EDIT);
-        set_field_back(fc.fields[i], COLOR_PAIR(2));
-        set_field_fore(fc.fields[i], COLOR_PAIR(2));
-    }
-
-    set_field_buffer(fc.fields[3], 0, "[ OK ]");
-    set_field_buffer(fc.fields[4], 0, "[ CANCEL ]");
-    set_field_buffer(fc.fields[5], 0, "[ Add Musician ]");
-    set_field_buffer(fc.fields[6], 0, "[ Delete Musician ]");
-
-    if (existing) {
+    if (existing)
+    {
         set_field_buffer(fc.fields[0], 0, existing->getTitle().c_str());
 
-        std::string placesStr;
-        for (const auto& p : existing->getPlaces()) {
-            if (!placesStr.empty()) placesStr += ", ";
-            placesStr += p;
+        std::string placesStr, datesStr;
+        for (size_t i = 0; i < existing->getPlaces().size(); ++i)
+        {
+            if (i > 0)
+                placesStr += ", ";
+            placesStr += existing->getPlaces()[i];
         }
-        set_field_buffer(fc.fields[1], 0, placesStr.c_str());
+        for (size_t i = 0; i < existing->getDates().size(); ++i)
+        {
+            if (i > 0)
+                datesStr += ", ";
+            datesStr += existing->getDates()[i];
+        }
 
-        std::string datesStr;
-        for (const auto& d : existing->getDates()) {
-            if (!datesStr.empty()) datesStr += ", ";
-            datesStr += d;
-        }
+        set_field_buffer(fc.fields[1], 0, placesStr.c_str());
         set_field_buffer(fc.fields[2], 0, datesStr.c_str());
     }
 
@@ -94,48 +91,40 @@ FormComponents drawForm(const Concert* existing) {
     mvprintw(2, 5, "Title:");
     mvprintw(4, 5, "Places (comma-separated):");
     mvprintw(6, 5, "Dates  (comma-separated):");
+    mvprintw(8, 5, "F2 = Actions");
+
     refresh();
-
     form_driver(fc.form, REQ_FIRST_FIELD);
-
     return fc;
 }
 
-void ConcertFormView::show(const Concert* existing) {
+// Metodo show
+bool ConcertFormView::show(const Concert *existing)
+{
     const int NUM_FIELDS = 3;
-    const int NUM_BUTTONS = 4;
 
-    std::string tempTitle, tempPlaces, tempDates;
+    std::string tempTitle = title;
+    std::string tempPlaces, tempDates;
 
-    if (existing) {
-        tempTitle = existing->getTitle();
-
-        const auto& pl = existing->getPlaces();
-        for (size_t i = 0; i < pl.size(); ++i) {
-            if (i > 0) tempPlaces += ", ";
-            tempPlaces += pl[i];
-        }
-
-        const auto& dt = existing->getDates();
-        for (size_t i = 0; i < dt.size(); ++i) {
-            if (i > 0) tempDates += ", ";
-            tempDates += dt[i];
-        }
+    for (size_t i = 0; i < places.size(); ++i)
+    {
+        if (i > 0)
+            tempPlaces += ", ";
+        tempPlaces += places[i];
+    }
+    for (size_t i = 0; i < dates.size(); ++i)
+    {
+        if (i > 0)
+            tempDates += ", ";
+        tempDates += dates[i];
     }
 
 redraw:
     clear();
-FormComponents fc = drawForm(nullptr);  // Passiamo nullptr perché carichiamo a mano
-    FIELD** fields = fc.fields;
-    FORM* form = fc.form;
+    FormComponents fc = drawForm(existing);
+    FIELD **fields = fc.fields;
+    FORM *form = fc.form;
 
-    // Salviamo i dati dell’ultima digitazione
-    if (!tempTitle.empty()) set_field_buffer(fields[0], 0, tempTitle.c_str());
-    if (!tempPlaces.empty()) set_field_buffer(fields[1], 0, tempPlaces.c_str());
-    if (!tempDates.empty()) set_field_buffer(fields[2], 0, tempDates.c_str());
-
-    
-    // Reimposta buffer con valori precedenti
     set_field_buffer(fields[0], 0, tempTitle.c_str());
     set_field_buffer(fields[1], 0, tempPlaces.c_str());
     set_field_buffer(fields[2], 0, tempDates.c_str());
@@ -143,106 +132,143 @@ FormComponents fc = drawForm(nullptr);  // Passiamo nullptr perché carichiamo a
     bool done = false;
     int ch;
 
-    while (!done) {
-        FIELD* current = current_field(form);
+    while (!done)
+    {
+        FIELD *current = current_field(form);
         int currentIndex = field_index(current);
 
-        // Evidenzia il pulsante attivo
-        for (int i = NUM_FIELDS; i < NUM_FIELDS + NUM_BUTTONS; ++i) {
-            if (i == currentIndex) {
-                set_field_back(fields[i], COLOR_PAIR(1));
-                set_field_fore(fields[i], COLOR_PAIR(1));
-            } else {
-                set_field_back(fields[i], COLOR_PAIR(2));
-                set_field_fore(fields[i], COLOR_PAIR(2));
-            }
-        }
-        refresh();
-
         ch = getch();
+        switch (ch)
+        {
+        case 10: // ENTER
+            form_driver(form, REQ_NEXT_FIELD);
+            form_driver(form, REQ_END_LINE);
+            break;
 
-        switch (ch) {
-            case 10: // ENTER
-                if (current == fields[3]) { // OK
-                    form_driver(form, REQ_VALIDATION);
-                    title = trim(field_buffer(fields[0], 0));
-                    places = split(field_buffer(fields[1], 0));
-                    dates = split(field_buffer(fields[2], 0));
-                    done = true;
-                } else if (current == fields[4]) { // CANCEL
-                    title = "";
-                    places.clear();
-                    dates.clear();
-                    done = true;
-                } else if (current == fields[5]) { // Add Musician
-                    // Salva temporaneamente i valori correnti
-                    form_driver(form, REQ_VALIDATION);
-                    tempTitle  = trim(field_buffer(fields[0], 0));
-                    tempPlaces = trim(field_buffer(fields[1], 0));
-                    tempDates  = trim(field_buffer(fields[2], 0));
+        case KEY_DOWN:
+        case 9: // TAB
+            form_driver(form, REQ_NEXT_FIELD);
+            break;
 
-                    // ✅ Chiamata immutata come richiesto
-                    Musician musician;
-                    bool added = runMusicianForm(nullptr, musician);
-                    if (added) musicians.push_back(musician);
+        case KEY_UP:
+            form_driver(form, REQ_PREV_FIELD);
+            break;
 
-                    // 🔁 Redraw con ripristino valori
-                    unpost_form(form);
-                    free_form(form);
-                    for (int i = 0; i < NUM_FIELDS + NUM_BUTTONS; ++i)
-                        free_field(fields[i]);
-                    goto redraw;
-                } else if (current == fields[6]) { // Delete Musician
-                    std::vector<Musician> musicians = 
-                    int choice = runDeleteMusicianForm(musicians);
-                } else {
-                    form_driver(form, REQ_NEXT_FIELD);
-                    form_driver(form, REQ_END_LINE);
+        case KEY_BACKSPACE:
+        case 127:
+            form_driver(form, REQ_DEL_PREV);
+            break;
+
+        case KEY_F(2):
+        { // 🔧 MENU AZIONI
+            std::vector<std::string> actions = {
+                "Save and Exit",
+                "Exit without saving",
+                "Add Musician",
+                "Edit Musician",
+                "Delete Musician",
+                "Add Piece",
+                "Edit Piece",
+                "Delete Piece"};
+            PopupMenu popup(stdscr, actions, 10, 12);
+            int selected = popup.show();
+
+            form_driver(form, REQ_VALIDATION);
+            tempTitle = trim(field_buffer(fields[0], 0));
+            tempPlaces = trim(field_buffer(fields[1], 0));
+            tempDates = trim(field_buffer(fields[2], 0));
+
+            switch (selected)
+            {
+            case 0: // Save and Exit
+                form_driver(form, REQ_VALIDATION);
+                title = trim(field_buffer(fields[0], 0));
+                places = split(field_buffer(fields[1], 0));
+                dates = split(field_buffer(fields[2], 0));
+                done = true;
+                clear();
+                refresh();
+                return true;
+
+            case 1: // Exit without saving
+                title.clear();
+                places.clear();
+                dates.clear();
+                done = true;
+                clear();
+                refresh();
+                return false;
+
+            case 2:
+            { // Add musician
+                Musician m;
+                if (runMusicianForm(nullptr, m))
+                    musicians.push_back(m);
+                break;
+            }
+
+            case 3:
+            { // Edit musician
+                int idx = runChoiceMusicianForm(musicians);
+                if (idx == -1)
+                    return false;
+                // TODO
+                break;
+            }
+
+            case 4:
+            { // Delete musician
+                int idx = runChoiceMusicianForm(musicians);
+                if (idx >= 0 && idx < (int)musicians.size())
+                    musicians.erase(musicians.begin() + idx);
+                break;
+            }
+
+            case 5:
+            { // add piece
+                MusicalPiece newPiece("", "", "", "", false, "", "");
+                if (runPieceForm(nullptr, newPiece))
+                {
+                    pieces.push_back(newPiece); // aggiungi al vettore
                 }
                 break;
+            }
 
-            case KEY_DOWN:
-            case 9: // TAB
-                form_driver(form, REQ_NEXT_FIELD);
-                form_driver(form, REQ_END_LINE);
+            case 6:
+            { // edit piece
                 break;
+            }
 
-            case KEY_UP:
-                form_driver(form, REQ_PREV_FIELD);
-                form_driver(form, REQ_END_LINE);
+            case 7:
+            { // delete piece
                 break;
+            }
+            }
 
-            case KEY_BACKSPACE:
-            case 127:
-                form_driver(form, REQ_DEL_PREV);
-                break;
+            unpost_form(form);
+            free_form(form);
+            for (int i = 0; i < NUM_FIELDS + 1; ++i)
+                free_field(fields[i]);
+            goto redraw;
+        }
 
-            default:
-                if (currentIndex < NUM_FIELDS)
-                    form_driver(form, ch);
-                break;
+        default:
+            if (currentIndex < NUM_FIELDS)
+                form_driver(form, ch);
+            break;
         }
     }
 
     // Pulizia finale
     unpost_form(form);
     free_form(form);
-    for (int i = 0; i < NUM_FIELDS + NUM_BUTTONS; ++i)
+    for (int i = 0; i < NUM_FIELDS + 1; ++i)
         free_field(fields[i]);
 }
 
-std::string ConcertFormView::getTitle() const {
-    return title;
-}
-
-std::vector<std::string> ConcertFormView::getPlaces() const {
-    return places;
-}
-
-std::vector<std::string> ConcertFormView::getDates() const {
-    return dates;
-}
-
-std::vector<Musician> ConcertFormView::getMusicians() const {
-    return musicians;
-}
+// Getters
+std::string ConcertFormView::getTitle() const { return title; }
+std::vector<std::string> ConcertFormView::getPlaces() const { return places; }
+std::vector<std::string> ConcertFormView::getDates() const { return dates; }
+std::vector<Musician> ConcertFormView::getMusicians() const { return musicians; }
+std::vector<MusicalPiece> ConcertFormView::getProgram() const { LOG_MSG ("Mando pieces"); return pieces; }

@@ -6,5 +6,8 @@
 class ConcertSummaryView {
 public:
     void show(const Concert& concert);
+
+private:
+void saveToFile(const Concert& concert);
 };
 

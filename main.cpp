@@ -6,6 +6,7 @@
 #include <fstream>
 #include <cstdlib>
 
+#include "logMessage.h"
 void saveConcertsToXML(const std::vector<Concert>& concerts) {
     std::string path = std::string(std::getenv("HOME")) + "/concerti.xml";
     std::ofstream file(path);
@@ -70,6 +71,7 @@ std::string getTagValue(const std::string& line, const std::string& tag) {
 }
 
 std::vector<Concert> loadConcertsFromXML() {
+LOG_MSG("Load");
     std::vector<Concert> concerts;
     std::ifstream file(std::string(std::getenv("HOME")) + "/concerti.xml");
     if (!file) return concerts;
@@ -129,9 +131,6 @@ int main()
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
-    start_color();
-    init_pair(1, COLOR_WHITE, COLOR_YELLOW); // Attivo
-    init_pair(2, COLOR_WHITE, COLOR_BLUE);   // Normale
 
     ConcertController controller;
 
@@ -142,8 +141,10 @@ int main()
 
         switch (action)
         {
-        case MainMenuView::ADD_CONCERT:
-            concerts.push_back(controller.createConcert());
+        case MainMenuView::ADD_CONCERT: {
+            auto concert = controller.createConcert();
+if (concert) concerts.push_back(*concert);
+}
             break;
         case MainMenuView::VIEW_CONCERTS:
             controller.listConcerts(concerts);
