@@ -94,7 +94,7 @@ ch = getch();
 				"Save and Exit",
 				"Exit without saving"
 			};
-                PopupMenu popup(stdscr, actions, 10, 12);
+                PopupMenu popup(stdscr, actions);
                 int selected = popup.show();
 					switch (selected) {
 						case 0: { // save and exit

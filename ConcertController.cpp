@@ -71,6 +71,7 @@ std::optional<Concert> ConcertController::createConcert()
     concert.setDates(view.getDates());
     concert.setMusicians(view.getMusicians());
     concert.setProgram(view.getProgram());
+    concert.setComment(view.getComment());
     LOG_MSG("Return concert");
     return concert;
 }
@@ -135,6 +136,7 @@ std::optional<Concert> ConcertController::editConcertSingle(const Concert &exist
     updated.setProgram(existing.getProgram()); // oppure aggiorna anche questo se la form è completa
     updated.setMusicians(view.getMusicians()); // stesso discorso
     updated.setProgram(view.getProgram());
+    updated.setComment(view.getComment());
     LOG_MSG("Concert updated");
     return updated;
 }

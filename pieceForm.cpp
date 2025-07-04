@@ -64,7 +64,7 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
                     "Save and Exit",
                     "Exit without saving"
                 };
-                PopupMenu popup(stdscr, options, 19, 4);
+                PopupMenu popup(stdscr, options);
                 int choice = popup.show();
 
                 if (choice == 0) { // Save

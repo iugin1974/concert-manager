@@ -8,7 +8,9 @@
 class PopupMenu {
 public:
     PopupMenu(WINDOW* parent, const std::vector<std::string>& options,
-              int x = 10, int y = 10);
+              int x, int y);
+PopupMenu(WINDOW* parent, const std::vector<std::string>& options);
+
     int show();  // Ritorna indice selezionato o -1 se cancellato
 
 private:

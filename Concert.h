@@ -27,10 +27,15 @@ std::vector<Musician> getMusicians() const;
 
 bool hasMusicians() const;
 
+void setComment(const std::string& c) { comment = c; }
+    std::string getComment() const { return comment; }
+
+
 private:
     std::string title;
     std::vector<std::string> places;
     std::vector<std::string> dates;
 	std::vector<MusicalPiece> program;  
     std::vector<Musician> musicians; 
+std::string comment;
 };

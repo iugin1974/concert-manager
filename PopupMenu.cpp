@@ -1,5 +1,5 @@
 #include "PopupMenu.h"
-
+#include <algorithm> // per std::max
 PopupMenu::PopupMenu(WINDOW* parent, const std::vector<std::string>& options,
                      int x, int y)
     : parent(parent), options(options), posX(x), posY(y) {}
@@ -53,3 +53,16 @@ end:
     return choice;
 }
 
+PopupMenu::PopupMenu(WINDOW* parent, const std::vector<std::string>& options)
+    : parent(parent), options(options)
+{
+    int width = 0;
+    for (const auto& opt : options)
+        width = std::max(width, static_cast<int>(opt.size()));
+    width += 4;
+
+    int height = options.size() + 2;
+
+    posY = (LINES - height) / 2;
+    posX = (COLS - width) / 2;
+}

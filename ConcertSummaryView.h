@@ -9,5 +9,6 @@ public:
 
 private:
 void saveToFile(const Concert& concert);
+void viewProgram(const Concert& concert) const;
 };
 

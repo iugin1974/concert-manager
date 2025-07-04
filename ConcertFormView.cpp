@@ -7,7 +7,10 @@
 #include <ncurses.h>
 #include <cstring>
 #include <sstream>
-
+#include <unistd.h>
+#include <fstream>
+#include <cstdlib>
+#include <sys/wait.h>
 // Costruttori
 ConcertFormView::ConcertFormView() {}
 
@@ -17,6 +20,7 @@ ConcertFormView::ConcertFormView(const Concert &c)
     dates = c.getDates();
     places = c.getPlaces();
     musicians = c.getMusicians();
+	comment = c.getComment();
 }
 
 // Helper: trim
@@ -40,6 +44,50 @@ static std::vector<std::string> split(const std::string &input, char sep = ',')
     }
     return result;
 }
+
+bool ConcertFormView::editComment(std::string& comment) {
+    const char* tmpFile = "/tmp/concert_comment.txt";
+
+    // 1) Scrivi il commento corrente sul file temporaneo
+    {
+        std::ofstream out(tmpFile);
+        if (!out) return false;
+        out << comment;
+    }
+
+    // 2) Fork + exec dell’editor
+    pid_t pid = fork();
+    if (pid == 0) {
+        execlp("vim", "vim", tmpFile, (char*)nullptr);
+        _exit(1);  // se execlp fallisce
+    }
+    else if (pid > 0) {
+        int status;
+        if (waitpid(pid, &status, 0) == -1) return false;
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) return false;
+
+        // 3) Rileggi direttamente su 'comment'
+        std::ifstream in(tmpFile);
+        if (!in) return false;
+        comment.clear();
+        std::string line;
+        while (std::getline(in, line)) {
+            comment += line;
+            comment += '\n';
+        }
+        // Rimuovi l’ultimo '\n' in eccesso
+        if (!comment.empty() && comment.back() == '\n')
+            comment.pop_back();
+
+        // 4) Pulisci il file temporaneo
+        std::remove(tmpFile);
+        return true;
+    }
+
+    // fork fallito
+    return false;
+}
+
 
 struct FormComponents
 {
@@ -99,7 +147,7 @@ FormComponents drawForm(const Concert *existing)
 }
 
 // Metodo show
-bool ConcertFormView::show(const Concert *existing)
+bool ConcertFormView::show(const Concert* existing)
 {
     const int NUM_FIELDS = 3;
 
@@ -160,7 +208,7 @@ redraw:
             break;
 
         case KEY_F(2):
-        { // 🔧 MENU AZIONI
+        { // MENU AZIONI
             std::vector<std::string> actions = {
                 "Save and Exit",
                 "Exit without saving",
@@ -169,8 +217,9 @@ redraw:
                 "Delete Musician",
                 "Add Piece",
                 "Edit Piece",
-                "Delete Piece"};
-            PopupMenu popup(stdscr, actions, 10, 12);
+                "Delete Piece",
+				"Comment"};
+            PopupMenu popup(stdscr, actions);
             int selected = popup.show();
 
             form_driver(form, REQ_VALIDATION);
@@ -243,6 +292,13 @@ redraw:
             { // delete piece
                 break;
             }
+
+			case 8: 
+			{ // Comment
+			editComment(comment);
+			// TODO verifica se ritorna true o false
+			break;
+			}
             }
 
             unpost_form(form);
@@ -264,6 +320,7 @@ redraw:
     free_form(form);
     for (int i = 0; i < NUM_FIELDS + 1; ++i)
         free_field(fields[i]);
+return true;
 }
 
 // Getters
@@ -272,3 +329,4 @@ std::vector<std::string> ConcertFormView::getPlaces() const { return places; }
 std::vector<std::string> ConcertFormView::getDates() const { return dates; }
 std::vector<Musician> ConcertFormView::getMusicians() const { return musicians; }
 std::vector<MusicalPiece> ConcertFormView::getProgram() const { LOG_MSG ("Mando pieces"); return pieces; }
+std::string ConcertFormView::getComment() const { return comment; }
