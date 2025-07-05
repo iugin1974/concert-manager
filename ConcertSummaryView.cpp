@@ -68,7 +68,7 @@ void ConcertSummaryView::show(const Concert& concert) {
       mvprintw(row++, 6, "- %s", place.c_str());
 
     mvprintw(row++, 2, "Dates:");
-    for (const auto& date : concert.getDates())
+    for (const auto& date : concert.getDatesAsString())
       mvprintw(row++, 6, "- %s", date.c_str());
 
     row++;
@@ -132,7 +132,7 @@ viewProgram(concert);
 		  out << "Places:\n";
 		  for (const auto& p : concert.getPlaces()) out << "  - " << p << "\n";
 		  out << "Dates:\n";
-		  for (const auto& d : concert.getDates()) out << "  - " << d << "\n";
+		  for (const auto& d : concert.getDatesAsString()) out << "  - " << d << "\n";
 
 		  out << "\nMusicians:\n";
 		  for (const auto& m : concert.getMusicians())

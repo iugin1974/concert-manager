@@ -43,7 +43,7 @@ Concert inputConcert(const Concert* existing) {
         std::string places = "";
         for (const auto& place : existing->getPlaces()) places += place + ", ";
         std::string dates = "";
-        for (const auto& d : existing->getDates()) dates += d + ", ";
+        for (const auto& d : existing->getDatesAsString()) dates += d + ", ";
         set_field_buffer(fields[0], 0, places.c_str());
         set_field_buffer(fields[1], 0, dates.c_str());
     }
@@ -103,6 +103,6 @@ Concert inputConcert(const Concert* existing) {
 
     Concert concert;
     concert.setPlaces(places);
-    concert.setDates(dates);
+    concert.setDatesAsString(dates);
     return concert;
 }

@@ -17,7 +17,7 @@ ConcertFormView::ConcertFormView() {}
 ConcertFormView::ConcertFormView(const Concert &c)
 {
     title = c.getTitle();
-    dates = c.getDates();
+    dates = c.getDatesAsString();
     places = c.getPlaces();
     musicians = c.getMusicians();
 	comment = c.getComment();
@@ -122,11 +122,11 @@ FormComponents drawForm(const Concert *existing)
                 placesStr += ", ";
             placesStr += existing->getPlaces()[i];
         }
-        for (size_t i = 0; i < existing->getDates().size(); ++i)
+        for (size_t i = 0; i < existing->getDatesAsString().size(); ++i)
         {
             if (i > 0)
                 datesStr += ", ";
-            datesStr += existing->getDates()[i];
+            datesStr += existing->getDatesAsString()[i];
         }
 
         set_field_buffer(fc.fields[1], 0, placesStr.c_str());

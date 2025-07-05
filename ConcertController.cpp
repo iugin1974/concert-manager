@@ -43,10 +43,13 @@ int ConcertController::selectConcert(std::vector<Concert> &concerts)
 
 void ConcertController::listConcerts(std::vector<Concert> &concerts)
 {
+while (true) {
     int choice = selectConcert(concerts);
     if (choice == -1)
     {
         LOG_MSG("Choice -1 - exit");
+clear();
+    refresh();
         return;
     }
     ConcertSummaryView summaryView;
@@ -54,6 +57,7 @@ void ConcertController::listConcerts(std::vector<Concert> &concerts)
     summaryView.show(concert);
     clear();
     refresh();
+}
 }
 
 std::optional<Concert> ConcertController::createConcert()
@@ -68,7 +72,7 @@ std::optional<Concert> ConcertController::createConcert()
 
     Concert concert(view.getTitle());
     concert.setPlaces(view.getPlaces());
-    concert.setDates(view.getDates());
+    concert.setDatesAsString(view.getDates());
     concert.setMusicians(view.getMusicians());
     concert.setProgram(view.getProgram());
     concert.setComment(view.getComment());
@@ -132,7 +136,7 @@ std::optional<Concert> ConcertController::editConcertSingle(const Concert &exist
 
     Concert updated(view.getTitle());
     updated.setPlaces(view.getPlaces());
-    updated.setDates(view.getDates());
+    updated.setDatesAsString(view.getDates());
     updated.setProgram(existing.getProgram()); // oppure aggiorna anche questo se la form è completa
     updated.setMusicians(view.getMusicians()); // stesso discorso
     updated.setProgram(view.getProgram());

@@ -5,8 +5,32 @@
 #include <ncurses.h>
 #include <fstream>
 #include <cstdlib>
-
+#include <algorithm>  // std::sort
 #include "logMessage.h"
+
+// Funzione di confronto per Concert basata sulla prima data nel vettore dates
+bool compareConcertByFirstDate(const Concert& a, const Concert& b) {
+    const auto& datesA = a.getDatesAsTm();
+    const auto& datesB = b.getDatesAsTm();
+
+    if (datesA.empty() && datesB.empty())
+        return false; // uguali, non cambia l'ordine
+    if (datesA.empty())
+        return false; // a senza date va dopo b
+    if (datesB.empty())
+        return true;  // b senza date va dopo a
+
+    // Confronta la prima data usando lo stesso criterio di prima
+    const std::tm& dA = datesA.front();
+    const std::tm& dB = datesB.front();
+
+    if (dA.tm_year != dB.tm_year)
+        return dA.tm_year < dB.tm_year;
+    if (dA.tm_mon != dB.tm_mon)
+        return dA.tm_mon < dB.tm_mon;
+    return dA.tm_mday < dB.tm_mday;
+}
+
 
 std::string xmlEscape(const std::string &data)
 {
@@ -106,7 +130,7 @@ void saveConcertsToXML(const std::vector<Concert> &concerts)
         file << "    </places>\n";
 
         file << "    <dates>\n";
-        for (const auto &date : concert.getDates())
+        for (const auto &date : concert.getDatesAsString())
             file << "      <date>" << date << "</date>\n";
         file << "    </dates>\n";
 
@@ -275,7 +299,7 @@ std::vector<Concert> loadConcertsFromXML()
         else if (line.find("</concert>") != std::string::npos)
         {
             currentConcert.setPlaces(places);
-            currentConcert.setDates(dates);
+            currentConcert.setDatesAsString(dates);
             currentConcert.setMusicians(musicians);
             currentConcert.setProgram(program);
             concerts.push_back(currentConcert);
@@ -292,6 +316,15 @@ int main()
     initscr();
     cbreak();
     noecho();
+    initscr();            // inizializza ncurses
+    start_color();        // abilita i colori
+
+    // Definisci la coppia 1: testo bianco (COLOR_WHITE), sfondo blu (COLOR_BLUE)
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);
+
+    // Usa la coppia di colori 1 per tutto lo schermo
+    attron(COLOR_PAIR(1));
+    bkgd(COLOR_PAIR(1));  // imposta il background dello schermo
     keypad(stdscr, TRUE);
 
     ConcertController controller;
@@ -308,6 +341,7 @@ int main()
             auto concert = controller.createConcert();
             if (concert)
                 concerts.push_back(*concert);
+std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
         }
         break;
         case MainMenuView::VIEW_CONCERTS:
@@ -315,9 +349,11 @@ int main()
             break;
         case MainMenuView::EDIT_CONCERT:
             controller.editConcert(concerts);
+std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
             break;
         case MainMenuView::DELETE_CONCERT:
             controller.deleteConcert(concerts);
+std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
             break;
         case MainMenuView::EXIT:
             saveConcertsToXML(concerts); // salva prima di uscire
