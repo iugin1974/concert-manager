@@ -1,5 +1,5 @@
 # Nome dell'eseguibile
-TARGET = concerti_tui
+TARGET = concertmanager
 
 # Compilatore
 CXX = g++
@@ -21,3 +21,6 @@ $(TARGET): $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(TARGET)
+
+install:
+	cp $(TARGET) /urs/bin/
