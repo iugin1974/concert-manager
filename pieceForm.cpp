@@ -3,22 +3,21 @@
 #include <string>
 #include "MusicalPiece.h"
 #include "PopupMenu.h"  // se usi la tua classe menu F2
-
+#define FORM_NUMBER 7
 bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
-    FIELD* fields[8 + 1];  // 8 campi + terminatore
+    FIELD* fields[FORM_NUMBER + 1];  // 8 campi + terminatore
     FORM* form;
 
     // 1. Crea campi
     fields[0] = new_field(1, 40, 2, 20, 0, 0); // Composer
     fields[1] = new_field(1, 40, 4, 20, 0, 0); // Title
-    fields[2] = new_field(1, 20, 6, 20, 0, 0); // Key
-    fields[3] = new_field(1, 10, 8, 20, 0, 0); // Duration (MM:SS)
-    fields[4] = new_field(1, 5, 10, 20, 0, 0); // Choir (Yes/No)
-    fields[5] = new_field(1, 30, 12, 20, 0, 0); // Singer part
-    fields[6] = new_field(1, 40, 14, 20, 0, 0); // Instruments
-    fields[7] = nullptr;
+    fields[2] = new_field(1, 10, 8, 20, 0, 0); // Duration (MM:SS)
+    fields[3] = new_field(1, 5, 10, 20, 0, 0); // Choir (Yes/No)
+    fields[4] = new_field(1, 30, 12, 20, 0, 0); // Singer part
+    fields[5] = new_field(1, 40, 14, 20, 0, 0); // Instruments
+    fields[6] = nullptr;
 
-    for (int i = 0; i < 7; ++i) {
+    for (int i = 0; i < FORM_NUMBER; ++i) {
         set_field_back(fields[i], A_UNDERLINE);
         field_opts_off(fields[i], O_AUTOSKIP);
     }
@@ -27,11 +26,10 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
     if (existing) {
         set_field_buffer(fields[0], 0, existing->getComposer().c_str());
         set_field_buffer(fields[1], 0, existing->getTitle().c_str());
-        set_field_buffer(fields[2], 0, existing->getKey().c_str());
-        set_field_buffer(fields[3], 0, existing->getDuration().c_str());
-        set_field_buffer(fields[4], 0, existing->hasChoir() ? "Yes" : "No");
-        set_field_buffer(fields[5], 0, existing->getSingerPart().c_str());
-        set_field_buffer(fields[6], 0, existing->getInstruments().c_str());
+        set_field_buffer(fields[2], 0, existing->getDuration().c_str());
+        set_field_buffer(fields[3], 0, existing->hasChoir() ? "Yes" : "No");
+        set_field_buffer(fields[4], 0, existing->getSingerPart().c_str());
+        set_field_buffer(fields[5], 0, existing->getInstruments().c_str());
     }
 
     form = new_form(fields);
@@ -39,7 +37,6 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
 
     mvprintw(2,  2, "Composer:");
     mvprintw(4,  2, "Title*:");
-    mvprintw(6,  2, "Key:");
     mvprintw(8,  2, "Duration (MM:SS):");
     mvprintw(10, 2, "Choir (Yes/No):");
     mvprintw(12, 2, "Singer Part:");
@@ -72,11 +69,10 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
 
                     std::string composer   = trim(field_buffer(fields[0], 0));
                     std::string title      = trim(field_buffer(fields[1], 0));
-                    std::string key        = trim(field_buffer(fields[2], 0));
-                    std::string duration   = trim(field_buffer(fields[3], 0));
-                    std::string choirStr   = trim(field_buffer(fields[4], 0));
-                    std::string singerPart = trim(field_buffer(fields[5], 0));
-                    std::string instruments= trim(field_buffer(fields[6], 0));
+                    std::string duration   = trim(field_buffer(fields[2], 0));
+                    std::string choirStr   = trim(field_buffer(fields[3], 0));
+                    std::string singerPart = trim(field_buffer(fields[4], 0));
+                    std::string instruments= trim(field_buffer(fields[5], 0));
 
                     if (title.empty()) return false; // obbligatorio
 
@@ -84,7 +80,6 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
 
                     piece.setComposer(composer);
                     piece.setTitle(title);
-                    piece.setKey(key);
                     piece.setDuration(duration);
                     piece.setChoir(choir);
                     piece.setSingerPart(singerPart);
@@ -93,7 +88,7 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
                     // cleanup
                     unpost_form(form);
                     free_form(form);
-                    for (int i = 0; i < 7; ++i)
+                    for (int i = 0; i < FORM_NUMBER; ++i)
                         free_field(fields[i]);
                     return true;
                 } else if (choice == 1) {

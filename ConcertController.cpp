@@ -2,6 +2,8 @@
 #include "ConcertFormView.h"
 #include "ConcertSummaryView.h"
 #include "logMessage.h"
+#include "Utils.h"
+#include <algorithm>  // std::sort
 #include <ncurses.h>
 #include <optional>
 int ConcertController::selectConcert(std::vector<Concert> &concerts)
@@ -41,23 +43,54 @@ int ConcertController::selectConcert(std::vector<Concert> &concerts)
     }
 }
 
-void ConcertController::listConcerts(std::vector<Concert> &concerts)
-{
-while (true) {
-    int choice = selectConcert(concerts);
-    if (choice == -1)
-    {
-        LOG_MSG("Choice -1 - exit");
-clear();
-    refresh();
-        return;
-    }
-    ConcertSummaryView summaryView;
-    Concert concert = concerts.at(choice);
-    summaryView.show(concert);
-    clear();
-    refresh();
+void ConcertController::listConcerts(std::vector<Concert>& concerts) {
+    while (true) {
+        int choice = selectConcert(concerts);
+        if (choice == -1) return;
+
+        Concert& selected = concerts[choice];
+
+        while (true) {
+            clear();
+            mvprintw(0, 0, "Selected concert: %s", selected.getTitle().c_str());
+            mvprintw(2, 2, "1. View Program");
+            mvprintw(3, 2, "2. Edit Concert");
+            mvprintw(4, 2, "3. Delete Concert");
+            mvprintw(5, 2, "4. Back");
+            refresh();
+
+            int ch = getch();
+            switch (ch) {
+                case '1': {
+                    ConcertSummaryView view;
+                    view.show(selected);
+					clear();
+					refresh();
+                    break;
+                }
+                case '2': {
+                    std::optional<Concert> updated = editConcertSingle(selected);
+                    if (updated) {
+selected = *updated;
 }
+					clear();
+					refresh();
+                    break;
+                }
+                case '3': {
+                    concerts.erase(concerts.begin() + choice);
+					clear();
+					refresh();
+                    return; // torna alla lista aggiornata
+                }
+                case '4':
+                case 27: // ESC
+				clear();
+				refresh();
+                    return;
+            }
+        }
+    }
 }
 
 std::optional<Concert> ConcertController::createConcert()

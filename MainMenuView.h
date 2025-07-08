@@ -4,9 +4,7 @@ class MainMenuView {
 public:
     enum Action {
         ADD_CONCERT,
-        VIEW_CONCERTS,
-        EDIT_CONCERT,
-        DELETE_CONCERT,
+        MANAGE_CONCERTS,
         EXIT
     };
 

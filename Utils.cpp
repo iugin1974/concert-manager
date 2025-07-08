@@ -4,6 +4,7 @@
 #include <thread>
 #include <chrono>
 
+
 // Mostra un messaggio temporaneo in rosso per errori
 void showErrorMessage(WINDOW* win, int y, int x, const std::string& message) {
     wattron(win, A_BOLD | COLOR_PAIR(3));  // Assumi che COLOR_PAIR(3) sia rosso
@@ -67,4 +68,3 @@ mvwprintw(win, y, input_x, "%*s", static_cast<int>(input.length() + 1), " ");
         mvwprintw(win, y, x, "%*s", static_cast<int>(prompt.length() + input.length()), " ");
     }
 }
-

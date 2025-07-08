@@ -108,6 +108,7 @@ FormComponents drawForm(const Concert *existing)
     for (int i = 0; i < 3; ++i)
     {
         set_field_back(fc.fields[i], A_UNDERLINE);
+set_field_back(fc.fields[i], COLOR_PAIR(1));
         field_opts_off(fc.fields[i], O_AUTOSKIP);
     }
 
@@ -211,6 +212,7 @@ redraw:
         { // MENU AZIONI
             std::vector<std::string> actions = {
                 "Save and Exit",
+		"Save",
                 "Exit without saving",
                 "Add Musician",
                 "Edit Musician",
@@ -238,8 +240,10 @@ redraw:
                 clear();
                 refresh();
                 return true;
+	case 1: // Save
 
-            case 1: // Exit without saving
+		break;
+            case 2: // Exit without saving
                 title.clear();
                 places.clear();
                 dates.clear();
@@ -248,7 +252,7 @@ redraw:
                 refresh();
                 return false;
 
-            case 2:
+            case 3:
             { // Add musician
                 Musician m;
                 if (runMusicianForm(nullptr, m))
@@ -256,7 +260,7 @@ redraw:
                 break;
             }
 
-            case 3:
+            case 4:
             { // Edit musician
                 int idx = runChoiceMusicianForm(musicians);
                 if (idx == -1)
@@ -265,7 +269,7 @@ redraw:
                 break;
             }
 
-            case 4:
+            case 5:
             { // Delete musician
                 int idx = runChoiceMusicianForm(musicians);
                 if (idx >= 0 && idx < (int)musicians.size())
@@ -273,9 +277,9 @@ redraw:
                 break;
             }
 
-            case 5:
+            case 6:
             { // add piece
-                MusicalPiece newPiece("", "", "", "", false, "", "");
+                MusicalPiece newPiece("", "", "", false, "", "");
                 if (runPieceForm(nullptr, newPiece))
                 {
                     pieces.push_back(newPiece); // aggiungi al vettore
@@ -283,17 +287,17 @@ redraw:
                 break;
             }
 
-            case 6:
+            case 7:
             { // edit piece
                 break;
             }
 
-            case 7:
+            case 8:
             { // delete piece
                 break;
             }
 
-			case 8: 
+			case 9: 
 			{ // Comment
 			editComment(comment);
 			// TODO verifica se ritorna true o false
