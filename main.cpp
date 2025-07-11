@@ -124,7 +124,7 @@ void saveConcertsToXML(const std::vector<Concert> &concerts)
     file << "  <concert>\n";
     file << "    <title>" << concert.getTitle() << "</title>\n";
     file << "    <comment>" << xmlEscape(concert.getComment()) << "</comment>\n";
-	file << "    <todo>" << xmlEscape(concert.getToDo()) << "</todo>\n";
+    file << "    <todo>" << xmlEscape(concert.getToDo()) << "</todo>\n";
 
     file << "    <places>\n";
     for (const auto &place : concert.getPlaces())
@@ -213,7 +213,7 @@ std::vector<Concert> loadConcertsFromXML()
     {
       currentConcert.setTitle(getTagValue(line, "title"));
     }
- else if (line.find("<todo>") != std::string::npos)
+    else if (line.find("<todo>") != std::string::npos)
     {
       currentConcert.setToDo(getTagValue(line, "todo"));
     }
@@ -279,16 +279,16 @@ std::vector<Concert> loadConcertsFromXML()
 	break;
       p.setTitle(getTagValue(line, "title"));
 
-   if (!std::getline(file, line))
+      if (!std::getline(file, line))
 	break;
- std::string durationStr = getTagValue(line, "duration");
-int duration = 0;
-try {
-    duration = stringToInt(durationStr);
-} catch (...) {
-    LOG_MSG("Missing or invalid <duration> tag, defaulting to 0");
-}
-p.setDuration(duration);
+      std::string durationStr = getTagValue(line, "duration");
+      int duration = 0;
+      try {
+	duration = stringToInt(durationStr);
+      } catch (...) {
+	LOG_MSG("Missing or invalid <duration> tag, defaulting to 0");
+      }
+      p.setDuration(duration);
 
       if (!std::getline(file, line))
 	break;
@@ -325,14 +325,14 @@ int main()
   cbreak();
   noecho();
   initscr();            // inizializza ncurses
-  start_color();        // abilita i colori
+  //start_color();        // abilita i colori
 
   // Definisci la coppia 1: testo bianco (COLOR_WHITE), sfondo blu (COLOR_BLUE)
-  init_pair(1, COLOR_WHITE, COLOR_BLUE);
+  //init_pair(1, COLOR_WHITE, COLOR_BLUE);
 
   // Usa la coppia di colori 1 per tutto lo schermo
-  attron(COLOR_PAIR(1));
-  bkgd(COLOR_PAIR(1));  // imposta il background dello schermo
+  //attron(COLOR_PAIR(1));
+  //bkgd(COLOR_PAIR(1));  // imposta il background dello schermo
   keypad(stdscr, TRUE);
 
   ConcertController controller;
@@ -354,7 +354,7 @@ int main()
 	break;
       case MainMenuView::MANAGE_CONCERTS:
 	controller.listConcerts(concerts);
-break;
+	break;
 
       case MainMenuView::EXIT:
 	saveConcertsToXML(concerts); // salva prima di uscire

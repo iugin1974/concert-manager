@@ -21,7 +21,7 @@ ConcertFormView::ConcertFormView(const Concert &c)
     dates = c.getDatesAsString();
     places = c.getPlaces();
     musicians = c.getMusicians();
-	comment = c.getComment();
+    comment = c.getComment();
 }
 
 // Helper: trim
@@ -46,33 +46,41 @@ static std::vector<std::string> split(const std::string &input, char sep = ',')
     return result;
 }
 
-bool ConcertFormView::editComment(std::string& comment) {
-    const char* tmpFile = "/tmp/concert_comment.txt";
+bool ConcertFormView::editComment(std::string &comment)
+{
+    const char *tmpFile = "/tmp/concert_comment.txt";
 
     // 1) Scrivi il commento corrente sul file temporaneo
     {
         std::ofstream out(tmpFile);
-        if (!out) return false;
+        if (!out)
+            return false;
         out << comment;
     }
 
     // 2) Fork + exec dell’editor
     pid_t pid = fork();
-    if (pid == 0) {
-        execlp("vim", "vim", tmpFile, (char*)nullptr);
-        _exit(1);  // se execlp fallisce
+    if (pid == 0)
+    {
+        execlp("vim", "vim", tmpFile, (char *)nullptr);
+        _exit(1); // se execlp fallisce
     }
-    else if (pid > 0) {
+    else if (pid > 0)
+    {
         int status;
-        if (waitpid(pid, &status, 0) == -1) return false;
-        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) return false;
+        if (waitpid(pid, &status, 0) == -1)
+            return false;
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+            return false;
 
         // 3) Rileggi direttamente su 'comment'
         std::ifstream in(tmpFile);
-        if (!in) return false;
+        if (!in)
+            return false;
         comment.clear();
         std::string line;
-        while (std::getline(in, line)) {
+        while (std::getline(in, line))
+        {
             comment += line;
             comment += '\n';
         }
@@ -88,7 +96,6 @@ bool ConcertFormView::editComment(std::string& comment) {
     // fork fallito
     return false;
 }
-
 
 struct FormComponents
 {
@@ -148,8 +155,9 @@ FormComponents drawForm(const Concert *existing)
 }
 
 // Metodo show
-bool ConcertFormView::show(const Concert* existing)
+bool ConcertFormView::show(const Concert *existing)
 {
+
     const int NUM_FIELDS = 3;
 
     std::string tempTitle = title;
@@ -212,7 +220,7 @@ redraw:
         { // MENU AZIONI
             std::vector<std::string> actions = {
                 "Save and Exit",
-				"Save",
+                "Save",
                 "Exit without saving",
                 "Add Musician",
                 "Edit Musician",
@@ -220,8 +228,8 @@ redraw:
                 "Add Piece",
                 "Edit Piece",
                 "Delete Piece",
-				"Comment",
-				"TODO"};
+                "Comment",
+                "TODO"};
             PopupMenu popup(stdscr, actions);
             int selected = popup.show();
 
@@ -241,9 +249,9 @@ redraw:
                 clear();
                 refresh();
                 return true;
-	case 1: // Save
+            case 1: // Save
 
-		break;
+                break;
             case 2: // Exit without saving
                 title.clear();
                 places.clear();
@@ -281,6 +289,11 @@ redraw:
             case 6:
             { // add piece
                 MusicalPiece newPiece("", "", 0, false, "", "");
+
+                if (existing)
+                {
+                    pieces = existing->getProgram();
+                }
                 if (runPieceForm(nullptr, newPiece))
                 {
                     pieces.push_back(newPiece); // aggiungi al vettore
@@ -298,45 +311,51 @@ redraw:
                 break;
             }
 
-			case 9: 
-			{ // Comment
-			editComment(comment);
-			// TODO verifica se ritorna true o false
-			break;
-			}
+            case 9:
+            { // Comment
+                editComment(comment);
+                // TODO verifica se ritorna true o false
+                break;
+            }
 
-case 10:
-{ // todo
-form_driver(form, REQ_VALIDATION);
-    const char* raw = field_buffer(fields[0], 0);
-    todo_filename = raw;
+            case 10:
+            { // todo
+                form_driver(form, REQ_VALIDATION);
+                const char *raw = field_buffer(fields[0], 0);
+                todo_filename = raw;
 
-    // Rimuove spazi finali
-    todo_filename.erase(std::find_if(todo_filename.rbegin(), todo_filename.rend(), [](char c) {
-        return !std::isspace(static_cast<unsigned char>(c));
-    }).base(), todo_filename.end());
-todo_filename += ".xml";
+                // Rimuove spazi finali
+                todo_filename.erase(std::find_if(todo_filename.rbegin(), todo_filename.rend(), [](char c)
+                                                 { return !std::isspace(static_cast<unsigned char>(c)); })
+                                        .base(),
+                                    todo_filename.end());
+                todo_filename += ".xml";
 
-pid_t pid = fork();
+                pid_t pid = fork();
 
-    if (pid == 0) {
-        // Processo figlio: esegue il programma
+                if (pid == 0)
+                {
+                    // Processo figlio: esegue il programma
 
-        execlp("pm", "pm", "--file", todo_filename.c_str(), nullptr);
-        // Se execlp fallisce
-        perror("execlp");
-        return 1;
-    } else if (pid > 0) {
-        // Processo padre: attende il completamento
-        int status;
-        waitpid(pid, &status, 0);
-    } else {
-        perror("fork");
-        return 1;
-    }
+                    execlp("pm", "pm", "--file", todo_filename.c_str(), nullptr);
+                    // Se execlp fallisce
+                    perror("execlp");
+                    return 1;
+                }
+                else if (pid > 0)
+                {
+                    // Processo padre: attende il completamento
+                    int status;
+                    waitpid(pid, &status, 0);
+                }
+                else
+                {
+                    perror("fork");
+                    return 1;
+                }
 
-break;
-}
+                break;
+            }
             }
 
             unpost_form(form);
@@ -358,7 +377,7 @@ break;
     free_form(form);
     for (int i = 0; i < NUM_FIELDS + 1; ++i)
         free_field(fields[i]);
-return true;
+    return true;
 }
 
 // Getters
@@ -366,6 +385,10 @@ std::string ConcertFormView::getTitle() const { return title; }
 std::vector<std::string> ConcertFormView::getPlaces() const { return places; }
 std::vector<std::string> ConcertFormView::getDates() const { return dates; }
 std::vector<Musician> ConcertFormView::getMusicians() const { return musicians; }
-std::vector<MusicalPiece> ConcertFormView::getProgram() const { LOG_MSG ("Mando pieces"); return pieces; }
+std::vector<MusicalPiece> ConcertFormView::getProgram() const
+{
+    LOG_MSG("Mando pieces");
+    return pieces;
+}
 std::string ConcertFormView::getComment() const { return comment; }
 std::string ConcertFormView::getToDo() const { return todo_filename; }
