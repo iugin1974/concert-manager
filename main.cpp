@@ -1,5 +1,6 @@
 #include "ConcertController.h"
 #include "MainMenuView.h"
+#include "Utils.h"
 #include <vector>
 #include <iostream>
 #include <ncurses.h>
@@ -123,6 +124,7 @@ void saveConcertsToXML(const std::vector<Concert> &concerts)
     file << "  <concert>\n";
     file << "    <title>" << concert.getTitle() << "</title>\n";
     file << "    <comment>" << xmlEscape(concert.getComment()) << "</comment>\n";
+	file << "    <todo>" << xmlEscape(concert.getToDo()) << "</todo>\n";
 
     file << "    <places>\n";
     for (const auto &place : concert.getPlaces())
@@ -154,7 +156,7 @@ void saveConcertsToXML(const std::vector<Concert> &concerts)
       file << "      <piece>\n";
       file << "        <composer>" << p.getComposer() << "</composer>\n";
       file << "        <title>" << p.getTitle() << "</title>\n";
-      file << "        <duration>" << p.getDuration() << "</duration>\n";
+      file << "        <duration>" << intToString(p.getDuration()) << "</duration>\n";
       file << "        <choir>" << (p.hasChoir() ? "1" : "0") << "</choir>\n";
       file << "        <singerPart>" << p.getSingerPart() << "</singerPart>\n";
       file << "        <instruments>" << p.getInstruments() << "</instruments>\n";
@@ -211,6 +213,10 @@ std::vector<Concert> loadConcertsFromXML()
     {
       currentConcert.setTitle(getTagValue(line, "title"));
     }
+ else if (line.find("<todo>") != std::string::npos)
+    {
+      currentConcert.setToDo(getTagValue(line, "todo"));
+    }
     else if (line.find("<place>") != std::string::npos)
     {
       places.push_back(getTagValue(line, "place"));
@@ -263,7 +269,7 @@ std::vector<Concert> loadConcertsFromXML()
     }
     else if (line.find("<piece>") != std::string::npos)
     {
-      MusicalPiece p("", "", "", false, "", "");
+      MusicalPiece p("", "", 0, false, "", "");
 
       if (!std::getline(file, line))
 	break;
@@ -273,9 +279,16 @@ std::vector<Concert> loadConcertsFromXML()
 	break;
       p.setTitle(getTagValue(line, "title"));
 
-      if (!std::getline(file, line))
+   if (!std::getline(file, line))
 	break;
-      p.setDuration(getTagValue(line, "duration"));
+ std::string durationStr = getTagValue(line, "duration");
+int duration = 0;
+try {
+    duration = stringToInt(durationStr);
+} catch (...) {
+    LOG_MSG("Missing or invalid <duration> tag, defaulting to 0");
+}
+p.setDuration(duration);
 
       if (!std::getline(file, line))
 	break;

@@ -83,6 +83,22 @@ bool Concert::hasMusicians() const {
     return musicians.size() > 0;
 }
 
+void Concert::setToDo(const std::string& td) {
+todo = td;
+}
+
+const std::string Concert::getToDo() const {
+return todo;
+} 
+
+int Concert::getDuration() const {
+int duration = 0;
+for (size_t i = 0; i<program.size(); i++) {
+duration += program.at(i).getDuration();
+}
+return duration;
+}
+
 // Converte tm in stringa "gg.mm.aaaa"
 std::string Concert::tmToString(const std::tm& date) {
     std::ostringstream oss;

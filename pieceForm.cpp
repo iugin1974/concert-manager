@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include <string>
 #include "MusicalPiece.h"
+#include "Utils.h"
 #include "PopupMenu.h"  // se usi la tua classe menu F2
 #define FORM_NUMBER 7
 bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
@@ -12,7 +13,7 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
     fields[0] = new_field(1, 40, 2, 20, 0, 0); // Composer
     fields[1] = new_field(1, 40, 4, 20, 0, 0); // Title
     fields[2] = new_field(1, 10, 8, 20, 0, 0); // Duration (MM:SS)
-    fields[3] = new_field(1, 5, 10, 20, 0, 0); // Choir (Yes/No)
+    fields[3] = new_field(1, 1, 10, 20, 0, 0); // Choir (Yes/No)
     fields[4] = new_field(1, 30, 12, 20, 0, 0); // Singer part
     fields[5] = new_field(1, 40, 14, 20, 0, 0); // Instruments
     fields[6] = nullptr;
@@ -26,8 +27,8 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
     if (existing) {
         set_field_buffer(fields[0], 0, existing->getComposer().c_str());
         set_field_buffer(fields[1], 0, existing->getTitle().c_str());
-        set_field_buffer(fields[2], 0, existing->getDuration().c_str());
-        set_field_buffer(fields[3], 0, existing->hasChoir() ? "Yes" : "No");
+        set_field_buffer(fields[2], 0, convertToMMSS(existing->getDuration()).c_str());
+        set_field_buffer(fields[3], 0, existing->hasChoir() ? "X" : "");
         set_field_buffer(fields[4], 0, existing->getSingerPart().c_str());
         set_field_buffer(fields[5], 0, existing->getInstruments().c_str());
     }
@@ -38,7 +39,7 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
     mvprintw(2,  2, "Composer:");
     mvprintw(4,  2, "Title*:");
     mvprintw(8,  2, "Duration (MM:SS):");
-    mvprintw(10, 2, "Choir (Yes/No):");
+    mvprintw(10, 2, "Choir [X]:");
     mvprintw(12, 2, "Singer Part:");
     mvprintw(14, 2, "Instruments:");
 
@@ -76,11 +77,11 @@ bool runPieceForm(const MusicalPiece* existing, MusicalPiece& piece) {
 
                     if (title.empty()) return false; // obbligatorio
 
-                    bool choir = (choirStr == "Yes" || choirStr == "yes");
+                    bool choir = !choirStr.empty();
 
                     piece.setComposer(composer);
                     piece.setTitle(title);
-                    piece.setDuration(duration);
+                    piece.setDuration(convertToSeconds(duration));
                     piece.setChoir(choir);
                     piece.setSingerPart(singerPart);
                     piece.setInstruments(instruments);

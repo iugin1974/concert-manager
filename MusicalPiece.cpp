@@ -4,7 +4,7 @@
 // Costruttore
 MusicalPiece::MusicalPiece(const std::string& composer,
                            const std::string& title,
-                           const std::string& duration,
+                           const int duration,
                            bool choir,
                            const std::string& singerPart,
                            const std::string& instruments)
@@ -14,7 +14,7 @@ MusicalPiece::MusicalPiece(const std::string& composer,
 // Getter
 std::string MusicalPiece::getComposer() const    { return composer; }
 std::string MusicalPiece::getTitle() const       { return title; }
-std::string MusicalPiece::getDuration() const    { return duration; }
+int MusicalPiece::getDuration() const    { return duration; }
 bool MusicalPiece::hasChoir() const              { return choir; }
 std::string MusicalPiece::getSingerPart() const  { return singerPart; }
 std::string MusicalPiece::getInstruments() const { return instruments; }
@@ -22,7 +22,7 @@ std::string MusicalPiece::getInstruments() const { return instruments; }
 // Setter
 void MusicalPiece::setComposer(const std::string& c)      { composer = c; }
 void MusicalPiece::setTitle(const std::string& t)         { title = t; }
-void MusicalPiece::setDuration(const std::string& d)      { duration = d; }
+void MusicalPiece::setDuration(const int d)      { duration = d; }
 void MusicalPiece::setChoir(bool ch)                      { choir = ch; }
 void MusicalPiece::setSingerPart(const std::string& s)    { singerPart = s; }
 void MusicalPiece::setInstruments(const std::string& i)   { instruments = i; }

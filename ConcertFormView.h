@@ -17,10 +17,12 @@ ConcertFormView(const Concert& c);
     std::vector<Musician> getMusicians() const;
     std::vector<MusicalPiece> getProgram() const;
     std::string getComment() const;
+	std::string getToDo() const;
 
 private:
     bool editComment(std::string& comment);
     std::string title;
+	std::string todo_filename;
     std::vector<std::string> places;
     std::vector<std::string> dates;
     std::vector<Musician> musicians;

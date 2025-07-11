@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <cstdlib>
+#include <algorithm>
 #include <sys/wait.h>
 // Costruttori
 ConcertFormView::ConcertFormView() {}
@@ -108,7 +109,6 @@ FormComponents drawForm(const Concert *existing)
     for (int i = 0; i < 3; ++i)
     {
         set_field_back(fc.fields[i], A_UNDERLINE);
-set_field_back(fc.fields[i], COLOR_PAIR(1));
         field_opts_off(fc.fields[i], O_AUTOSKIP);
     }
 
@@ -212,7 +212,7 @@ redraw:
         { // MENU AZIONI
             std::vector<std::string> actions = {
                 "Save and Exit",
-		"Save",
+				"Save",
                 "Exit without saving",
                 "Add Musician",
                 "Edit Musician",
@@ -220,7 +220,8 @@ redraw:
                 "Add Piece",
                 "Edit Piece",
                 "Delete Piece",
-				"Comment"};
+				"Comment",
+				"TODO"};
             PopupMenu popup(stdscr, actions);
             int selected = popup.show();
 
@@ -279,7 +280,7 @@ redraw:
 
             case 6:
             { // add piece
-                MusicalPiece newPiece("", "", "", false, "", "");
+                MusicalPiece newPiece("", "", 0, false, "", "");
                 if (runPieceForm(nullptr, newPiece))
                 {
                     pieces.push_back(newPiece); // aggiungi al vettore
@@ -303,6 +304,39 @@ redraw:
 			// TODO verifica se ritorna true o false
 			break;
 			}
+
+case 10:
+{ // todo
+form_driver(form, REQ_VALIDATION);
+    const char* raw = field_buffer(fields[0], 0);
+    todo_filename = raw;
+
+    // Rimuove spazi finali
+    todo_filename.erase(std::find_if(todo_filename.rbegin(), todo_filename.rend(), [](char c) {
+        return !std::isspace(static_cast<unsigned char>(c));
+    }).base(), todo_filename.end());
+todo_filename += ".xml";
+
+pid_t pid = fork();
+
+    if (pid == 0) {
+        // Processo figlio: esegue il programma
+
+        execlp("pm", "pm", "--file", todo_filename.c_str(), nullptr);
+        // Se execlp fallisce
+        perror("execlp");
+        return 1;
+    } else if (pid > 0) {
+        // Processo padre: attende il completamento
+        int status;
+        waitpid(pid, &status, 0);
+    } else {
+        perror("fork");
+        return 1;
+    }
+
+break;
+}
             }
 
             unpost_form(form);
@@ -334,3 +368,4 @@ std::vector<std::string> ConcertFormView::getDates() const { return dates; }
 std::vector<Musician> ConcertFormView::getMusicians() const { return musicians; }
 std::vector<MusicalPiece> ConcertFormView::getProgram() const { LOG_MSG ("Mando pieces"); return pieces; }
 std::string ConcertFormView::getComment() const { return comment; }
+std::string ConcertFormView::getToDo() const { return todo_filename; }
