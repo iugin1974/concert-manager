@@ -16,6 +16,7 @@ ConcertFormView(const Concert& c);
     std::vector<std::string> getDates() const;
     std::vector<Musician> getMusicians() const;
     std::vector<MusicalPiece> getProgram() const;
+	std::vector<Rehearsal> getRehearsals() const;
     std::string getComment() const;
 	std::string getToDo() const;
 
@@ -26,7 +27,8 @@ private:
     std::vector<std::string> places;
     std::vector<std::string> dates;
     std::vector<Musician> musicians;
-    std::vector<MusicalPiece> program;
+	std::vector<Rehearsal> rehearsals;
+    std::vector<MusicalPiece> program;	
     std::string comment;
 };
 

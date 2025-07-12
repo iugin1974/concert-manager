@@ -1,5 +1,6 @@
 #include "PopupMenu.h"
 #include <algorithm> // per std::max
+
 PopupMenu::PopupMenu(WINDOW* parent, const std::vector<std::string>& options,
                      int x, int y)
     : parent(parent), options(options), posX(x), posY(y) {}

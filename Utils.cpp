@@ -8,6 +8,83 @@
 #include <iomanip>
 #include <vector>
 
+std::string trim(const char* buffer) {
+    std::string str(buffer);
+    str.erase(str.find_last_not_of(" \n") + 1);
+    str.erase(0, str.find_first_not_of(" "));
+    return str;
+}
+// Converte std::tm in stringa "DD.MM.YYYY"
+std::string dateToString(const std::tm& date) {
+    std::ostringstream oss;
+    oss << std::setfill('0') << std::setw(2) << date.tm_mday << "."
+        << std::setw(2) << date.tm_mon + 1 << "."  // tm_mon è 0-based
+        << std::setw(4) << date.tm_year + 1900;   // tm_year è years since 1900
+    return oss.str();
+}
+
+// Converte stringa "DD.MM.YYYY" in std::tm
+bool stringToDate(const std::string& str, std::tm& result) {
+    if (str.length() != 10 || str[2] != '.' || str[5] != '.')
+        return false;
+
+    int day, month, year;
+    try {
+        day = std::stoi(str.substr(0, 2));
+        month = std::stoi(str.substr(3, 2));
+        year = std::stoi(str.substr(6, 4));
+    } catch (...) {
+        return false;
+    }
+
+    if (day < 1 || day > 31 || month < 1 || month > 12)
+        return false;
+
+    result = {};
+    result.tm_mday = day;
+    result.tm_mon = month - 1;     // tm_mon is 0-based
+    result.tm_year = year - 1900;  // tm_year is years since 1900
+
+    return true;
+}
+
+bool confirmDialog(WINDOW* parent) {
+    std::string message = "Are you sure (Y/n)?";
+    int width = message.size() + 4;
+    int height = 5;
+
+    int posY = (LINES - height) / 2;
+    int posX = (COLS - width) / 2;
+
+    WINDOW* dialog_win = newwin(height, width, posY, posX);
+    box(dialog_win, 0, 0);
+    mvwprintw(dialog_win, 2, 2, "%s", message.c_str());
+    wrefresh(dialog_win);
+
+    keypad(dialog_win, TRUE);
+    int ch;
+    bool result = false;
+
+    while (true) {
+        ch = wgetch(dialog_win);
+        if (ch == 'Y' || ch == 'y') {
+            result = true;
+            break;
+        } else if (ch == 'N' || ch == 'n' || ch == 27) { // ESC as no
+            result = false;
+            break;
+        }
+    }
+
+    werase(dialog_win);
+    wrefresh(dialog_win);
+    delwin(dialog_win);
+    touchwin(parent);
+    wrefresh(parent);
+    return result;
+}
+
+
 std::string intToString(int value) {
     return std::to_string(value);
 }

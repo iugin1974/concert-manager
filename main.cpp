@@ -163,6 +163,18 @@ void saveConcertsToXML(const std::vector<Concert> &concerts)
       file << "      </piece>\n";
     }
     file << "    </program>\n";
+    // Aggiungi il salvataggio delle prove (rehearsals)
+    file << "    <rehearsals>\n";
+    for (const auto &r : concert.getRehearsals())
+    {
+      file << "      <rehearsal>\n";
+      file << "        <date>" << dateToString(r.getDate()) << "</date>\n";
+      file << "        <start>" << r.getStartTime() << "</start>\n";
+      file << "        <place>" << r.getPlace() << "</place>\n";
+      file << "        <musicians>" << r.getMusicians() << "</musicians>\n";
+      file << "      </rehearsal>\n";
+    }
+    file << "    </rehearsals>\n";
 
     file << "  </concert>\n";
   }
@@ -194,6 +206,7 @@ std::vector<Concert> loadConcertsFromXML()
   std::string line;
   Concert currentConcert;
   std::vector<std::string> places, dates;
+  std::vector<Rehearsal> rehearsals;
   std::vector<Musician> musicians;
   std::vector<MusicalPiece> program;
   std::string comment;
@@ -205,6 +218,7 @@ std::vector<Concert> loadConcertsFromXML()
       currentConcert = Concert();
       places.clear();
       dates.clear();
+      rehearsals.clear();
       musicians.clear();
       program.clear();
       comment.clear();
@@ -230,6 +244,31 @@ std::vector<Concert> loadConcertsFromXML()
       std::string rawComment = getTagValue(line, "comment");
       currentConcert.setComment(xmlUnescape(rawComment));
     }
+    else if (line.find("<rehearsal>") != std::string::npos)
+{
+  std::string dateStr, startTime, place, musicians;
+
+  if (!std::getline(file, line)) break;
+  dateStr = getTagValue(line, "date");
+
+  if (!std::getline(file, line)) break;
+  startTime = getTagValue(line, "start");
+
+  if (!std::getline(file, line)) break;
+  place = getTagValue(line, "place");
+
+  if (!std::getline(file, line)) break;
+  musicians = getTagValue(line, "musicians");
+
+  std::tm date{};
+  if (!stringToDate(dateStr, date)) {
+    LOG_MSG("Invalid rehearsal date format: " + dateStr);
+    continue;  // salta questa prova
+  }
+
+  Rehearsal r(date, startTime, place, musicians);
+  rehearsals.push_back(r);
+}
     else if (line.find("<musician>") != std::string::npos)
     {
       Musician m;
@@ -306,6 +345,7 @@ std::vector<Concert> loadConcertsFromXML()
     }
     else if (line.find("</concert>") != std::string::npos)
     {
+      currentConcert.setRehearsals(rehearsals);
       currentConcert.setPlaces(places);
       currentConcert.setDatesAsString(dates);
       currentConcert.setMusicians(musicians);
@@ -354,6 +394,10 @@ int main()
 	break;
       case MainMenuView::MANAGE_CONCERTS:
 	controller.listConcerts(concerts);
+	break;
+
+      case MainMenuView::SAVE:
+	saveConcertsToXML(concerts);
 	break;
 
       case MainMenuView::EXIT:

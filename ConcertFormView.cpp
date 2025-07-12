@@ -1,5 +1,6 @@
 #include "ConcertFormView.h"
 #include "musician_form.h"
+#include "rehearsal_form.h"
 #include "pieceForm.h"
 #include "PopupMenu.h"
 #include "logMessage.h"
@@ -24,15 +25,6 @@ ConcertFormView::ConcertFormView(const Concert &c)
   places = c.getPlaces();
   musicians = c.getMusicians();
   comment = c.getComment();
-}
-
-// Helper: trim
-static std::string trim(const char *buffer)
-{
-  std::string s(buffer);
-  size_t start = s.find_first_not_of(" \t");
-  size_t end = s.find_last_not_of(" \t");
-  return (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
 }
 
 // Helper: split da stringa separata da virgole
@@ -163,10 +155,11 @@ bool ConcertFormView::show(const Concert *existing)
   if (existing) {
     title = existing->getTitle();
     places = existing->getPlaces();
-    dates = existing->getDatesAsString();  // supponendo che tu abbia questa funzione
+    dates = existing->getDatesAsString(); 
     musicians = existing->getMusicians();
     program = existing->getProgram();
     comment = existing->getComment();
+    rehearsals = existing->getRehearsals();
   }
 
   const int NUM_FIELDS = 3;
@@ -223,6 +216,9 @@ redraw:
 	    "Add Piece",
 	    "Edit Piece",
 	    "Delete Piece",
+	    "Add Rehearsal",
+	    "Edit Rehearsal",
+	    "Delete Rehearsal",
 	    "Comment",
 	    "TODO"};
 	  PopupMenu popup(stdscr, actions);
@@ -271,17 +267,21 @@ redraw:
 		Musician m;
 		bool changed = runMusicianForm(&musicians.at(idx), m);
 		if (changed) {
-			musicians.erase(musicians.begin() + idx);
-			musicians.push_back(m);
+		  musicians.erase(musicians.begin() + idx);
+		  musicians.push_back(m);
 		}
 		break;
 	      }
 
 	    case 5:
+
 	      { // Delete musician
 		int idx = runChoiceForm(musicians);
 		if (idx == -1) break;
-		musicians.erase(musicians.begin() + idx);
+		bool del = confirmDialog(stdscr);
+		if (del) {
+		  musicians.erase(musicians.begin() + idx);
+		}
 		break;
 	      }
 
@@ -302,8 +302,8 @@ redraw:
 		MusicalPiece newPiece("", "", 0, false, "", "");
 		bool added = runPieceForm(&program.at(choice), newPiece);
 		if (added) {
-program.erase(program.begin() + choice);
-program.push_back(newPiece);
+		  program.erase(program.begin() + choice);
+		  program.push_back(newPiece);
 		}
 		break;
 	      }
@@ -312,56 +312,72 @@ program.push_back(newPiece);
 	      { //  delete piece
 		int idx = runChoiceForm(program);
 		if (idx == -1) break;
-
-		program.erase(program.begin() + idx);
+		bool del = confirmDialog(stdscr);
+		if (del) {
+		  program.erase(program.begin() + idx);
+		}
 		break;
 	      }
+	    case 9: { // add rehearsal
+Rehearsal newRehearsal;
+if (runRehearsalForm(nullptr, newRehearsal)) {
+rehearsals.push_back(newRehearsal);
+    }
+		      break;
+		    }
+	    case 10: { // edit rehearsal
+	
+		       break;
+		     }
+	    case 11: { // delete rehearsal
 
-	    case 9:
-	      { // Comment
-		editComment(comment);
-		// TODO verifica se ritorna true o false
-		break;
-	      }
+		       break;
+		     }
+	    case 12:
+		     { // Comment
+		       editComment(comment);
+		       // TODO verifica se ritorna true o false
+		       break;
+		     }
 
-	    case 10:
-	      { // todo
-		form_driver(form, REQ_VALIDATION);
-		const char *raw = field_buffer(fields[0], 0);
-		todo_filename = raw;
+	    case 13:
+		     { // todo
+		       form_driver(form, REQ_VALIDATION);
+		       const char *raw = field_buffer(fields[0], 0);
+		       todo_filename = raw;
 
-		// Rimuove spazi finali
-		todo_filename.erase(std::find_if(todo_filename.rbegin(), todo_filename.rend(), [](char c)
-		      { return !std::isspace(static_cast<unsigned char>(c)); })
-		    .base(),
-		    todo_filename.end());
-		todo_filename += ".xml";
+		       // Rimuove spazi finali
+		       todo_filename.erase(std::find_if(todo_filename.rbegin(), todo_filename.rend(), [](char c)
+			     { return !std::isspace(static_cast<unsigned char>(c)); })
+			   .base(),
+			   todo_filename.end());
+		       todo_filename += ".xml";
 
-		pid_t pid = fork();
+		       pid_t pid = fork();
 
-		if (pid == 0)
-		{
-		  // Processo figlio: esegue il programma
+		       if (pid == 0)
+		       {
+			 // Processo figlio: esegue il programma
 
-		  execlp("pm", "pm", "--file", todo_filename.c_str(), nullptr);
-		  // Se execlp fallisce
-		  perror("execlp");
-		  return 1;
-		}
-		else if (pid > 0)
-		{
-		  // Processo padre: attende il completamento
-		  int status;
-		  waitpid(pid, &status, 0);
-		}
-		else
-		{
-		  perror("fork");
-		  return 1;
-		}
+			 execlp("pm", "pm", "--file", todo_filename.c_str(), nullptr);
+			 // Se execlp fallisce
+			 perror("execlp");
+			 return 1;
+		       }
+		       else if (pid > 0)
+		       {
+			 // Processo padre: attende il completamento
+			 int status;
+			 waitpid(pid, &status, 0);
+		       }
+		       else
+		       {
+			 perror("fork");
+			 return 1;
+		       }
 
-		break;
-	      }
+		       break;
+		     }
 	  }
 
 	  unpost_form(form);
@@ -391,10 +407,7 @@ std::string ConcertFormView::getTitle() const { return title; }
 std::vector<std::string> ConcertFormView::getPlaces() const { return places; }
 std::vector<std::string> ConcertFormView::getDates() const { return dates; }
 std::vector<Musician> ConcertFormView::getMusicians() const { return musicians; }
-std::vector<MusicalPiece> ConcertFormView::getProgram() const
-{
-  LOG_MSG("Mando program");
-  return program;
-}
+std::vector<MusicalPiece> ConcertFormView::getProgram() const { return program; }
+std::vector<Rehearsal> ConcertFormView::getRehearsals() const { return rehearsals; }
 std::string ConcertFormView::getComment() const { return comment; }
 std::string ConcertFormView::getToDo() const { return todo_filename; }

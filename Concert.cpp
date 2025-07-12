@@ -83,6 +83,18 @@ bool Concert::hasMusicians() const {
     return musicians.size() > 0;
 }
 
+void Concert::addRehearsal(const Rehearsal& r) {
+    rehearsals.push_back(r);
+}
+
+const std::vector<Rehearsal>& Concert::getRehearsals() const {
+    return rehearsals;
+}
+
+void Concert::setRehearsals(const std::vector<Rehearsal> &r) {
+    rehearsals = r;
+}
+
 void Concert::setToDo(const std::string& td) {
 todo = td;
 }

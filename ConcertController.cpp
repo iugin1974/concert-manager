@@ -75,10 +75,13 @@ void ConcertController::listConcerts(std::vector<Concert>& concerts) {
 		    break;
 		  }
 	case '3': {
-		    concerts.erase(concerts.begin() + choice);
+			bool del = confirmDialog(stdscr);
+			if (del) {
+		    	concerts.erase(concerts.begin() + choice);
+			}
 		    clear();
 		    refresh();
-		    return; // torna alla lista aggiornata
+		    break; // torna alla lista aggiornata
 		  }
 	case '4':
 	case 27: // ESC
@@ -106,6 +109,7 @@ std::optional<Concert> ConcertController::createConcert()
   concert.setDatesAsString(view.getDates());
   concert.setMusicians(view.getMusicians());
   concert.setProgram(view.getProgram());
+  concert.setRehearsals(view.getRehearsals());
   concert.setComment(view.getComment());
   LOG_MSG("Return concert");
   return concert;
@@ -169,8 +173,9 @@ std::optional<Concert> ConcertController::editConcertSingle(const Concert &exist
   updated.setPlaces(view.getPlaces());
   updated.setToDo(view.getToDo());
   updated.setDatesAsString(view.getDates());
-  updated.setProgram(existing.getProgram()); // oppure aggiorna anche questo se la form è completa
-  updated.setMusicians(view.getMusicians()); // stesso discorso
+  updated.setProgram(existing.getProgram());
+  updated.setMusicians(view.getMusicians());
+updated.setRehearsals(view.getRehearsals());
   updated.setProgram(view.getProgram());
   updated.setComment(view.getComment());
   LOG_MSG("Concert updated");

@@ -57,7 +57,7 @@ void ConcertSummaryView::show(const Concert& concert) {
   const auto& pieces = concert.getProgram();
   const int pageSize = 10;
   int currentPage = 0;
-  int totalPages = (pieces.size() + pageSize - 1) / pageSize;
+  //int totalPages = (pieces.size() + pageSize - 1) / pageSize;
 
   while (true) {
     clear();
@@ -67,7 +67,7 @@ void ConcertSummaryView::show(const Concert& concert) {
     mvprintw(row++, 2, "Concert Summary");
     mvprintw(row++, 2, "---------------");
     mvprintw(row++, 2, "%s", concert.getTitle().c_str());
-    row += 2;
+    row ++;
     attroff(A_BOLD);
     const auto& places = concert.getPlaces();
     const auto& dates = concert.getDatesAsString(); 
@@ -76,7 +76,24 @@ void ConcertSummaryView::show(const Concert& concert) {
       mvprintw(row++, 2, "- %s - %s", dates[i].c_str(), places[i].c_str());
     }
 
-    row += 3;
+    row += 2;
+
+	attron(A_BOLD);
+    mvprintw(row++, 2, "Rehearsals:");
+    attroff(A_BOLD);
+    mvprintw(row++, 2, "%-12s %-6s %-20s %-20s", "Date", "Time", "Place", "Musicians");
+    mvhline(row++, 2, ACS_HLINE, 70);
+
+    for (const auto& r : concert.getRehearsals()) {
+        mvprintw(row++, 2, "%-12s %-6s %-20s %-20s",
+            dateToString(r.getDate()).c_str(),
+            r.getStartTime().c_str(),
+            r.getPlace().c_str(),
+            r.getMusicians().c_str());
+    }
+mvhline(row++, 2, ACS_HLINE, 70);
+
+row += 2;
 
     attron(A_BOLD);
     mvprintw(row++, 2, "Program:");

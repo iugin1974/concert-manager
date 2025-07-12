@@ -1,7 +1,12 @@
 #pragma once
 #include <ncurses.h>
 #include <vector>
+#include <ctime>
 
+std::string trim(const char* buffer);
+std::string dateToString(const std::tm& date);
+bool stringToDate(const std::string& str, std::tm& result);
+bool confirmDialog(WINDOW* parent);
 int promptNumber(WINDOW* win, int y, int x, int min, int max);
 int convertToSeconds(const std::string& timeStr);
 std::string convertToMMSS(int totalSeconds);

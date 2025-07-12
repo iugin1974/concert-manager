@@ -1,0 +1,34 @@
+#pragma once
+
+#include <string>
+#include <ctime>
+
+class Rehearsal {
+private:
+    std::tm date{};              // solo parte data (YYYY-MM-DD)
+    std::string startTime;       // orario in formato "HH:MM"
+    std::string place;
+    std::string musicians;
+
+public:
+    Rehearsal();
+    Rehearsal(const std::tm& date,
+              const std::string& startTime,
+              const std::string& place,
+              const std::string& musicians);
+
+    // Getters
+    std::tm getDate() const;
+    std::string getStartTime() const;
+    std::string getPlace() const;
+    std::string getMusicians() const;
+
+    // Setters
+    void setDate(const std::tm& d);
+    void setStartTime(const std::string& s);
+    void setPlace(const std::string& p);
+    void setMusicians(const std::string& m);
+
+    // Formattazione per output
+    std::string toString() const;
+};

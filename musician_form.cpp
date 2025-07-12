@@ -101,11 +101,11 @@ ch = getch();
 
 								return true;
 								}
-case 1: // exit without saving
-return false;
-}
-break;
-}
+						case 1: // exit without saving
+							return false;
+							}
+						break;
+						}
 
 			case 10: // Enter
             case KEY_DOWN:

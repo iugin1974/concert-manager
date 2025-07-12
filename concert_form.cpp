@@ -1,5 +1,5 @@
 #include "concert_form.h"
-
+#include "Utils.h"
 #include <form.h>
 #include <ncurses.h>
 #include <locale.h>
@@ -8,12 +8,7 @@
 #include <sstream>
 #include <algorithm>
 
-static std::string trim(const char* buffer) {
-    std::string str(buffer);
-    str.erase(str.find_last_not_of(" \n") + 1);
-    str.erase(0, str.find_first_not_of(" "));
-    return str;
-}
+
 
 static std::vector<std::string> split(const std::string& input, char sep) {
     std::vector<std::string> result;

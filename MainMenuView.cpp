@@ -10,14 +10,15 @@ MainMenuView::Action MainMenuView::show()
   const char *choices[] = {
     "1. Add Concert",
     "2. Manage Concerts",
-    "3. Exit",
+    "3. Save",
+    "4. Save and exit"
   };
 
   int n_choices = sizeof(choices) / sizeof(choices[0]);
 
   for (int i = 0; i < n_choices; ++i)
   {
-    mvprintw(i + 5, 2, choices[i]);
+    mvprintw(i + 5, 2, "%s", choices[i]);
   }
 
   while (1)
