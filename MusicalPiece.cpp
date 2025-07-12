@@ -36,3 +36,7 @@ void MusicalPiece::print() const {
               << "Singer Part: " << singerPart << "\n"
               << "Instruments: " << instruments << "\n";
 }
+
+std::string MusicalPiece::toString() const {
+return title;
+}

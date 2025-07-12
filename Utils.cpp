@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 std::string intToString(int value) {
     return std::to_string(value);

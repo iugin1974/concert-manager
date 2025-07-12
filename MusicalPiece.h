@@ -39,6 +39,7 @@ public:
 
     // Stampa a terminale
     void print() const;
+std::string toString() const;
 };
 
 #endif // MUSICALPIECE_H

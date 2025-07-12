@@ -2,7 +2,7 @@
 TARGET = concertmanager
 
 # Compilatore
-CXX = g++
+CXX = clang++
 
 # Opzioni di compilazione
 CXXFLAGS = -std=c++17 -Wall -Wextra -g
@@ -23,4 +23,4 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 install:
-	cp $(TARGET) /urs/bin/
+	cp $(TARGET) /usr/bin/

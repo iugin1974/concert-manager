@@ -10,5 +10,3 @@
 // ritorna true se l'utente ha riempito i campi in maniera valida
 // e quindi il musicista può essere salveto
 bool runMusicianForm(const Musician* existing, Musician&);
-
-int runChoiceMusicianForm(std::vector<Musician>&);

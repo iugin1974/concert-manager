@@ -38,3 +38,7 @@ void Musician::print() const {
               << "Indirizzo: " << address << "\n"
               << "Cachet: €" << gage << "\n";
 }
+
+std::string Musician::toString() const {
+return name;
+}

@@ -42,6 +42,7 @@ public:
 
     // Stampa su terminale
     void print() const;
+	std::string toString() const;
 };
 
 #endif // MUSICIAN_H

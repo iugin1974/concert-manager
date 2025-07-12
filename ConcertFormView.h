@@ -26,7 +26,7 @@ private:
     std::vector<std::string> places;
     std::vector<std::string> dates;
     std::vector<Musician> musicians;
-    std::vector<MusicalPiece> pieces;
+    std::vector<MusicalPiece> program;
     std::string comment;
 };
 

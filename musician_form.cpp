@@ -6,39 +6,6 @@
 #include <string>
 #include <locale.h>
 
-int runChoiceMusicianForm(std::vector<Musician>& musicians) {
-    clear();
-    refresh();
-
-    int l = musicians.size();
-    if (l == 0) {
-        mvprintw(0, 0, "No musicians in Concert");
-        refresh();
-        getch();
-        return -1;
-    }
-
-    // Mostra lista
-    for (int i = 0; i < l; i++) {
-        mvprintw(i, 3, "%d. %s", i + 1, musicians.at(i).getName().c_str()); // numeri da 1
-    }
-
-    mvprintw(l + 2, 3, "Quale musicista scegli?");
-
-    // Leggi scelta con promptNumber
-    int choice = promptNumber(stdscr, l + 3, 3, 1, l);
-	if (choice == 0) return -1;
-    if (choice < 1 || choice > l) {
-        mvprintw(l + 4, 3, "Scelta non valida");
-        refresh();
-        getch();
-        return -1;
-    }
-
-    return choice - 1;  // ritorna indice cancellato
-}
-
-
 bool runMusicianForm(const Musician* existing, Musician& musician) {
     FIELD* fields[7];  // 6 campi + nullptr
     FORM* form;
