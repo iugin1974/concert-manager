@@ -26,5 +26,5 @@ void Rehearsal::setMusicians(const std::string& m) { musicians = m; }
 std::string Rehearsal::toString() const {
     char buf[20];
     std::strftime(buf, sizeof(buf), "%Y-%m-%d", &date);
-    return std::string(buf) + " " + startTime + " @ " + place + " [" + musicians + "]";
+    return std::string(buf) + ", " + startTime + " - " + place + " [" + musicians + "]";
 }

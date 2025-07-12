@@ -326,11 +326,23 @@ rehearsals.push_back(newRehearsal);
 		      break;
 		    }
 	    case 10: { // edit rehearsal
-	
+	int choice = runChoiceForm(rehearsals);
+		if (choice == -1) break;
+		Rehearsal newRehearsal;
+		bool added = runRehearsalForm(&rehearsals.at(choice), newRehearsal);
+		if (added) {
+		  rehearsals.erase(rehearsals.begin() + choice);
+		  rehearsals.push_back(newRehearsal);
+		}
 		       break;
 		     }
 	    case 11: { // delete rehearsal
-
+int idx = runChoiceForm(rehearsals);
+		if (idx == -1) break;
+		bool del = confirmDialog(stdscr);
+		if (del) {
+		  rehearsals.erase(rehearsals.begin() + idx);
+		}
 		       break;
 		     }
 	    case 12:
