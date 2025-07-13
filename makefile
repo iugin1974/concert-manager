@@ -8,7 +8,7 @@ CXX = clang++
 CXXFLAGS = -std=c++17 -Wall -Wextra -g
 
 # File sorgente
-SRCS = main.cpp Musician.cpp MusicalPiece.cpp Concert.cpp musician_form.cpp concert_form.cpp ConcertFormView.cpp ConcertController.cpp MainMenuView.cpp ConcertSummaryView.cpp Utils.cpp PopupMenu.cpp logMessage.cpp pieceForm.cpp Rehearsal.cpp rehearsal_form.cpp
+SRCS = main.cpp Musician.cpp MusicalPiece.cpp Concert.cpp musician_form.cpp concert_form.cpp ConcertFormView.cpp ConcertController.cpp MainMenuView.cpp ConcertSummaryView.cpp Utils.cpp PopupMenu.cpp logMessage.cpp pieceForm.cpp Rehearsal.cpp rehearsal_form.cpp NcursesMenuBar.cpp
 
 # File oggetto
 OBJS = $(SRCS:.cpp=.o)
@@ -17,7 +17,7 @@ OBJS = $(SRCS:.cpp=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lncurses -lform 2>&1 | c++filt
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lncurses -lmenu -lform 2>&1 | c++filt
 
 clean:
 	rm -f $(OBJS) $(TARGET)

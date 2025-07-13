@@ -1,5 +1,6 @@
 #include "rehearsal_form.h"
 #include "PopupMenu.h"
+#include "NcursesMenuBar.h"
 #include <form.h>
 #include <ncurses.h>
 #include <string>
@@ -62,56 +63,55 @@ bool runRehearsalForm(const Rehearsal *existing, Rehearsal &rehearsal)
             form_driver(form, REQ_DEL_PREV);
             break;
         case KEY_F(2):
-        { // MENU ACTIONS
-            std::vector<std::string> actions = {
-                "Save and Exit",
-                "Exit without saving"};
-            PopupMenu popup(stdscr, actions);
-            int selected = popup.show();
+{
+    std::vector<std::string> menuTitles = {"File"};
+    std::vector<std::vector<std::string>> menuItems = {
+        {"Save & Exit", "Exit without saving"}
+    };
 
-            switch (selected)
-            {
-            case 0:
-            { // ✅ Save and Exit
-                form_driver(form, REQ_VALIDATION);
+    NcursesMenuBar bar(menuTitles, menuItems);
+    std::pair<int, int> result = bar.activate();
 
-                std::string dateStr = trim(field_buffer(fields[0], 0));
-                std::string start = trim(field_buffer(fields[1], 0));
-                std::string place = trim(field_buffer(fields[2], 0));
-                std::string musicians = trim(field_buffer(fields[3], 0));
+    if (result.first == 0) {
+        switch (result.second)
+        {
+        case 0: // ✅ Save and Exit
+        {
+            form_driver(form, REQ_VALIDATION);
+            std::string dateStr = trim(field_buffer(fields[0], 0));
+            std::string start = trim(field_buffer(fields[1], 0));
+            std::string place = trim(field_buffer(fields[2], 0));
+            std::string musicians = trim(field_buffer(fields[3], 0));
 
-                std::tm date;
-                if (!stringToDate(dateStr, date))
-                {
-                    mvprintw(12, 2, "Invalid date format. Press any key.");
-                    getch();
-                    break;
-                }
-
-                rehearsal.setDate(date);
-                rehearsal.setStartTime(start);
-                rehearsal.setPlace(place);
-                rehearsal.setMusicians(musicians);
-                unpost_form(form);
-                free_form(form);
-                for (int i = 0; i < 4; ++i)
-                    free_field(fields[i]);
-
-                done = true;
-                return true;
-            }
-            case 1: // ❌ Exit without saving
-                unpost_form(form);
-                free_form(form);
-                for (int i = 0; i < 4; ++i)
-                    free_field(fields[i]);
-                return false;
+            std::tm date;
+            if (!stringToDate(dateStr, date)) {
+                mvprintw(12, 2, "Invalid date format. Press any key.");
+                getch();
                 break;
+            }
 
-            
-            refresh();
+            rehearsal.setDate(date);
+            rehearsal.setStartTime(start);
+            rehearsal.setPlace(place);
+            rehearsal.setMusicians(musicians);
+            unpost_form(form);
+            free_form(form);
+            for (int i = 0; i < 4; ++i)
+                free_field(fields[i]);
+
+            done = true;
+            return true;
         }
+        case 1: // ❌ Exit without saving
+            unpost_form(form);
+            free_form(form);
+            for (int i = 0; i < 4; ++i)
+                free_field(fields[i]);
+            return false;
         }
+    }
+    break;
+}
 default:
                 form_driver(form, ch);
                 break;

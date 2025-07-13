@@ -1,6 +1,7 @@
 #include "ConcertController.h"
 #include "ConcertFormView.h"
 #include "ConcertSummaryView.h"
+#include "NcursesMenuBar.h"
 #include "logMessage.h"
 #include "Utils.h"
 #include <algorithm>  // std::sort
@@ -48,46 +49,33 @@ void ConcertController::listConcerts(std::vector<Concert>& concerts) {
     Concert& selected = concerts[choice];
 
     while (true) {
+      // 1. Mostra il resoconto
       clear();
-      mvprintw(0, 0, "Selected concert: %s", selected.getTitle().c_str());
-      mvprintw(2, 2, "1. View Program");
-      mvprintw(3, 2, "2. Edit Concert");
-      mvprintw(4, 2, "3. Delete Concert");
-      mvprintw(5, 2, "4. Back");
-      refresh();
+      ConcertSummaryView view;
+      view.show(selected);
 
-      int ch = getch();
-      switch (ch) {
-	case '1': {
-		    ConcertSummaryView view;
-		    view.show(selected);
-		    clear();
-		    refresh();
-		    break;
-		  }
-	case '2': {
-		    std::optional<Concert> updated = editConcertSingle(selected);
-		    if (updated) {
-		      selected = *updated;
-		    }
-		    clear();
-		    refresh();
-		    break;
-		  }
-	case '3': {
-			bool del = confirmDialog(stdscr);
-			if (del) {
-		    	concerts.erase(concerts.begin() + choice);
-			}
-		    clear();
-		    refresh();
-		    break; // torna alla lista aggiornata
-		  }
-	case '4':
-	case 27: // ESC
-		  clear();
-		  refresh();
-		  return;
+      // 2. Menu azioni
+      std::vector<std::string> menuTitles = {"Actions"};
+      std::vector<std::vector<std::string>> menuItems = {
+          {"Edit", "Delete", "Back"}
+      };
+
+      NcursesMenuBar bar(menuTitles, menuItems);
+      std::pair<int, int> result = bar.activate();
+
+      int action = result.second;
+
+      if (action == 0) { // Edit
+        std::optional<Concert> updated = editConcertSingle(selected);
+        if (updated)
+          selected = *updated;
+      } else if (action == 1) { // Delete
+        if (confirmDialog(stdscr)) {
+          concerts.erase(concerts.begin() + choice);
+          break; // torna alla lista aggiornata
+        }
+      } else if (action == 2 || action == -1) { // Back o ESC
+        break;
       }
     }
   }

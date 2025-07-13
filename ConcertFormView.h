@@ -22,6 +22,17 @@ ConcertFormView(const Concert& c);
 
 private:
     bool editComment(std::string& comment);
+    void addPiece(std::vector<MusicalPiece>& program);
+    void deletePiece(std::vector<MusicalPiece>& program);
+    void editPiece(std::vector<MusicalPiece>& program);
+
+    void deleteMusician(std::vector<Musician>& musicians);
+void editMusician(std::vector<Musician>& musicians);
+void addMusician(std::vector<Musician>& musicians);
+
+    void deleteRehearsal(std::vector<Rehearsal>& rehearsals);
+void editRehearsal(std::vector<Rehearsal>& rehearsals);
+void addRehearsal(std::vector<Rehearsal>& rehearsals);
     std::string title;
 	std::string todo_filename;
     std::vector<std::string> places;
