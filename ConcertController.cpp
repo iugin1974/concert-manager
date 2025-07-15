@@ -1,12 +1,55 @@
 #include "ConcertController.h"
 #include "ConcertFormView.h"
 #include "ConcertSummaryView.h"
+#include "File.h"
 #include "NcursesMenuBar.h"
 #include "logMessage.h"
 #include "Utils.h"
-#include <algorithm>  // std::sort
+#include <algorithm> // std::sort
 #include <ncurses.h>
 #include <optional>
+
+void ConcertController::loadXML(std::vector<Concert> &concerts)
+{
+  File file;
+  concerts = file.loadConcertsFromXML(); // carica
+}
+
+void ConcertController::saveXML(std::vector<Concert> &concerts)
+{
+  File file;
+  file.saveConcertsToXML(concerts); // carica
+}
+
+// Funzione di confronto per Concert basata sulla prima data nel vettore dates
+bool compareConcertByFirstDate(const Concert &a, const Concert &b)
+{
+  const auto &datesA = a.getDatesAsTm();
+  const auto &datesB = b.getDatesAsTm();
+
+  if (datesA.empty() && datesB.empty())
+    return false; // uguali, non cambia l'ordine
+  if (datesA.empty())
+    return false; // a senza date va dopo b
+  if (datesB.empty())
+    return true; // b senza date va dopo a
+
+  // Confronta la prima data usando lo stesso criterio di prima
+  const std::tm &dA = datesA.front();
+  const std::tm &dB = datesB.front();
+
+  if (dA.tm_year != dB.tm_year)
+    return dA.tm_year < dB.tm_year;
+  if (dA.tm_mon != dB.tm_mon)
+    return dA.tm_mon < dB.tm_mon;
+  return dA.tm_mday < dB.tm_mday;
+}
+
+void ConcertController::sortConcerts(std::vector<Concert> &concerts)
+{
+  std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
+}
+
 int ConcertController::selectConcert(std::vector<Concert> &concerts)
 {
   clear();
@@ -20,35 +63,39 @@ int ConcertController::selectConcert(std::vector<Concert> &concerts)
   }
 
   while (true)
-{
+  {
     mvprintw(0, 0, "Select any concert [ESC to return]:");
     for (size_t i = 0; i < concerts.size(); ++i)
     {
-        mvprintw(i + 2, 2, "%zu. %s", i + 1, concerts[i].getTitle().c_str());
+      mvprintw(i + 2, 2, "%zu. %s", i + 1, concerts[i].getTitle().c_str());
     }
 
     int ch = getch();
 
     if (ch == 27) // ESC
-        return -1;
+      return -1;
 
     // Controlla se è una cifra valida '1' .. 'n'
     if (ch >= '1' && ch <= '0' + static_cast<int>(concerts.size()))
     {
-        int index = ch - '1'; // Converte '1' in 0, '2' in 1, ecc.
-        return index;
+      int index = ch - '1'; // Converte '1' in 0, '2' in 1, ecc.
+      return index;
     }
+  }
 }
- }
 
-void ConcertController::listConcerts(std::vector<Concert>& concerts) {
-  while (true) {
+void ConcertController::listConcerts(std::vector<Concert> &concerts)
+{
+  while (true)
+  {
     int choice = selectConcert(concerts);
-    if (choice == -1) return;
+    if (choice == -1)
+      return;
 
-    Concert& selected = concerts[choice];
+    Concert &selected = concerts[choice];
 
-    while (true) {
+    while (true)
+    {
       // 1. Mostra il resoconto
       clear();
       ConcertSummaryView view;
@@ -57,24 +104,29 @@ void ConcertController::listConcerts(std::vector<Concert>& concerts) {
       // 2. Menu azioni
       std::vector<std::string> menuTitles = {"Actions"};
       std::vector<std::vector<std::string>> menuItems = {
-          {"Edit", "Delete", "Back"}
-      };
+          {"Edit", "Delete", "Exit"}};
 
       NcursesMenuBar bar(menuTitles, menuItems);
       std::pair<int, int> result = bar.activate();
 
       int action = result.second;
 
-      if (action == 0) { // Edit
+      if (action == 0)
+      { // Edit
         std::optional<Concert> updated = editConcertSingle(selected);
         if (updated)
           selected = *updated;
-      } else if (action == 1) { // Delete
-        if (confirmDialog(stdscr)) {
+      }
+      else if (action == 1)
+      { // Delete
+        if (confirmDialog(stdscr))
+        {
           concerts.erase(concerts.begin() + choice);
           break; // torna alla lista aggiornata
         }
-      } else if (action == 2 || action == -1) { // Back o ESC
+      }
+      else if (action == 2 || action == -1)
+      { // Exit o ESC
         break;
       }
     }
@@ -163,7 +215,7 @@ std::optional<Concert> ConcertController::editConcertSingle(const Concert &exist
   updated.setDatesAsString(view.getDates());
   updated.setProgram(existing.getProgram());
   updated.setMusicians(view.getMusicians());
-updated.setRehearsals(view.getRehearsals());
+  updated.setRehearsals(view.getRehearsals());
   updated.setProgram(view.getProgram());
   updated.setComment(view.getComment());
   LOG_MSG("Concert updated");

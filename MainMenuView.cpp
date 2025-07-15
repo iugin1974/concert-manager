@@ -3,6 +3,7 @@
 
 MainMenuView::Action MainMenuView::show()
 {
+  clear();
   attron(A_BOLD);
   mvprintw (1, 2, "Concert Manager - by Eugenio Giovine");
   mvprintw (3, 2, "Menu:");

@@ -4,6 +4,12 @@
 #include <optional>
 class ConcertController {
 public:
+void loadXML(std::vector<Concert>& concerts);
+
+void saveXML(std::vector<Concert>& concerts);
+// Funzione di confronto per Concert basata sulla prima data nel vettore dates
+
+void sortConcerts(std::vector<Concert> &concerts);
     std::optional<Concert> createConcert();
 void listConcerts(std::vector<Concert>& concerts);
 void editConcert(std::vector<Concert>& concerts);
