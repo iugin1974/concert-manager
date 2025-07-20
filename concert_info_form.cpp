@@ -1,0 +1,150 @@
+#include <form.h>
+#include <ncurses.h>
+#include <string>
+#include <vector>
+#include <sstream>
+#include "Concert.h"
+#include "concert_info_form.h"
+#include "Utils.h"
+
+ConcertInfoForm::ConcertInfoForm() {
+}
+
+void ConcertInfoForm::setConcert(const Concert *existing) {
+	this->existing = existing;
+}
+
+MenuCommand ConcertInfoForm::show() {
+
+	fields[0] = new_field(1, 40, 2, 30, 0, 0); // Title
+	fields[1] = new_field(1, 40, 4, 30, 0, 0); // Places
+	fields[2] = new_field(1, 40, 6, 30, 0, 0); // Dates
+	fields[3] = nullptr;
+
+	for (int i = 0; i < FORM_FIELDS - 1; ++i) {
+		set_field_back(fields[i], A_UNDERLINE);
+		field_opts_off(fields[i], O_AUTOSKIP);
+	}
+
+	if (existing) {
+		set_field_buffer(fields[0], 0, existing->getTitle().c_str());
+
+		std::string placesStr, datesStr;
+		const auto &pl = existing->getPlaces();
+		const auto &dt = existing->getDatesAsString();
+
+		for (size_t i = 0; i < pl.size(); ++i)
+			placesStr += (i ? ", " : "") + pl[i];
+
+		for (size_t i = 0; i < dt.size(); ++i)
+			datesStr += (i ? ", " : "") + dt[i];
+
+		set_field_buffer(fields[1], 0, placesStr.c_str());
+		set_field_buffer(fields[2], 0, datesStr.c_str());
+	}
+
+	form = new_form(fields);
+	post_form(form);
+
+	mvprintw(2, 5, "Title:");
+	mvprintw(4, 5, "Places (comma-separated):");
+	mvprintw(6, 5, "Dates  (comma-separated):");
+
+	refresh();
+	form_driver(form, REQ_FIRST_FIELD);
+
+	auto trim = [](std::string s) {
+		s.erase(s.find_last_not_of(" \n") + 1);
+		s.erase(0, s.find_first_not_of(" "));
+		return s;
+	};
+
+	auto split = [&](const std::string &s) {
+		std::vector<std::string> result;
+		std::stringstream ss(s);
+		std::string token;
+		while (std::getline(ss, token, ',')) {
+			result.push_back(trim(token));
+		}
+		return result;
+	};
+
+	int ch;
+	while ((ch = getch())) {
+		switch (ch) {
+		case KEY_F(2): {
+
+			MenuCommand result = menuBar.show();
+			return result;
+		}
+		case KEY_DOWN:
+		case 9:
+			form_driver(form, REQ_NEXT_FIELD);
+			form_driver(form, REQ_END_LINE);
+			break;
+		case KEY_UP:
+		case KEY_BTAB:
+			form_driver(form, REQ_PREV_FIELD);
+			form_driver(form, REQ_END_LINE);
+			break;
+		case 10:
+			form_driver(form, REQ_NEXT_FIELD);
+			form_driver(form, REQ_END_LINE);
+			break;
+		case KEY_BACKSPACE:
+		case 127:
+		case '\b':
+			form_driver(form, REQ_DEL_PREV);
+			break;
+		case KEY_DC:
+			form_driver(form, REQ_DEL_CHAR);
+			break;
+		default:
+			form_driver(form, ch);
+			break;
+		}
+		refresh();
+	}
+
+	return MenuCommand::Quit;
+}
+
+void ConcertInfoForm::validateFields() {
+	form_driver(form, REQ_VALIDATION);
+	title = trim(field_buffer(fields[0], 0));
+	places = trim(field_buffer(fields[1], 0));
+	dates = trim(field_buffer(fields[2], 0));
+}
+
+void ConcertInfoForm::closeForm() {
+	unpost_form(form);
+	free_form(form);
+	for (int i = 0; fields[i]; ++i)
+		free_field(fields[i]);
+	clear();
+	    refresh();
+}
+
+// Helper: split da stringa separata da virgole
+std::vector<std::string> ConcertInfoForm::split(const std::string &input, char sep = ',')
+{
+  std::stringstream ss(input);
+  std::string item;
+  std::vector<std::string> result;
+  while (std::getline(ss, item, sep))
+  {
+    result.push_back(trim(item.c_str()));
+  }
+  return result;
+}
+
+
+const std::string ConcertInfoForm::getDates() const { return dates; }
+const std::vector<std::string> ConcertInfoForm::getDatesAsVector() {
+return split(dates, ',');
+}
+const std::vector<std::string> ConcertInfoForm::getPlacesAsVector() {
+return split(places, ',');
+}
+const std::string ConcertInfoForm::getPlaces() const { return places; }
+const std::string ConcertInfoForm::getTitle() const { return title; }

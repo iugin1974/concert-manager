@@ -1,33 +1,34 @@
-#ifndef MUSICIAN_H
-#define MUSICIAN_H
+#pragma once
 
 #include <string>
+#include "Timestamped.h"
 
-class Musician {
+class Musician : public Timestamped {
 private:
     std::string name;
     std::string phone;
     std::string instrument;
     std::string email;
     std::string address;
-    double gage;  // cachet
+    double gage;
 
 public:
-    // Costruttore
-	Musician();
+    // Costruttori
+    Musician();
     Musician(const std::string& name,
              const std::string& phone,
              const std::string& instrument,
              const std::string& email,
              const std::string& address,
-             double gage);
+             double gage,
+             long long ts = 0); // opzionale timestamp
 
     // Getter
-    std::string getName() const;
-    std::string getPhone() const;
-    std::string getInstrument() const;
-    std::string getMail() const;
-    std::string getAddress() const;
+    const std::string& getName() const;
+    const std::string& getPhone() const;
+    const std::string& getInstrument() const;
+    const std::string& getMail() const;
+    const std::string& getAddress() const;
     double getGage() const;
 
     // Setter
@@ -38,11 +39,9 @@ public:
     void setAddress(const std::string& newAddress);
     void setGage(double newGage);
 
-	bool isEmpty();
+    bool isEmpty() const;
 
-    // Stampa su terminale
+    // Output
     void print() const;
-	std::string toString() const;
+    std::string toString() const;
 };
-
-#endif // MUSICIAN_H

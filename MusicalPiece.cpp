@@ -2,22 +2,22 @@
 #include <iostream>
 
 // Costruttore
+MusicalPiece::MusicalPiece() { choir = false; }
 MusicalPiece::MusicalPiece(const std::string& composer,
                            const std::string& title,
                            const int duration,
                            bool choir,
                            const std::string& singerPart,
-                           const std::string& instruments)
-    : composer(composer), title(title), duration(duration),
-      choir(choir), singerPart(singerPart), instruments(instruments) {}
+                           const std::string& instruments,
+						   long long ts) {}
 
 // Getter
-std::string MusicalPiece::getComposer() const    { return composer; }
-std::string MusicalPiece::getTitle() const       { return title; }
+const std::string& MusicalPiece::getComposer() const    { return composer; }
+const std::string& MusicalPiece::getTitle() const       { return title; }
 int MusicalPiece::getDuration() const    { return duration; }
 bool MusicalPiece::hasChoir() const              { return choir; }
-std::string MusicalPiece::getSingerPart() const  { return singerPart; }
-std::string MusicalPiece::getInstruments() const { return instruments; }
+const std::string& MusicalPiece::getSingerPart() const  { return singerPart; }
+const std::string& MusicalPiece::getInstruments() const { return instruments; }
 
 // Setter
 void MusicalPiece::setComposer(const std::string& c)      { composer = c; }
@@ -38,5 +38,5 @@ void MusicalPiece::print() const {
 }
 
 std::string MusicalPiece::toString() const {
-return title;
+return composer + ": " + title;
 }

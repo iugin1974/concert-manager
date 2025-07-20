@@ -2,4 +2,8 @@
 
 #include "Concert.h"
 
-Concert inputConcert(const Concert* existing = nullptr);
+class ConcertForm {
+public:
+	void show(const Concert *existing = nullptr);
+
+};

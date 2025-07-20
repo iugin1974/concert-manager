@@ -1,23 +1,47 @@
-// ConcertController.h
-#pragma once
-#include "Concert.h"
+/*
+ * ConcertController.h
+ *
+ *  Created on: 17.07.2025
+ *      Author: eugenio
+ */
+
+#ifndef CONCERTCONTROLLER_H_
+#define CONCERTCONTROLLER_H_
+
+#include <vector>
 #include <optional>
+#include "Concert.h"
+#include "Model.h"
+
 class ConcertController {
 public:
-void loadXML(std::vector<Concert>& concerts);
-
-void saveXML(std::vector<Concert>& concerts);
-// Funzione di confronto per Concert basata sulla prima data nel vettore dates
-
-void sortConcerts(std::vector<Concert> &concerts);
-    std::optional<Concert> createConcert();
-void listConcerts(std::vector<Concert>& concerts);
-void editConcert(std::vector<Concert>& concerts);
-void deleteConcert(std::vector<Concert>& concerts);
-std::optional<Concert> editConcertSingle(const Concert& existing);
-
+	void start();
 private:
-// ritorna -1 se nessun concerto è selezionato, altrimenti il numero del concerto
-int selectConcert(std::vector<Concert>& concerts);
+	bool createEditConcert(Concert *concert);
+	void manageConcerts();
+
+	void deleteConcert(Concert* concert);
+	void createMusician(Concert* concert);
+	void editMusician(Concert* concert);
+	std::optional<Musician> createEditMusician(const Musician *musicians);
+	void deleteMusician(Concert* concert);
+
+	void createPiece(Concert* concert);
+	void editPiece(Concert* concert);
+	std::optional<MusicalPiece> createEditPiece(const MusicalPiece *MusicalPieces);
+	void deletePiece(Concert* concert);
+
+	void createRehearsal(Concert* concert);
+	void editRehearsal(Concert* concert);
+	void deleteRehearsal(Concert* concert);
+	std::optional<Rehearsal> createEditRehearsal(const Rehearsal* rehearsal);
+
+	void save();
+	void load();
+	void sort();
+	Model model;
 };
 
+
+
+#endif /* CONCERTCONTROLLER_H_ */

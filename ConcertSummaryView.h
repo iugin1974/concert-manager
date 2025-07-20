@@ -2,12 +2,18 @@
 #pragma once
 
 #include "Concert.h"
+#include "View.h"
 
-class ConcertSummaryView {
+class ConcertSummaryView: public View {
 public:
-    void show(const Concert& concert);
+	MenuCommand show() override;
+	~ConcertSummaryView() override = default;
+	void setConcert(const Concert &concert);
+	void validateFields() override;
+	void closeForm() override;
 
 private:
-void saveToFile(const Concert& concert);
+	Concert concert;
+
 };
 

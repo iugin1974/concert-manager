@@ -1,9 +1,9 @@
 #include "File.h"
 #include "logMessage.h"
-#include "tinyxml2.h"
 #include "Utils.h"
 #include <fstream>
 #include <cstdlib>
+#include <vector>
 using namespace tinyxml2;
 
 std::string File::getSafeText(tinyxml2::XMLElement* elem) {
@@ -12,9 +12,8 @@ std::string File::getSafeText(tinyxml2::XMLElement* elem) {
     return txt ? txt : "";
 }
 
-void File::saveConcertsToXML(const std::vector<Concert> &concerts)
+void File::saveConcertsToXML(const std::vector<Concert> &concerts, const std::string &path) const
 {
-  std::string path = std::string(std::getenv("HOME")) + "/concerti.xml";
     XMLDocument doc;
 
     XMLDeclaration* decl = doc.NewDeclaration(R"(xml version="1.0" encoding="UTF-8")");
@@ -35,6 +34,7 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts)
         append("title", c.getTitle());
         append("comment", c.getComment());
         append("todo", c.getToDo());
+        append("timestamp", c.getTimestampAsString());
 
         // Places
         XMLElement* placesElem = doc.NewElement("places");
@@ -75,6 +75,11 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts)
             g->SetText(std::to_string(m.getGage()).c_str());
             mElem->InsertEndChild(g);
 
+            // ✅ timestamp
+            XMLElement* ts = doc.NewElement("timestamp");
+            ts->SetText(m.getTimestampAsString().c_str());
+            mElem->InsertEndChild(ts);
+
             musiciansElem->InsertEndChild(mElem);
         }
         concertElem->InsertEndChild(musiciansElem);
@@ -97,6 +102,11 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts)
             pelem("singerPart", p.getSingerPart());
             pelem("instruments", p.getInstruments());
 
+            // ✅ timestamp
+            XMLElement* ts = doc.NewElement("timestamp");
+            ts->SetText(p.getTimestampAsString().c_str());
+            pElem->InsertEndChild(ts);
+
             programElem->InsertEndChild(pElem);
         }
         concertElem->InsertEndChild(programElem);
@@ -117,6 +127,11 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts)
             rfield("place", r.getPlace());
             rfield("musicians", r.getMusicians());
 
+            // ✅ timestamp
+            XMLElement* ts = doc.NewElement("timestamp");
+            ts->SetText(r.getTimestampAsString().c_str());
+            rElem->InsertEndChild(ts);
+
             rehElem->InsertEndChild(rElem);
         }
         concertElem->InsertEndChild(rehElem);
@@ -127,12 +142,12 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts)
     doc.SaveFile(path.c_str());
 }
 
-std::vector<Concert> File::loadConcertsFromXML()
+
+std::vector<Concert> File::loadConcertsFromXML(const std::string& path)
 {
     LOG_MSG("Loading concerts from XML");
     std::vector<Concert> concerts;
 
-    std::string path = std::string(std::getenv("HOME")) + "/concerti.xml";
     XMLDocument doc;
     if (doc.LoadFile(path.c_str()) != XML_SUCCESS) {
         LOG_MSG("Could not open XML file");
@@ -151,6 +166,15 @@ std::vector<Concert> File::loadConcertsFromXML()
         concert.setTitle(getSafeText(concertElem->FirstChildElement("title")));
         concert.setComment(getSafeText(concertElem->FirstChildElement("comment")));
         concert.setToDo(getSafeText(concertElem->FirstChildElement("todo")));
+        std::string tsStr = getSafeText(concertElem->FirstChildElement("timestamp"));
+        if (!tsStr.empty()) {
+                        try {
+                            long long ts = std::stoll(tsStr);
+                            concert.setTimestamp(ts);
+                        } catch (...) {
+                            LOG_MSG("Invalid timestamp format for concert: ");
+                        }
+                    }
 
         // Places
         std::vector<std::string> places;
@@ -193,9 +217,21 @@ std::vector<Concert> File::loadConcertsFromXML()
                 LOG_MSG("Invalid gage value, set to 0");
             }
 
+            // Lettura del timestamp
+            std::string tsStr = getSafeText(mElem->FirstChildElement("timestamp"));
+            if (!tsStr.empty()) {
+                try {
+                    long long ts = std::stoll(tsStr);
+                    m.setTimestamp(ts);
+                } catch (...) {
+                    LOG_MSG("Invalid timestamp format for musician: " + tsStr);
+                }
+            }
+
             musicians.push_back(m);
         }
         concert.setMusicians(musicians);
+
 
         // Program
         std::vector<MusicalPiece> program;
@@ -207,19 +243,33 @@ std::vector<Concert> File::loadConcertsFromXML()
             MusicalPiece p("", "", 0, false, "", "");
             p.setComposer(getSafeText(pieceElem->FirstChildElement("composer")));
             p.setTitle(getSafeText(pieceElem->FirstChildElement("title")));
+
             try {
                 p.setDuration(stringToInt(getSafeText(pieceElem->FirstChildElement("duration"))));
             } catch (...) {
                 LOG_MSG("Invalid or missing duration");
                 p.setDuration(0);
             }
+
             p.setChoir(getSafeText(pieceElem->FirstChildElement("choir")) == "1");
             p.setSingerPart(getSafeText(pieceElem->FirstChildElement("singerPart")));
             p.setInstruments(getSafeText(pieceElem->FirstChildElement("instruments")));
 
+            // Lettura del timestamp
+            std::string tsStr = getSafeText(pieceElem->FirstChildElement("timestamp"));
+            if (!tsStr.empty()) {
+                try {
+                    long long ts = std::stoll(tsStr);
+                    p.setTimestamp(ts);
+                } catch (...) {
+                    LOG_MSG("Invalid timestamp format for musical piece: " + tsStr);
+                }
+            }
+
             program.push_back(p);
         }
         concert.setProgram(program);
+
 
         // Rehearsals
         std::vector<Rehearsal> rehearsals;
@@ -235,11 +285,21 @@ std::vector<Concert> File::loadConcertsFromXML()
                 continue;
             }
 
+            std::string tsStr = getSafeText(rElem->FirstChildElement("timestamp"));
+            long long ts = 0;
+            try {
+                ts = std::stoll(tsStr);
+            } catch (const std::exception& e) {
+                LOG_MSG("Invalid timestamp format: " + tsStr);
+                continue;
+            }
+
             Rehearsal r(
                 date,
                 getSafeText(rElem->FirstChildElement("start")),
                 getSafeText(rElem->FirstChildElement("place")),
-                getSafeText(rElem->FirstChildElement("musicians"))
+                getSafeText(rElem->FirstChildElement("musicians")),
+				ts
             );
             rehearsals.push_back(r);
         }

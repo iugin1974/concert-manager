@@ -1,8 +1,8 @@
 #include "ConcertController.h"
-#include "MainMenuView.h"
+
 #include <vector>
 #include <ncurses.h>
-#include <algorithm> // std::sort
+
 
 int main()
 {
@@ -22,36 +22,8 @@ int main()
 	keypad(stdscr, TRUE);
 
 	ConcertController controller;
-	std::vector<Concert> concerts;
-	controller.loadXML(concerts);
+	controller.start();
+	endwin();
+return 0;
 
-	while (true)
-	{
-		MainMenuView menu;
-		MainMenuView::Action action = menu.show();
-
-		switch (action)
-		{
-		case MainMenuView::ADD_CONCERT:
-		{
-			auto concert = controller.createConcert();
-			if (concert)
-				concerts.push_back(*concert);
-			controller.saveXML(concerts);
-		}
-		break;
-		case MainMenuView::MANAGE_CONCERTS:
-			controller.listConcerts(concerts);
-			break;
-
-		case MainMenuView::SAVE:
-			controller.saveXML(concerts);
-			break;
-
-		case MainMenuView::EXIT:
-			controller.saveXML(concerts); // salva prima di uscire
-			endwin();
-			return 0;
-		}
-	}
 }
