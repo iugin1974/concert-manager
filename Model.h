@@ -34,6 +34,7 @@ public:
     void deleteRehearsal(const Rehearsal& rehearsal, Concert& concert);
     void deleteConcert(size_t index);
     void deleteConcert(Concert* c);
+    void addComment(const std::string& comment, Concert* concert);
     void clear(); // rimuove tutto
 	void sortConcerts();
     size_t concertCount() const;

@@ -11,7 +11,11 @@ int main()
 	noecho();
 	initscr(); // inizializza ncurses
 	setlocale(LC_ALL, "");
-	// start_color();        // abilita i colori
+	start_color();        // abilita i colori
+use_default_colors();
+init_pair(1, COLOR_WHITE, COLOR_BLUE);   // barra principale
+init_pair(2, COLOR_BLACK, COLOR_CYAN);   // menu selezionato
+init_pair(3, COLOR_YELLOW, -1);          // evidenziato
 
 	// Definisci la coppia 1: testo bianco (COLOR_WHITE), sfondo blu (COLOR_BLUE)
 	// init_pair(1, COLOR_WHITE, COLOR_BLUE);

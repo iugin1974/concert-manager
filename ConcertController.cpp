@@ -6,6 +6,7 @@
 #include "concert_info_form.h"
 #include "rehearsal_form.h"
 #include "pieceForm.h"
+#include "VimView.h"
 #include <ncurses.h>
 #include "SelectionView.h"
 #include <optional> // per std::optional
@@ -124,68 +125,74 @@ void ConcertController::manageConcerts() {
 
 	ConcertSummaryView form;
 	form.setMenuBar(menuBar);
-	form.setConcert(*concert);
 
-	MenuCommand command = form.show();
-	switch (command) {
-	case MenuCommand::Quit: {
-		form.closeForm();
-		return;
-	}
-	case MenuCommand::EditConcertInfo: {
-		if(createEditConcert(concert)) {
-		sort();
-		save();
-	}
-		break;
-	}
-	case MenuCommand::DeleteConcert:
-		deleteConcert(concert);
-		save();
-		break;
-	case MenuCommand::AddMusician:
-		createMusician(concert);
-		save();
-		break;
-	case MenuCommand::EditMusician:
-		editMusician(concert);
-		save();
-		break;
-	case MenuCommand::DeleteMusician:
-		deleteMusician(concert);
-		save();
-		break;
-	case MenuCommand::AddPiece:
-		createPiece(concert);
-		save();
-		break;
-	case MenuCommand::EditPiece:
-		editPiece(concert);
-		save();
-		break;
-	case MenuCommand::DeletePiece:
-		deletePiece(concert);
-		save();
-		break;
-	case MenuCommand::AddRehearsal:
-		createRehearsal(concert);
-		save();
-		break;
-	case MenuCommand::EditRehearsal:
-		editRehearsal(concert);
-		save();
-		break;
-	case MenuCommand::DeleteRehearsal:
-		deleteRehearsal(concert);
-		save();
-		break;
-	case MenuCommand::Comment:
-		break;
-	case MenuCommand::Todo:
-		break;
 
-	default:
-		break;
+	while (true) {
+		form.setConcert(*concert);
+		MenuCommand command = form.show();
+		switch (command) {
+		case MenuCommand::Quit: {
+			form.closeForm();
+			return;
+		}
+		case MenuCommand::EditConcertInfo: {
+			if (createEditConcert(concert)) {
+				sort();
+				save();
+			}
+			break;
+		}
+		case MenuCommand::DeleteConcert:
+			deleteConcert(concert);
+			save();
+			break;
+		case MenuCommand::AddMusician:
+			createMusician(concert);
+			save();
+			break;
+		case MenuCommand::EditMusician:
+			editMusician(concert);
+			save();
+			break;
+		case MenuCommand::DeleteMusician:
+			deleteMusician(concert);
+			save();
+			break;
+		case MenuCommand::AddPiece:
+			createPiece(concert);
+			save();
+			break;
+		case MenuCommand::EditPiece:
+			editPiece(concert);
+			save();
+			break;
+		case MenuCommand::DeletePiece:
+			deletePiece(concert);
+			save();
+			break;
+		case MenuCommand::AddRehearsal:
+			createRehearsal(concert);
+			save();
+			break;
+		case MenuCommand::EditRehearsal:
+			editRehearsal(concert);
+			save();
+			break;
+		case MenuCommand::DeleteRehearsal:
+			deleteRehearsal(concert);
+			save();
+			break;
+		case MenuCommand::Comment:
+			if (commentConcert(concert)) {
+				save();
+			}
+			break;
+		case MenuCommand::Todo:
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 
@@ -401,6 +408,17 @@ std::optional<Rehearsal> ConcertController::createEditRehearsal(
 	}
 
 	return std::nullopt;
+}
+
+bool ConcertController::commentConcert(Concert *concert) {
+	std::string comment = concert->getComment();
+	VimView vimv;
+	bool commented = vimv.edit(comment);
+	if (commented) {
+		comment = vimv.getText();
+		model.addComment(comment, concert);
+	}
+	return commented;
 }
 
 void ConcertController::sort() {

@@ -165,6 +165,10 @@ void Model::deleteRehearsal(const Rehearsal &rehearsal, Concert &concert) {
 	}
 }
 
+void Model::addComment(const std::string& comment, Concert* concert) {
+	concert->setComment(comment);
+}
+
 void Model::clear() {
 	concerts.clear();
 }

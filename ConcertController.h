@@ -36,6 +36,8 @@ private:
 	void deleteRehearsal(Concert* concert);
 	std::optional<Rehearsal> createEditRehearsal(const Rehearsal* rehearsal);
 
+	bool commentConcert(Concert* concert);
+
 	void save();
 	void load();
 	void sort();
