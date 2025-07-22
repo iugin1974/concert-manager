@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <ctime>
 
+std::string Concert::basePathScores = "";
+
 Concert::Concert() : title("Untitled") {}
 
 Concert::Concert(const std::string &t) : title(t) {}
@@ -136,6 +138,12 @@ int Concert::getDuration() const {
     }
     return duration;
 }
+
+const std::vector<Score>& Concert::getScores() const { return scores; }
+    std::vector<Score>& Concert::getScores() { return scores; }
+
+    void Concert::setScores(const std::vector<Score>& s) { scores = s; }
+    void Concert::addScore(const Score& s) { scores.push_back(s); }
 
 std::string Concert::tmToString(const std::tm &date) {
     std::ostringstream oss;

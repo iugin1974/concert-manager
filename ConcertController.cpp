@@ -2,6 +2,8 @@
 #include "MainMenuView.h"
 #include "musician_form.h"
 #include "MusicalPiece.h"
+#include "ScoreSelectView.h"
+#include "Score.h"
 #include "ConcertSummaryView.h"
 #include "concert_info_form.h"
 #include "rehearsal_form.h"
@@ -10,6 +12,7 @@
 #include <ncurses.h>
 #include "SelectionView.h"
 #include <optional> // per std::optional
+#include <cstdlib>  // per system()
 
 void ConcertController::start() {
 	load();
@@ -94,7 +97,7 @@ void ConcertController::manageConcerts() {
 	concert = model.getConcert(choice);
 // Mostra la finestra con le possibilità di modificare il concerto
 	std::vector<std::string> menuTitles = { "File", "Concert", "Musician",
-			"Piece", "Rehearsal", "Tools" };
+			"Piece", "Rehearsal", "Scores", "Tools" };
 
 	std::vector<std::vector<MenuItem>> menuItems =
 			{ { { "Exit", MenuCommand::Quit } },
@@ -116,6 +119,11 @@ void ConcertController::manageConcerts() {
 							"Edit Rehearsal", MenuCommand::EditRehearsal }, {
 							"Delete Rehearsal", MenuCommand::DeleteRehearsal } },
 
+					{   // Scores
+					{ "Add Score", MenuCommand::AddScore }, { "Delete Score",
+							MenuCommand::DeleteScore },
+					{ "View Score", MenuCommand::ViewScore } },
+
 					{ // Misc
 					{ "Comment", MenuCommand::Comment }, { "TODO",
 							MenuCommand::Todo } } };
@@ -126,7 +134,6 @@ void ConcertController::manageConcerts() {
 
 	ConcertSummaryView form;
 	form.setMenuBar(menuBar);
-
 
 	while (true) {
 		form.setConcert(*concert);
@@ -182,6 +189,17 @@ void ConcertController::manageConcerts() {
 		case MenuCommand::DeleteRehearsal:
 			deleteRehearsal(concert);
 			save();
+			break;
+		case MenuCommand::AddScore:
+			addScore(concert);
+			save();
+			break;
+		case MenuCommand::DeleteScore:
+			deleteScore(concert);
+			save();
+			break;
+		case MenuCommand::ViewScore:
+			viewScore(concert);
 			break;
 		case MenuCommand::Comment:
 			if (commentConcert(concert)) {
@@ -409,6 +427,54 @@ std::optional<Rehearsal> ConcertController::createEditRehearsal(
 	}
 
 	return std::nullopt;
+}
+
+void ConcertController::viewScore(Concert *concert) {
+	clear();
+	SelectionView view;
+	const std::vector<Score> &scores = concert->getScores();
+	int choice = view.runChoiceForm(scores);
+	if (choice == -1)
+		return;
+	std::string path = concert->getScores().at(choice).getPath();
+#ifdef _WIN32
+    // Windows
+    std::string cmd = "start \"\" \"" + path + "\"";
+    system(cmd.c_str());
+#elif __APPLE__
+    // macOS
+    std::string cmd = "open \"" + path + "\"";
+    system(cmd.c_str());
+#else
+	// Linux/Unix
+	std::string cmd = "xdg-open \"" + path + "\"";
+	system(cmd.c_str());
+#endif
+}
+
+bool ConcertController::deleteScore(Concert *concert) {
+	clear();
+	SelectionView view;
+	const std::vector<Score> &scores = concert->getScores();
+	int choice = view.runChoiceForm(scores);
+	if (choice == -1)
+		return false;
+
+	Score s = scores.at(choice);
+	model.deleteScore(s, *concert);
+	return true;
+}
+
+bool ConcertController::addScore(Concert *concert) {
+	clear();
+	ScoreSelectView scoreSelectView;
+	std::optional<std::string> path = scoreSelectView.show();
+	if (path == std::nullopt)
+		return false;
+	Score s;
+	s.setPath(path.value());
+	model.addScore(s, *concert);
+	return true;
 }
 
 bool ConcertController::commentConcert(Concert *concert) {

@@ -20,6 +20,9 @@ enum class MenuCommand {
     AddRehearsal,
     EditRehearsal,
     DeleteRehearsal,
+	AddScore,
+	DeleteScore,
+	ViewScore,
     Comment,
     Todo,
     None

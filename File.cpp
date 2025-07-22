@@ -20,6 +20,7 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts, const std::st
     doc.InsertFirstChild(decl);
 
     XMLElement* root = doc.NewElement("concerts");
+    root->SetAttribute("pathScores", Concert::basePathScores.c_str());
     doc.InsertEndChild(root);
 
     for (const Concert& c : concerts) {
@@ -136,6 +137,19 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts, const std::st
         }
         concertElem->InsertEndChild(rehElem);
 
+        // Scores
+        XMLElement* scoresElem = doc.NewElement("scores");
+        for (const auto& score : c.getScores()) {
+            XMLElement* sElem = doc.NewElement("score");
+
+            XMLElement* pathElem = doc.NewElement("path");
+            pathElem->SetText(score.getPath().c_str());
+            sElem->InsertEndChild(pathElem);
+
+            scoresElem->InsertEndChild(sElem);
+        }
+        concertElem->InsertEndChild(scoresElem);
+
         root->InsertEndChild(concertElem);
     }
 
@@ -155,7 +169,14 @@ std::vector<Concert> File::loadConcertsFromXML(const std::string& path)
     }
 
     XMLElement* root = doc.FirstChildElement("concerts");
-    if (!root) return concerts;
+
+    // Leggi l'attributo pathScores dalla root
+    const char* basePath = root->Attribute("pathScores");
+    if (basePath) {
+        Concert::basePathScores = std::string(basePath);
+    } else {
+        Concert::basePathScores = "";  // default vuoto se non presente
+    }
 
     for (XMLElement* concertElem = root->FirstChildElement("concert");
          concertElem;
@@ -304,6 +325,26 @@ std::vector<Concert> File::loadConcertsFromXML(const std::string& path)
             rehearsals.push_back(r);
         }
         concert.setRehearsals(rehearsals);
+
+        // Scores
+        std::vector<Score> scores;
+        XMLElement* scoresElem = concertElem->FirstChildElement("scores");
+        for (XMLElement* sElem = scoresElem ? scoresElem->FirstChildElement("score") : nullptr;
+             sElem;
+             sElem = sElem->NextSiblingElement("score")) {
+
+            XMLElement* pathElem = sElem->FirstChildElement("path");
+            if (pathElem && pathElem->GetText()) {
+                Score s;
+                s.setPath(pathElem->GetText());
+                scores.push_back(s);
+            } else {
+                LOG_MSG("Invalid or missing <path> element in <score>");
+            }
+        }
+        concert.setScores(scores);
+
+
 
         concerts.push_back(concert);
     }

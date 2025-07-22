@@ -168,6 +168,23 @@ void Model::deleteRehearsal(const Rehearsal &rehearsal, Concert &concert) {
 	}
 }
 
+// aggiungi una score al concert
+void Model::addScore(const Score &score, Concert &concert) {
+    std::vector<Score> &scores = concert.getScores();
+    scores.push_back(score);
+}
+
+// elimina una score dal concert
+void Model::deleteScore(const Score &score, Concert &concert) {
+    std::vector<Score> &scores = concert.getScores();
+    for (auto it = scores.begin(); it != scores.end(); ++it) {
+        if (it->getPath() == score.getPath()) {
+            scores.erase(it);
+            break;
+        }
+    }
+}
+
 void Model::addComment(const std::string& comment, Concert* concert) {
 	concert->setComment(comment);
 }
