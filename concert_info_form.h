@@ -3,7 +3,6 @@
 #include "View.h"
 #include "MenuBar.h"
 #include <form.h>
-#define FORM_FIELDS 4
 
 class ConcertInfoForm : public View {
 public:
@@ -21,11 +20,12 @@ public:
     const std::vector<std::string> getPlacesAsVector();
 
 private:
+    static constexpr int NUMBER_OF_FIELDS = 4;
     const Concert* existing = nullptr;
     std::string title;
     std::string places;
     std::string dates;
-    FIELD *fields[FORM_FIELDS];
+    FIELD *fields[NUMBER_OF_FIELDS];
     FORM *form;
     std::vector<std::string> split(const std::string &input, char sep);
 };

@@ -5,12 +5,16 @@
 Rehearsal::Rehearsal() : Timestamped() {}
 
 Rehearsal::Rehearsal(const std::tm &date,
-		const std::string &startTime,
-		const std::string &place,
-		const std::string &musicians,
-		long long ts) :
-		date(date), startTime(startTime), place(place), musicians(musicians),
-	      Timestamped(ts == 0 ? generateTimestamp() : ts) {}
+                     const std::string &startTime,
+                     const std::string &place,
+                     const std::string &musicians,
+                     long long ts)
+    : Timestamped(ts == 0 ? generateTimestamp() : ts),
+      date(date),
+      startTime(startTime),
+      place(place),
+      musicians(musicians)
+{}
 
 
 // Getters

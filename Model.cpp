@@ -2,6 +2,7 @@
 #include "File.h"
 #include <string>
 #include <algorithm> // std::sort
+#include <stdexcept> // per std::out_of_range
 
 bool compareConcertByFirstDate(const Concert &a, const Concert &b)
 {
@@ -54,11 +55,13 @@ std::vector<Concert>& Model::getConcerts() {
 	return concerts;
 }
 
-Concert* Model::getConcert(int index) {
-	if (index >= concerts.size())
-		return nullptr;
-	return &concerts[index];
-}
+	Concert* Model::getConcert(int index) {
+	    if (index < 0 || static_cast<size_t>(index) >= concerts.size()) {
+	        throw std::out_of_range("Index out of range for vector 'concerts'");
+	    }
+
+	    return &concerts[index];
+	}
 
 // Operazioni
 void Model::addConcert(const Concert &concert) {

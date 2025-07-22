@@ -12,7 +12,6 @@ void ConcertSummaryView::setConcert(const Concert &c) {
 
 MenuCommand ConcertSummaryView::show() {
 	const auto &pieces = concert.getProgram();
-	const int pageSize = 10;
 
 	while (true) {
 		clear();

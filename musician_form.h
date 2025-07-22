@@ -6,7 +6,6 @@
 #include "View.h"
 #include <vector>
 #include <form.h>
-#define FORM_FIELDS 7
 
 class MusicianForm: public View {
 
@@ -24,6 +23,7 @@ public:
 	void closeForm() override;
 
 private:
+	static constexpr int NUMBER_OF_FIELDS = 7;
 	const Musician *existing = nullptr;
 	std::string name;
 	std::string phone;
@@ -31,6 +31,6 @@ private:
 	std::string mail;
 	std::string address;
 	double gage;
-	FIELD *fields[FORM_FIELDS];
+	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form;
 };

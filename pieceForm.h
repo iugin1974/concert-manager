@@ -1,7 +1,6 @@
 #pragma once
 #include "MusicalPiece.h"
 #include "View.h"
-#define FORM_FIELDS 6
 
 class PieceForm : public View {
 
@@ -12,14 +11,15 @@ public:
 	void setPiece(const MusicalPiece *piece);
 	const std::string getTitle() const;
 	const std::string getComposer() const;
-	const int getDuration() const;
+	int getDuration() const;
 	const std::string getSinger() const;
 	const std::string getInstruments() const;
-	const bool hasChoir() const;
+	bool hasChoir() const;
 	void validateFields() override;
 	void closeForm() override;
 
 private:
+	static constexpr int NUMBER_OF_FIELDS = 7;
 	const MusicalPiece *existing = nullptr;
 	std::string title;
 	std::string composer;
@@ -27,6 +27,6 @@ private:
 	std::string singer;
 	std::string instruments;
 	bool choir = false;
-	FIELD *fields[FORM_FIELDS];
+	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form;
 };

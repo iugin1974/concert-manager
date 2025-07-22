@@ -5,11 +5,19 @@
 MusicalPiece::MusicalPiece() { choir = false; }
 MusicalPiece::MusicalPiece(const std::string& composer,
                            const std::string& title,
-                           const int duration,
+                           int duration,
                            bool choir,
                            const std::string& singerPart,
                            const std::string& instruments,
-						   long long ts) {}
+                           long long ts)
+    : Timestamped(ts),
+	  composer(composer),
+      title(title),
+      duration(duration),
+      choir(choir),
+      singerPart(singerPart),
+      instruments(instruments) {}
+
 
 // Getter
 const std::string& MusicalPiece::getComposer() const    { return composer; }

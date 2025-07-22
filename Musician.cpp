@@ -3,7 +3,7 @@
 
 // Costruttori
 Musician::Musician()
-    : gage(0.0), Timestamped() {}
+    : Timestamped(), gage (0.0) {}
 
 Musician::Musician(const std::string& name,
                    const std::string& phone,
@@ -12,10 +12,14 @@ Musician::Musician(const std::string& name,
                    const std::string& address,
                    double gage,
                    long long ts)
-    : name(name), phone(phone), instrument(instrument),
-      email(email), address(address), gage(gage),
-      Timestamped(ts == 0 ? generateTimestamp() : ts) {}
-
+    : Timestamped(ts == 0 ? generateTimestamp() : ts),
+      name(name),
+      phone(phone),
+      instrument(instrument),
+      email(email),
+      address(address),
+      gage(gage)
+{}
 // Getter
 const std::string& Musician::getName() const       { return name; }
 const std::string& Musician::getPhone() const      { return phone; }

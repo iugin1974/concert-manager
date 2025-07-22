@@ -79,6 +79,7 @@ bool ConcertController::createEditConcert(Concert *existing) {
 
 	}
 	}
+	return false;
 }
 
 void ConcertController::manageConcerts() {

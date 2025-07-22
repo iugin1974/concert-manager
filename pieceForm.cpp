@@ -22,7 +22,7 @@ MenuCommand PieceForm::show() {
 	fields[5] = new_field(1, 40, 14, 20, 0, 0); // Instruments
 	fields[6] = nullptr;
 
-	for (int i = 0; i < FORM_FIELDS; ++i) {
+	for (int i = 0; i < NUMBER_OF_FIELDS; ++i) {
 		set_field_back(fields[i], A_UNDERLINE);
 		field_opts_off(fields[i], O_AUTOSKIP);
 	}
@@ -52,12 +52,6 @@ MenuCommand PieceForm::show() {
 
 	refresh();
 	form_driver(form, REQ_FIRST_FIELD);
-
-	auto trim = [](std::string s) {
-		s.erase(s.find_last_not_of(" \n") + 1);
-		s.erase(0, s.find_first_not_of(" "));
-		return s;
-	};
 
 	int ch;
 	while ((ch = getch())) {
@@ -96,6 +90,7 @@ MenuCommand PieceForm::show() {
 		}
 		refresh();
 	}
+	return MenuCommand::None;
 }
 
 void PieceForm::validateFields() {
@@ -114,13 +109,13 @@ void PieceForm::validateFields() {
 void PieceForm::closeForm() {
 	unpost_form(form);
 	free_form(form);
-	for (int i = 0; i < FORM_FIELDS; ++i)
+	for (int i = 0; i < NUMBER_OF_FIELDS; ++i)
 		free_field(fields[i]);
 }
 
 const std::string PieceForm::getTitle() const { return title; }
 const std::string PieceForm::getComposer() const { return composer; }
-const int PieceForm::getDuration() const { return duration; }
+int PieceForm::getDuration() const { return duration; }
 const std::string PieceForm::getSinger() const { return singer; }
 const std::string PieceForm::getInstruments() const { return instruments; }
-const bool PieceForm::hasChoir() const { return choir; }
+bool PieceForm::hasChoir() const { return choir; }

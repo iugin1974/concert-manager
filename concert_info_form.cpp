@@ -21,7 +21,7 @@ MenuCommand ConcertInfoForm::show() {
 	fields[2] = new_field(1, 40, 6, 30, 0, 0); // Dates
 	fields[3] = nullptr;
 
-	for (int i = 0; i < FORM_FIELDS - 1; ++i) {
+	for (int i = 0; i < NUMBER_OF_FIELDS - 1; ++i) {
 		set_field_back(fields[i], A_UNDERLINE);
 		field_opts_off(fields[i], O_AUTOSKIP);
 	}
@@ -52,22 +52,6 @@ MenuCommand ConcertInfoForm::show() {
 
 	refresh();
 	form_driver(form, REQ_FIRST_FIELD);
-
-	auto trim = [](std::string s) {
-		s.erase(s.find_last_not_of(" \n") + 1);
-		s.erase(0, s.find_first_not_of(" "));
-		return s;
-	};
-
-	auto split = [&](const std::string &s) {
-		std::vector<std::string> result;
-		std::stringstream ss(s);
-		std::string token;
-		while (std::getline(ss, token, ',')) {
-			result.push_back(trim(token));
-		}
-		return result;
-	};
 
 	int ch;
 	while ((ch = getch())) {
