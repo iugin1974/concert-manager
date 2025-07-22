@@ -1,14 +1,29 @@
 #include "Score.h"
 #include <algorithm>
 
+std::string Score::basePathScores = "";
+
 Score::Score(const std::string& p) : path(p) {}
 
 void Score::setPath(const std::string& p) {
-    path = p;
+    if (p.rfind(basePathScores, 0) == 0) {
+        // Il path inizia con basePathScores → salva solo la parte relativa
+        path = p.substr(basePathScores.length());
+        // Rimuove eventuale '/' iniziale rimasto
+        if (!path.empty() && path[0] == '/')
+            path = path.substr(1);
+    } else {
+        // Path assoluto o da posizione diversa → salva come è
+        path = p;
+    }
 }
 
 const std::string& Score::getPath() const {
     return path;
+}
+
+const std::string Score::getFullPath() const {
+	return basePathScores + "/" + path;
 }
 
 std::string Score::toString() const {

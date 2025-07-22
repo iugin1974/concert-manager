@@ -32,6 +32,15 @@ void Model::sortConcerts()
   std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
 }
 
+void Model::loadBasePath() {
+	File f;
+	std::optional<std::string> path = f.loadBasePathFromRcFile();
+	if (path) {
+	Score::basePathScores = path.value();
+	} else {
+		// TODO -> ritorna errore o qualcosa del genere
+	}
+}
 // Caricamento da file
 bool Model::loadFromFile(const std::string &filename) {
 	File f;

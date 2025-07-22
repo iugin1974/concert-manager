@@ -2,9 +2,40 @@
 #include "logMessage.h"
 #include "Utils.h"
 #include <fstream>
+#include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <optional>
+
 using namespace tinyxml2;
+
+std::optional<std::string> File::loadBasePathFromRcFile() {
+    const char* homeDir = getenv("HOME");
+    if (!homeDir) {
+        std::cerr << "HOME environment variable not set\n";
+        return std::nullopt;
+    }
+
+    std::string rcPath = std::string(homeDir) + "/.concertmanagerrc";
+    std::ifstream infile(rcPath);
+    if (!infile) {
+        std::cerr << "Cannot open " << rcPath << "\n";
+        return std::nullopt;
+    }
+
+    std::string line;
+    while (std::getline(infile, line)) {
+        // Supporta sia chiave=valore che direttamente una path
+    	if (line.rfind("path=", 0) == 0) {
+    	    return line.substr(std::string("path=").length());
+        } else if (!line.empty() && line[0] != '#') { // questo trova la path se manca path=
+            return line;
+        }
+    }
+
+    std::cerr << "No valid basePathScores found in " << rcPath << "\n";
+    return std::nullopt;
+}
 
 std::string File::getSafeText(tinyxml2::XMLElement* elem) {
     if (!elem) return "";
@@ -20,7 +51,6 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts, const std::st
     doc.InsertFirstChild(decl);
 
     XMLElement* root = doc.NewElement("concerts");
-    root->SetAttribute("pathScores", Concert::basePathScores.c_str());
     doc.InsertEndChild(root);
 
     for (const Concert& c : concerts) {
@@ -171,13 +201,6 @@ std::vector<Concert> File::loadConcertsFromXML(const std::string& path)
     XMLElement* root = doc.FirstChildElement("concerts");
 
     // Leggi l'attributo pathScores dalla root
-    const char* basePath = root->Attribute("pathScores");
-    if (basePath) {
-        Concert::basePathScores = std::string(basePath);
-    } else {
-        Concert::basePathScores = "";  // default vuoto se non presente
-    }
-
     for (XMLElement* concertElem = root->FirstChildElement("concert");
          concertElem;
          concertElem = concertElem->NextSiblingElement("concert")) {

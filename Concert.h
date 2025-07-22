@@ -23,7 +23,6 @@ private:
 
 public:
 
-	static std::string basePathScores;
 	Concert();
 	Concert(const std::string &t);
 

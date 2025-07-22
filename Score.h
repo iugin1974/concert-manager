@@ -8,11 +8,13 @@ private:
     std::string path;
 
 public:
+    static std::string basePathScores;
     Score() = default;
     explicit Score(const std::string& p);
 
     void setPath(const std::string& p);
     const std::string& getPath() const;
+    const std::string getFullPath() const;
 
     // Restituisce solo il nome del file (es. "partitura.pdf")
     std::string toString() const;

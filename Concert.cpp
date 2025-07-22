@@ -5,8 +5,6 @@
 #include <algorithm>
 #include <ctime>
 
-std::string Concert::basePathScores = "";
-
 Concert::Concert() : title("Untitled") {}
 
 Concert::Concert(const std::string &t) : title(t) {}

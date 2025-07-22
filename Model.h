@@ -12,6 +12,7 @@ public:
 
     // Caricamento e salvataggio
     bool loadFromFile(const std::string& filename);
+    void loadBasePath();
     bool saveToFile(const std::string& filename) const;
 
     // Accesso ai concerti

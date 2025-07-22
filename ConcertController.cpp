@@ -436,7 +436,7 @@ void ConcertController::viewScore(Concert *concert) {
 	int choice = view.runChoiceForm(scores);
 	if (choice == -1)
 		return;
-	std::string path = concert->getScores().at(choice).getPath();
+	std::string path = Score::basePathScores + "/" + concert->getScores().at(choice).getPath();
 #ifdef _WIN32
     // Windows
     std::string cmd = "start \"\" \"" + path + "\"";
@@ -497,5 +497,6 @@ void ConcertController::save() {
 }
 
 void ConcertController::load() {
+	model.loadBasePath();
 	model.loadFromFile("/tmp/concerts.xml");
 }

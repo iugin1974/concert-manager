@@ -46,7 +46,7 @@ std::optional<std::string> ScoreSelectView::show() {
 
 void ScoreSelectView::loadScores() {
     availablePaths.clear();
-    std::string base = Concert::basePathScores;
+    std::string base = Score::basePathScores;
     if (!fs::exists(base) || !fs::is_directory(base)) return;
 
     for (const auto& entry : fs::recursive_directory_iterator(base)) {
