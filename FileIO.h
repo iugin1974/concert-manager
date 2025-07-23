@@ -6,8 +6,9 @@
 #include <string>
 #include <optional>
 
-class File {
+class FileIO {
 public:
+	static std::string savePath;
 	void saveConcertsToXML(const std::vector<Concert> &concerts,
 			const std::string &path) const;
 	std::vector<Concert> loadConcertsFromXML(const std::string &filename);

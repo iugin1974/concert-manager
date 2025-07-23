@@ -4,6 +4,7 @@
 #include "MusicalPiece.h"
 #include "ScoreSelectView.h"
 #include "Score.h"
+#include "FileIO.h"
 #include "ConcertSummaryView.h"
 #include "concert_info_form.h"
 #include "rehearsal_form.h"
@@ -493,10 +494,10 @@ void ConcertController::sort() {
 }
 
 void ConcertController::save() {
-	model.saveToFile("/tmp/concerts.xml");
+	model.saveToFile(FileIO::savePath);
 }
 
 void ConcertController::load() {
 	model.loadBasePath();
-	model.loadFromFile("/tmp/concerts.xml");
+	model.loadFromFile(FileIO::savePath);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <chrono>
 #include <ctime>
@@ -7,7 +8,13 @@
 
 // Funzione interna che scrive il log
 inline void logMessageImpl(const std::string& msg, const char* func, const char* file, int line) {
-    std::ofstream logFile("app.log", std::ios::app);
+	const char* homeDir = getenv("HOME");
+	if (homeDir == nullptr) {
+	    std::cerr << "Error: HOME environment variable not found.\n";
+	    exit(1);
+	}
+	std::string logPath = std::string(homeDir) + "/app.log";
+    std::ofstream logFile(logPath, std::ios::app);
     if (!logFile.is_open()) return;
 
     auto now = std::chrono::system_clock::now();

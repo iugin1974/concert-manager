@@ -8,7 +8,7 @@ CXX = clang++
 CXXFLAGS = -std=c++17 -Wall -Wextra -g
 
 # File sorgente
-SRCS = main.cpp Musician.cpp MusicalPiece.cpp Concert.cpp musician_form.cpp concert_info_form.cpp ConcertController.cpp MainMenuView.cpp ConcertSummaryView.cpp Utils.cpp logMessage.cpp pieceForm.cpp Rehearsal.cpp rehearsal_form.cpp MenuBar.cpp SelectionView.cpp ScoreSelectView.cpp File.cpp Timestamped.cpp Model.cpp VimView.cpp Score.cpp tinyxml2.cpp
+SRCS = main.cpp Musician.cpp MusicalPiece.cpp Concert.cpp musician_form.cpp concert_info_form.cpp ConcertController.cpp MainMenuView.cpp ConcertSummaryView.cpp Utils.cpp logMessage.cpp pieceForm.cpp Rehearsal.cpp rehearsal_form.cpp MenuBar.cpp SelectionView.cpp ScoreSelectView.cpp FileIO.cpp Timestamped.cpp Model.cpp VimView.cpp Score.cpp tinyxml2.cpp
 
 # File oggetto
 OBJS = $(SRCS:.cpp=.o)

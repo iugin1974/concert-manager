@@ -1,4 +1,5 @@
-#include "File.h"
+#include "FileIO.h"
+
 #include "logMessage.h"
 #include "Utils.h"
 #include <fstream>
@@ -8,8 +9,10 @@
 #include <optional>
 
 using namespace tinyxml2;
+std::string FileIO::savePath = "";
 
-std::optional<std::string> File::loadBasePathFromRcFile() {
+static std::string savePath;
+std::optional<std::string> FileIO::loadBasePathFromRcFile() {
     const char* homeDir = getenv("HOME");
     if (!homeDir) {
         std::cerr << "HOME environment variable not set\n";
@@ -37,13 +40,13 @@ std::optional<std::string> File::loadBasePathFromRcFile() {
     return std::nullopt;
 }
 
-std::string File::getSafeText(tinyxml2::XMLElement* elem) {
+std::string FileIO::getSafeText(tinyxml2::XMLElement* elem) {
     if (!elem) return "";
     const char* txt = elem->GetText();
     return txt ? txt : "";
 }
 
-void File::saveConcertsToXML(const std::vector<Concert> &concerts, const std::string &path) const
+void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::string &path) const
 {
     XMLDocument doc;
 
@@ -187,7 +190,7 @@ void File::saveConcertsToXML(const std::vector<Concert> &concerts, const std::st
 }
 
 
-std::vector<Concert> File::loadConcertsFromXML(const std::string& path)
+std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
 {
     LOG_MSG("Loading concerts from XML");
     std::vector<Concert> concerts;

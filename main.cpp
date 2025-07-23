@@ -1,5 +1,5 @@
 #include "ConcertController.h"
-
+#include "logMessage.h"
 #include <vector>
 #include <ncurses.h>
 #include <iostream>
@@ -7,12 +7,19 @@
 #include <string>
 #include <filesystem>
 #include <cstdlib>
+#include "FileIO.h"
 
-std::string get_partiture_base_path() {
+
+std::string getHomePath() {
+    const char* home = std::getenv("HOME");
+    return home ? std::string(home) : ".";
+}
+
+void load_config() {
     const char* home = std::getenv("HOME");
     if (!home) {
         std::cerr << "Error: HOME environment variable not set.\n";
-        return "";
+        std::exit(1);
     }
 
     std::filesystem::path config_path = std::filesystem::path(home) / ".concertmanagerrc";
@@ -20,31 +27,54 @@ std::string get_partiture_base_path() {
     if (!std::filesystem::exists(config_path)) {
         std::cerr << "[concertmanager] Configuration file not found:\n";
         std::cerr << "Please create a file at: " << config_path << "\n";
-        std::cerr << "The file should contain one line like:\n";
-        std::cerr << "path=/your/path/to/partiture\n";
-        return "";
+        std::cerr << "Example content:\n";
+        std::cerr << "scoresBasePath=/your/path/to/partiture\n";
+        std::cerr << "savePath=/your/path/for/xml\n";
+        std::exit(1);
     }
 
     std::ifstream infile(config_path);
     std::string line;
+
     while (std::getline(infile, line)) {
-        if (line.rfind("path=", 0) == 0) { // starts with "path="
-            std::string path = line.substr(5); // remove "path="
-            return path;
+        if (line.rfind("scoresBasePath=", 0) == 0) {
+            Score::basePathScores = line.substr(std::string("scoresBasePath=").length());
+            LOG_MSG("ScoresBasePath is " + Score::basePathScores);
+        } else if (line.rfind("savePath=", 0) == 0) {
+            FileIO::savePath = line.substr(std::string("savePath=").length());
+            LOG_MSG("SavePath is "+FileIO::savePath);
         }
     }
 
-    std::cerr << "[concertmanager] Invalid config file format.\n";
-    std::cerr << "Expected line like: path=/your/path/to/partiture\n";
-    return "";
+    // Fallback defaults
+    if (FileIO::savePath.empty()) {
+        FileIO::savePath = getHomePath();
+    }
+
+    // Validate paths
+    if (Score::basePathScores.empty()) {
+        std::cerr << "[concertmanager] Error: 'scoresBasePath' is missing in .concertmanagerrc.\n";
+        std::exit(1);
+    }
+    if (!std::filesystem::exists(Score::basePathScores) ||
+        !std::filesystem::is_directory(Score::basePathScores)) {
+        std::cerr << "[concertmanager] Error: scoresBasePath '"
+                  << Score::basePathScores << "' in .concertmanagerrc does not exist or is not a directory.\n";
+        std::exit(1);
+    }
+
+    if (!std::filesystem::exists(FileIO::savePath) ||
+        !std::filesystem::is_directory(FileIO::savePath)) {
+        std::cerr << "[concertmanager] Error: savePath '"
+                  << FileIO::savePath << "' in .concertmanagerrc does not exist or is not a directory.\n";
+        std::exit(1);
+    }
 }
+
 
 int main()
 {
-	std::string base_path = get_partiture_base_path();
-	if (base_path.empty()) {
-	    exit(1);
-	}
+	load_config();
 	initscr();
 	cbreak();
 	noecho();

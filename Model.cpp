@@ -1,8 +1,8 @@
 #include "Model.h"
-#include "File.h"
 #include <string>
 #include <algorithm> // std::sort
 #include <stdexcept> // per std::out_of_range
+#include "FileIO.h"
 
 bool compareConcertByFirstDate(const Concert &a, const Concert &b)
 {
@@ -33,7 +33,7 @@ void Model::sortConcerts()
 }
 
 void Model::loadBasePath() {
-	File f;
+	FileIO f;
 	std::optional<std::string> path = f.loadBasePathFromRcFile();
 	if (path) {
 	Score::basePathScores = path.value();
@@ -43,14 +43,14 @@ void Model::loadBasePath() {
 }
 // Caricamento da file
 bool Model::loadFromFile(const std::string &filename) {
-	File f;
+	FileIO f;
 	concerts = f.loadConcertsFromXML(filename);
 	return true; // TODO
 }
 
 // Salvataggio su file
 bool Model::saveToFile(const std::string &filename) const {
-	File f;
+	FileIO f;
 	f.saveConcertsToXML(concerts, filename);
 	return true; // TODO
 }
