@@ -494,10 +494,10 @@ void ConcertController::sort() {
 }
 
 void ConcertController::save() {
-	model.saveToFile(FileIO::savePath);
+	model.saveToFile(FileIO::savePath + "/concerts.xml");
 }
 
 void ConcertController::load() {
 	model.loadBasePath();
-	model.loadFromFile(FileIO::savePath);
+	model.loadFromFile(FileIO::savePath + "/concerts.xml");
 }

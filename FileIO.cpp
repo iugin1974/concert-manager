@@ -197,7 +197,7 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
 
     XMLDocument doc;
     if (doc.LoadFile(path.c_str()) != XML_SUCCESS) {
-        LOG_MSG("Could not open XML file");
+        LOG_MSG("Could not open XML file " + path);
         return concerts;
     }
 
