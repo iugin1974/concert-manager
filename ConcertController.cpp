@@ -98,7 +98,7 @@ void ConcertController::manageConcerts() {
 	concert = model.getConcert(choice);
 // Mostra la finestra con le possibilità di modificare il concerto
 	std::vector<std::string> menuTitles = { "File", "Concert", "Musician",
-			"Piece", "Rehearsal", "Scores", "Tools" };
+			"Piece", "Rehearsal", "Tools" };
 
 	std::vector<std::vector<MenuItem>> menuItems =
 			{ { { "Exit", MenuCommand::Quit } },
@@ -119,11 +119,6 @@ void ConcertController::manageConcerts() {
 					{ "Add Rehearsal", MenuCommand::AddRehearsal }, {
 							"Edit Rehearsal", MenuCommand::EditRehearsal }, {
 							"Delete Rehearsal", MenuCommand::DeleteRehearsal } },
-
-					{   // Scores
-					{ "Add Score", MenuCommand::AddScore }, { "Delete Score",
-							MenuCommand::DeleteScore },
-					{ "View Score", MenuCommand::ViewScore } },
 
 					{ // Misc
 					{ "Comment", MenuCommand::Comment }, { "TODO",
@@ -190,17 +185,6 @@ void ConcertController::manageConcerts() {
 		case MenuCommand::DeleteRehearsal:
 			deleteRehearsal(concert);
 			save();
-			break;
-		case MenuCommand::AddScore:
-			addScore(concert);
-			save();
-			break;
-		case MenuCommand::DeleteScore:
-			deleteScore(concert);
-			save();
-			break;
-		case MenuCommand::ViewScore:
-			viewScore(concert);
 			break;
 		case MenuCommand::Comment:
 			if (commentConcert(concert)) {
@@ -304,7 +288,7 @@ void ConcertController::editPiece(Concert *concert) {
 	if (choice == -1)
 		return;
 
-	const MusicalPiece oldPiece = pieces.at(choice);
+	MusicalPiece oldPiece = pieces.at(choice);
 	std::optional<MusicalPiece> updated = createEditPiece(&oldPiece);
 	if (updated) {
 		model.updatePiece(oldPiece, *updated, *concert);
@@ -324,11 +308,15 @@ void ConcertController::deletePiece(Concert *concert) {
 }
 
 std::optional<MusicalPiece> ConcertController::createEditPiece(
-		const MusicalPiece *piece) {
-	std::vector<std::string> menuTitles = { "File" };
+		MusicalPiece *piece) {
+	std::vector<std::string> menuTitles = { "File", "Score" };
 	std::vector<std::vector<MenuItem>> menuItems = { { { "Save and Exit",
 			MenuCommand::SaveExit },
-			{ "Exit without saving", MenuCommand::Quit } } };
+			{ "Exit without saving", MenuCommand::Quit } },
+			{   // Scores
+								{ "Add Score", MenuCommand::AddScore }, { "Delete Score",
+										MenuCommand::DeleteScore },
+								{ "View Score", MenuCommand::ViewScore } }};
 
 	MenuBar menuBar(stdscr);
 	menuBar.setTitles(menuTitles);
@@ -354,6 +342,17 @@ std::optional<MusicalPiece> ConcertController::createEditPiece(
 	}
 	case MenuCommand::Quit:
 		return std::nullopt;
+	case MenuCommand::AddScore:
+				addScore(piece);
+				save();
+				break;
+			case MenuCommand::DeleteScore:
+				deleteScore(piece);
+				save();
+				break;
+			case MenuCommand::ViewScore:
+				viewScore(piece);
+				break;
 	default:
 		break;
 	}
@@ -430,14 +429,14 @@ std::optional<Rehearsal> ConcertController::createEditRehearsal(
 	return std::nullopt;
 }
 
-void ConcertController::viewScore(Concert *concert) {
+void ConcertController::viewScore(const MusicalPiece* piece) {
 	clear();
 	SelectionView view;
-	const std::vector<Score> &scores = concert->getScores();
+	const std::vector<Score> &scores = piece->getScores();
 	int choice = view.runChoiceForm(scores);
 	if (choice == -1)
 		return;
-	std::string path = Score::basePathScores + "/" + concert->getScores().at(choice).getPath();
+	std::string path = Score::basePathScores + "/" + piece->getScores().at(choice).getPath();
 #ifdef _WIN32
     // Windows
     std::string cmd = "start \"\" \"" + path + "\"";
@@ -453,20 +452,20 @@ void ConcertController::viewScore(Concert *concert) {
 #endif
 }
 
-bool ConcertController::deleteScore(Concert *concert) {
+bool ConcertController::deleteScore(MusicalPiece *piece) {
 	clear();
 	SelectionView view;
-	const std::vector<Score> &scores = concert->getScores();
+	const std::vector<Score> &scores = piece->getScores();
 	int choice = view.runChoiceForm(scores);
 	if (choice == -1)
 		return false;
 
 	Score s = scores.at(choice);
-	model.deleteScore(s, *concert);
+	model.deleteScore(s, *piece);
 	return true;
 }
 
-bool ConcertController::addScore(Concert *concert) {
+bool ConcertController::addScore(MusicalPiece *piece) {
 	clear();
 	ScoreSelectView scoreSelectView;
 	std::optional<std::string> path = scoreSelectView.show();
@@ -474,7 +473,7 @@ bool ConcertController::addScore(Concert *concert) {
 		return false;
 	Score s;
 	s.setPath(path.value());
-	model.addScore(s, *concert);
+	model.addScore(s, *piece);
 	return true;
 }
 
@@ -498,6 +497,5 @@ void ConcertController::save() {
 }
 
 void ConcertController::load() {
-	model.loadBasePath();
 	model.loadFromFile(FileIO::savePath + "/concerts.xml");
 }

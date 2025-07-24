@@ -11,7 +11,6 @@
 using namespace tinyxml2;
 std::string FileIO::savePath = "";
 
-static std::string savePath;
 std::optional<std::string> FileIO::loadBasePathFromRcFile() {
     const char* homeDir = getenv("HOME");
     if (!homeDir) {
@@ -142,6 +141,21 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
             pElem->InsertEndChild(ts);
 
             programElem->InsertEndChild(pElem);
+
+            // Scores
+                    XMLElement* scoresElem = doc.NewElement("scores");
+                    for (const auto& score : p.getScores()) {
+                        XMLElement* sElem = doc.NewElement("score");
+
+                        XMLElement* pathElem = doc.NewElement("path");
+                        pathElem->SetText(score.getPath().c_str());
+                        sElem->InsertEndChild(pathElem);
+
+                        programElem->InsertEndChild(sElem);
+                    }
+                    concertElem->InsertEndChild(scoresElem);
+
+
         }
         concertElem->InsertEndChild(programElem);
 
@@ -169,19 +183,6 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
             rehElem->InsertEndChild(rElem);
         }
         concertElem->InsertEndChild(rehElem);
-
-        // Scores
-        XMLElement* scoresElem = doc.NewElement("scores");
-        for (const auto& score : c.getScores()) {
-            XMLElement* sElem = doc.NewElement("score");
-
-            XMLElement* pathElem = doc.NewElement("path");
-            pathElem->SetText(score.getPath().c_str());
-            sElem->InsertEndChild(pathElem);
-
-            scoresElem->InsertEndChild(sElem);
-        }
-        concertElem->InsertEndChild(scoresElem);
 
         root->InsertEndChild(concertElem);
     }
@@ -313,6 +314,24 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
                 }
             }
 
+            // ✅ Caricamento scores associati a questo piece
+            std::vector<Score> scores;
+            XMLElement* scoresElem = pieceElem->FirstChildElement("scores");
+            for (XMLElement* sElem = scoresElem ? scoresElem->FirstChildElement("score") : nullptr;
+                 sElem;
+                 sElem = sElem->NextSiblingElement("score")) {
+
+                XMLElement* pathElem = sElem->FirstChildElement("path");
+                if (pathElem && pathElem->GetText()) {
+                    Score s;
+                    s.setPath(pathElem->GetText());  // gestisce path relativa
+                    scores.push_back(s);
+                } else {
+                    LOG_MSG("Invalid or missing <path> element in <score>");
+                }
+            }
+            p.setScores(scores);
+
             program.push_back(p);
         }
         concert.setProgram(program);
@@ -351,26 +370,6 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
             rehearsals.push_back(r);
         }
         concert.setRehearsals(rehearsals);
-
-        // Scores
-        std::vector<Score> scores;
-        XMLElement* scoresElem = concertElem->FirstChildElement("scores");
-        for (XMLElement* sElem = scoresElem ? scoresElem->FirstChildElement("score") : nullptr;
-             sElem;
-             sElem = sElem->NextSiblingElement("score")) {
-
-            XMLElement* pathElem = sElem->FirstChildElement("path");
-            if (pathElem && pathElem->GetText()) {
-                Score s;
-                s.setPath(pathElem->GetText());
-                scores.push_back(s);
-            } else {
-                LOG_MSG("Invalid or missing <path> element in <score>");
-            }
-        }
-        concert.setScores(scores);
-
-
 
         concerts.push_back(concert);
     }

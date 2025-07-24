@@ -1,7 +1,7 @@
 // ScoreSelectView.cpp
 #include "ScoreSelectView.h"
 #include "Concert.h"
-
+#include "logMessage.h"
 #include <filesystem>
 #include <ncurses.h>
 #include <algorithm>
@@ -36,6 +36,35 @@ std::optional<std::string> ScoreSelectView::show() {
                 }
                 draw();
                 break;
+
+            case KEY_PPAGE:  // Page Up
+                currentSelection -= (windowHeight - 2);
+                if (currentSelection < 0) currentSelection = 0;
+                if (currentSelection < offset) offset = currentSelection;
+                draw();
+                break;
+
+            case KEY_NPAGE:  // Page Down
+                currentSelection += (windowHeight - 2);
+                if (currentSelection > (int)availablePaths.size() - 1)
+                    currentSelection = (int)availablePaths.size() - 1;
+                if (currentSelection >= offset + windowHeight - 2)
+                    offset = currentSelection - (windowHeight - 2) + 1;
+                draw();
+                break;
+
+            case KEY_HOME:
+                currentSelection = 0;
+                offset = 0;
+                draw();
+                break;
+
+            case KEY_END:
+                currentSelection = (int)availablePaths.size() - 1;
+                offset = (currentSelection >= windowHeight - 2) ? currentSelection - (windowHeight - 2) + 1 : 0;
+                draw();
+                break;
+
             case 10: // Enter
                 return availablePaths[currentSelection];
             case 27: // ESC
@@ -44,18 +73,29 @@ std::optional<std::string> ScoreSelectView::show() {
     }
 }
 
+
 void ScoreSelectView::loadScores() {
     availablePaths.clear();
     std::string base = Score::basePathScores;
-    if (!fs::exists(base) || !fs::is_directory(base)) return;
+    if (!fs::exists(base) || !fs::is_directory(base)) {
+        LOG_MSG(base + " doesn't exist or is not a directory");
+        return;
+    }
 
     for (const auto& entry : fs::recursive_directory_iterator(base)) {
         if (entry.is_regular_file() && entry.path().extension() == ".pdf") {
             availablePaths.push_back(entry.path().string());
         }
     }
-    std::sort(availablePaths.begin(), availablePaths.end());
+    // Ordina alfabeticamente (lexicograficamente)
+    std::sort(availablePaths.begin(), availablePaths.end(),
+        [](const std::string& a, const std::string& b) {
+            std::string fileA = fs::path(a).filename().string();
+            std::string fileB = fs::path(b).filename().string();
+            return fileA < fileB;
+        });
 }
+
 
 void ScoreSelectView::draw() {
     clear();

@@ -17,7 +17,6 @@ private:
 	std::vector<MusicalPiece> program;
 	std::vector<Musician> musicians;
 	std::vector<Rehearsal> rehearsals;
-	std::vector<Score> scores;
 	std::string todo;
 	std::string comment;
 
@@ -55,12 +54,6 @@ public:
 	void setRehearsals(const std::vector<Rehearsal> &r);
 	const std::vector<Rehearsal>& getRehearsals() const;
 	std::vector<Rehearsal>& getRehearsals();  // overload non const
-
-	const std::vector<Score>& getScores() const;
-	std::vector<Score>& getScores();
-
-	void setScores(const std::vector<Score> &s);
-	void addScore(const Score &s);
 
 	void setToDo(const std::string &td);
 	const std::string& getToDo() const;

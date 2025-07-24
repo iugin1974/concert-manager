@@ -28,7 +28,7 @@ private:
 
 	void createPiece(Concert* concert);
 	void editPiece(Concert* concert);
-	std::optional<MusicalPiece> createEditPiece(const MusicalPiece *MusicalPieces);
+	std::optional<MusicalPiece> createEditPiece(MusicalPiece *MusicalPieces);
 	void deletePiece(Concert* concert);
 
 	void createRehearsal(Concert* concert);
@@ -36,9 +36,9 @@ private:
 	void deleteRehearsal(Concert* concert);
 	std::optional<Rehearsal> createEditRehearsal(const Rehearsal* rehearsal);
 
-	bool addScore(Concert* concert);
-	bool deleteScore(Concert* concert);
-	void viewScore(Concert* concert);
+	bool addScore(MusicalPiece* piece);
+	bool deleteScore(MusicalPiece* piece);
+	void viewScore(const MusicalPiece* piece);
 
 	bool commentConcert(Concert* concert);
 

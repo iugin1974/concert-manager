@@ -1,5 +1,7 @@
 #include "MusicalPiece.h"
+#include "Score.h"
 #include <iostream>
+#include <vector>
 
 // Costruttore
 MusicalPiece::MusicalPiece() { choir = false; }
@@ -34,7 +36,11 @@ void MusicalPiece::setDuration(const int d)      { duration = d; }
 void MusicalPiece::setChoir(bool ch)                      { choir = ch; }
 void MusicalPiece::setSingerPart(const std::string& s)    { singerPart = s; }
 void MusicalPiece::setInstruments(const std::string& i)   { instruments = i; }
+const std::vector<Score>& MusicalPiece::getScores() const { return scores; }
+    std::vector<Score>& MusicalPiece::getScores() { return scores; }
 
+    void MusicalPiece::setScores(const std::vector<Score>& s) { scores = s; }
+    void MusicalPiece::addScore(const Score& s) { scores.push_back(s); }
 // Print
 void MusicalPiece::print() const {
     std::cout << "Title: " << title << "\n"

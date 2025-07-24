@@ -32,15 +32,6 @@ void Model::sortConcerts()
   std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
 }
 
-void Model::loadBasePath() {
-	FileIO f;
-	std::optional<std::string> path = f.loadBasePathFromRcFile();
-	if (path) {
-	Score::basePathScores = path.value();
-	} else {
-		// TODO -> ritorna errore o qualcosa del genere
-	}
-}
 // Caricamento da file
 bool Model::loadFromFile(const std::string &filename) {
 	FileIO f;
@@ -178,14 +169,14 @@ void Model::deleteRehearsal(const Rehearsal &rehearsal, Concert &concert) {
 }
 
 // aggiungi una score al concert
-void Model::addScore(const Score &score, Concert &concert) {
-    std::vector<Score> &scores = concert.getScores();
+void Model::addScore(const Score &score, MusicalPiece &piece) {
+    std::vector<Score> &scores = piece.getScores();
     scores.push_back(score);
 }
 
 // elimina una score dal concert
-void Model::deleteScore(const Score &score, Concert &concert) {
-    std::vector<Score> &scores = concert.getScores();
+void Model::deleteScore(const Score &score, MusicalPiece &piece) {
+    std::vector<Score> &scores = piece.getScores();
     for (auto it = scores.begin(); it != scores.end(); ++it) {
         if (it->getPath() == score.getPath()) {
             scores.erase(it);

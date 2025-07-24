@@ -12,7 +12,6 @@ public:
 
     // Caricamento e salvataggio
     bool loadFromFile(const std::string& filename);
-    void loadBasePath();
     bool saveToFile(const std::string& filename) const;
 
     // Accesso ai concerti
@@ -35,8 +34,8 @@ public:
     void deleteRehearsal(const Rehearsal& rehearsal, Concert& concert);
     void deleteConcert(size_t index);
     void deleteConcert(Concert* c);
-    void addScore(const Score &score, Concert &concert);
-    void deleteScore(const Score &score, Concert &concert);
+    void addScore(const Score &score, MusicalPiece &piece);
+    void deleteScore(const Score &score, MusicalPiece &piece);
     void addComment(const std::string& comment, Concert* concert);
     void clear(); // rimuove tutto
 	void sortConcerts();

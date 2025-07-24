@@ -2,6 +2,8 @@
 #define MUSICALPIECE_H
 
 #include <string>
+#include <vector>
+#include "Score.h"
 #include "Timestamped.h"
 
 class MusicalPiece: public Timestamped {
@@ -12,6 +14,7 @@ private:
 	bool choir = false;
 	std::string singerPart;
 	std::string instruments;  // es. "Vl1, Vl2, Vla, Kb"
+	std::vector<Score> scores;
 
 public:
 	// Costruttore
@@ -35,7 +38,11 @@ public:
 	void setChoir(bool choir);
 	void setSingerPart(const std::string &singerPart);
 	void setInstruments(const std::string &instruments);
+	const std::vector<Score>& getScores() const;
+		std::vector<Score>& getScores();
 
+		void setScores(const std::vector<Score> &s);
+		void addScore(const Score &s);
 	// Stampa a terminale
 	void print() const;
 	std::string toString() const;

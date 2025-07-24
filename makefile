@@ -5,7 +5,7 @@ TARGET = concertmanager
 CXX = clang++
 
 # Opzioni di compilazione
-CXXFLAGS = -std=c++17 -Wall -Wextra -g
+CXXFLAGS = -std=c++17 -Wall -Wextra -g -fsanitize=address -fno-omit-frame-pointer
 
 # File sorgente
 SRCS = main.cpp Musician.cpp MusicalPiece.cpp Concert.cpp musician_form.cpp concert_info_form.cpp ConcertController.cpp MainMenuView.cpp ConcertSummaryView.cpp Utils.cpp logMessage.cpp pieceForm.cpp Rehearsal.cpp rehearsal_form.cpp MenuBar.cpp SelectionView.cpp ScoreSelectView.cpp FileIO.cpp Timestamped.cpp Model.cpp VimView.cpp Score.cpp tinyxml2.cpp

@@ -108,6 +108,10 @@ MenuCommand ConcertSummaryView::show() {
 			MenuCommand result = menuBar.show();
 			if (result != MenuCommand::None)
 				return result;
+		} else if (ch == KEY_UP) {
+
+		} else if (ch == KEY_DOWN) {
+
 		}
 	}
 }
