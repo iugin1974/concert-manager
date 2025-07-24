@@ -111,7 +111,7 @@ void ConcertController::manageConcerts() {
 					MenuCommand::DeleteMusician } },
 
 			{   // Piece
-					{ "Add Piece", MenuCommand::AddPiece }, { "Edit Piece",
+					{ "Add Piece", MenuCommand::AddPiece }, { "Edit / View Piece",
 							MenuCommand::EditPiece }, { "Delete Piece",
 							MenuCommand::DeletePiece } },
 
@@ -149,7 +149,8 @@ void ConcertController::manageConcerts() {
 		case MenuCommand::DeleteConcert:
 			deleteConcert(concert);
 			save();
-			break;
+			form.closeForm();
+			return;
 		case MenuCommand::AddMusician:
 			createMusician(concert);
 			save();

@@ -95,7 +95,7 @@ void Model::deleteMusician(Musician &musician, Concert &concert) {
 	for (auto it = musicians.begin(); it != musicians.end(); ++it) {
 		if (it->isSameAs(musician)) {
 			musicians.erase(it);
-			break;
+			return;
 		}
 	}
 }
@@ -132,6 +132,7 @@ void Model::deleteConcert(Concert* concert) {
 	for (auto it = concerts.begin(); it != concerts.end(); it++) {
 		if (it->isSameAs(*concert)) {
 			concerts.erase(it);
+			return;
 		}
 	}
 }
@@ -163,7 +164,7 @@ void Model::deleteRehearsal(const Rehearsal &rehearsal, Concert &concert) {
 	for (auto it = rehearsals.begin(); it != rehearsals.end(); ++it) {
 		if (it->isSameAs(rehearsal)) {
 			rehearsals.erase(it);
-			break;
+			return;
 		}
 	}
 }
@@ -180,7 +181,7 @@ void Model::deleteScore(const Score &score, MusicalPiece &piece) {
     for (auto it = scores.begin(); it != scores.end(); ++it) {
         if (it->getPath() == score.getPath()) {
             scores.erase(it);
-            break;
+            return;
         }
     }
 }

@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <cstdlib>
 #include "FileIO.h"
+#include <signal.h>
 
 std::string getHomePath() {
 	const char *home = std::getenv("HOME");
@@ -74,7 +75,23 @@ void load_config() {
 	}
 }
 
+// Handler per segnali di crash
+void handle_crash(int sig) {
+    endwin();  // Ripristina il terminale
+    fprintf(stderr, "\n[Caught signal %d, restoring terminal before crash]\n", sig);
+    // Rilancia il segnale per permettere ad ASan di fare il suo lavoro
+    signal(sig, SIG_DFL);
+    raise(sig);
+}
+
 int main() {
+	 // Imposta il crash handler per i segnali più comuni
+	    signal(SIGSEGV, handle_crash);
+	    signal(SIGABRT, handle_crash);
+	    signal(SIGFPE,  handle_crash);
+	    signal(SIGILL,  handle_crash);
+	    signal(SIGBUS,  handle_crash);
+
 	load_config();
 	initscr();
 	cbreak();
