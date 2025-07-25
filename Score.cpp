@@ -1,7 +1,9 @@
 #include "Score.h"
 #include <algorithm>
+#include <vector>
 
 std::string Score::basePathScores = "";
+std::vector<std::string> Score::scoresDir = {};
 
 Score::Score(const std::string& p) : path(p) {}
 

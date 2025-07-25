@@ -22,14 +22,14 @@ void load_config() {
 		std::exit(1);
 	}
 
-	std::filesystem::path homePath(home);
-	std::filesystem::path config_path = homePath / ".concertmanagerrc";
+	std::filesystem::path config_path = std::filesystem::path(home) / ".concertmanagerrc";
 
 	if (!std::filesystem::exists(config_path)) {
 		std::cerr << "[concertmanager] Configuration file not found:\n";
 		std::cerr << "Please create a file at: " << config_path << "\n";
 		std::cerr << "Example content:\n";
 		std::cerr << "scoresBasePath=/your/path/to/partiture\n";
+		std::cerr << "scoresDir=dir1\nscoresDir=dir2\n";
 		std::cerr << "savePath=/your/path/for/xml\n";
 		std::exit(1);
 	}
@@ -37,11 +37,16 @@ void load_config() {
 	std::ifstream infile(config_path);
 	std::string line;
 
+	Score::scoresDir.clear();  // pulisce il vector all'inizio
+
 	while (std::getline(infile, line)) {
 		if (line.rfind("scoresBasePath=", 0) == 0) {
-			Score::basePathScores = line.substr(
-					std::string("scoresBasePath=").length());
+			Score::basePathScores = line.substr(std::string("scoresBasePath=").length());
 			LOG_MSG("ScoresBasePath is " + Score::basePathScores);
+		} else if (line.rfind("scoresDir=", 0) == 0) {
+			std::string dir = line.substr(std::string("scoresDir=").length());
+			Score::scoresDir.push_back(dir);
+			LOG_MSG("Added scoresDir: " + dir);
 		} else if (line.rfind("savePath=", 0) == 0) {
 			FileIO::savePath = line.substr(std::string("savePath=").length());
 			LOG_MSG("SavePath is " + FileIO::savePath);
@@ -53,20 +58,20 @@ void load_config() {
 		FileIO::savePath = getHomePath();
 	}
 
+	// Validate scoresBasePath
 	if (Score::basePathScores.empty()) {
-		Score::basePathScores = homePath;
-		LOG_MSG("ScoresBasePath not found in config. Using HOME directory: " + Score::basePathScores);
+		std::cerr << "[concertmanager] Error: 'scoresBasePath' is missing in .concertmanagerrc.\n";
+		std::exit(1);
 	}
-
-	// Validate paths
 	if (!std::filesystem::exists(Score::basePathScores)
 			|| !std::filesystem::is_directory(Score::basePathScores)) {
 		std::cerr << "[concertmanager] Error: scoresBasePath '"
 				<< Score::basePathScores
-				<< "' does not exist or is not a directory.\n";
+				<< "' in .concertmanagerrc does not exist or is not a directory.\n";
 		std::exit(1);
 	}
 
+	// Validate savePath
 	if (!std::filesystem::exists(FileIO::savePath)
 			|| !std::filesystem::is_directory(FileIO::savePath)) {
 		std::cerr << "[concertmanager] Error: savePath '" << FileIO::savePath
@@ -74,6 +79,7 @@ void load_config() {
 		std::exit(1);
 	}
 }
+
 
 
 // Handler per segnali di crash

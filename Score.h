@@ -2,6 +2,7 @@
 #define SCORE_H
 
 #include <string>
+#include <vector>
 
 class Score {
 private:
@@ -9,6 +10,7 @@ private:
 
 public:
     static std::string basePathScores;
+    static std::vector<std::string> scoresDir;
     Score() = default;
     explicit Score(const std::string& p);
 
