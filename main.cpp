@@ -22,8 +22,8 @@ void load_config() {
 		std::exit(1);
 	}
 
-	std::filesystem::path config_path = std::filesystem::path(home)
-			/ ".concertmanagerrc";
+	std::filesystem::path homePath(home);
+	std::filesystem::path config_path = homePath / ".concertmanagerrc";
 
 	if (!std::filesystem::exists(config_path)) {
 		std::cerr << "[concertmanager] Configuration file not found:\n";
@@ -53,17 +53,17 @@ void load_config() {
 		FileIO::savePath = getHomePath();
 	}
 
-	// Validate paths
 	if (Score::basePathScores.empty()) {
-		std::cerr
-				<< "[concertmanager] Error: 'scoresBasePath' is missing in .concertmanagerrc.\n";
-		std::exit(1);
+		Score::basePathScores = homePath;
+		LOG_MSG("ScoresBasePath not found in config. Using HOME directory: " + Score::basePathScores);
 	}
+
+	// Validate paths
 	if (!std::filesystem::exists(Score::basePathScores)
 			|| !std::filesystem::is_directory(Score::basePathScores)) {
 		std::cerr << "[concertmanager] Error: scoresBasePath '"
 				<< Score::basePathScores
-				<< "' in .concertmanagerrc does not exist or is not a directory.\n";
+				<< "' does not exist or is not a directory.\n";
 		std::exit(1);
 	}
 
@@ -74,6 +74,7 @@ void load_config() {
 		std::exit(1);
 	}
 }
+
 
 // Handler per segnali di crash
 void handle_crash(int sig) {
