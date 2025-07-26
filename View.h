@@ -12,11 +12,12 @@ public:
     }
 
     // Esegue la visualizzazione e ritorna il comando scelto dall'utente
-    virtual MenuCommand show() = 0;
-
-    virtual void closeForm() = 0;
+    virtual void show() = 0;
+    virtual MenuCommand getCommand() = 0;
     virtual void validateFields() = 0;
 
 protected:
     MenuBar menuBar; // comune a tutte le view
+    virtual void init_form() = 0;
+    virtual void closeForm() = 0;
 };
