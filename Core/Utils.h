@@ -25,9 +25,6 @@ std::string intToString(int value);
 template<typename T>
 int runChoiceForm(const std::vector<T>& items, const std::string& label = "Choose an element:")
 {
-    clear();
-    refresh();
-
     int l = items.size();
     if (l == 0) {
         mvprintw(0, 0, "No items present.");

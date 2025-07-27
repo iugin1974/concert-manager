@@ -17,8 +17,7 @@ void SelectionView::showErrorMessage(WINDOW *win, int y, int x,
 }
 
 int SelectionView::promptNumber(WINDOW *win, int y, int x, int min, int max) {
-	std::string prompt = "(" + std::to_string(min) + "-" + std::to_string(max)
-			+ ") > ";
+	std::string prompt = "(" + std::to_string(min) + "-" + std::to_string(max) + ") > ";
 	std::string input;
 	int ch;
 
@@ -39,19 +38,25 @@ int SelectionView::promptNumber(WINDOW *win, int y, int x, int min, int max) {
 
 			else if (ch == '\n' || ch == KEY_ENTER) {
 				if (!input.empty()) {
-					int num = std::stoi(input);
-					if (num >= min && num <= max)
-						return num;
+					try {
+						int num = std::stoi(input);
+						if (num >= min && num <= max)
+							return num;
+					} catch (...) {
+						// Ignore std::stoi error, fall through to show error message
+					}
 				}
 				showErrorMessage(win, y, x, "Input non valido!");
-				break;  // Resetta
+
+				// Pulisci completamente la riga (prompt + input)
+				mvwprintw(win, y, x, "%*s", static_cast<int>(prompt.length() + input.length()), " ");
+				break;  // Resetta il prompt
 			}
 
 			else if (ch == KEY_BACKSPACE || ch == 127 || ch == 8) {
 				if (!input.empty()) {
 					input.pop_back();
-					mvwprintw(win, y, input_x, "%*s",
-							static_cast<int>(input.length() + 1), " ");
+					mvwprintw(win, y, input_x, "%*s", static_cast<int>(input.length() + 1), " ");
 					mvwprintw(win, y, input_x, "%s", input.c_str());
 					wmove(win, y, input_x + input.length());
 					wrefresh(win);
@@ -66,8 +71,8 @@ int SelectionView::promptNumber(WINDOW *win, int y, int x, int min, int max) {
 			}
 		}
 
-		// Cancella riga
-		mvwprintw(win, y, x, "%*s",
-				static_cast<int>(prompt.length() + input.length()), " ");
+		// Pulizia finale della riga (già fatta sopra, ma nel dubbio la lasciamo)
+		mvwprintw(win, y, x, "%*s", static_cast<int>(prompt.length() + input.length()), " ");
 	}
 }
+

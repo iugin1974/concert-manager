@@ -17,34 +17,40 @@ public:
 	 * @return L’indice (zero-based) dell’oggetto selezionato, oppure -1 se vuoto, annullato, o errore.
 	 */
 	template<typename T>
-	int runChoiceForm(const std::vector<T>& items, const std::string& label = "Choose an element:")
-	{
-	    clear();
-	    refresh();
-
+	int runChoiceForm(const std::vector<T>& items, const std::string& label = "Choose an element [ESC to cancel]:") {
 	    int l = items.size();
 	    if (l == 0) {
-	        mvprintw(0, 0, "No items present.");
+	        mvprintw(0, 0, "No items present. Press any key to continue");
 	        refresh();
 	        getch();
 	        return -1;
 	    }
 
+	    // Stampa la lista delle opzioni
 	    for (int i = 0; i < l; ++i) {
 	        mvprintw(i, 3, "%d. %s", i + 1, items[i].toString().c_str());
 	    }
 
 	    mvprintw(l + 2, 3, "%s", label.c_str());
-	    int choice = promptNumber(stdscr, l + 3, 3, 1, l);
+	    refresh();
 
-	    if (choice == 0 || choice < 1 || choice > l) {
-	        mvprintw(l + 4, 3, "Invalid choice.");
-	        refresh();
-	        getch();
-	        return -1;
+	    int choice;
+	    while (true) {
+	        choice = SelectionView::promptNumber(stdscr, l + 3, 3, 1, l);
+
+	        if (choice == -1) {
+	            // ESC premuto
+	            return -1;
+	        }
+
+	        // Input valido → restituisci indice (0-based)
+	        if (choice >= 1 && choice <= l) {
+	            return choice - 1;
+	        }
+
+	        // Altrimenti il messaggio di errore è già mostrato da promptNumber()
+	        // Si continua il ciclo per richiedere di nuovo l'input
 	    }
-
-	    return choice - 1;
 	}
 
 	template<typename T>

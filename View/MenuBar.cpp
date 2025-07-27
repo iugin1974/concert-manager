@@ -39,9 +39,11 @@ void MenuBar::drawBar(int highlight) const {
         } else {
             wattron(parent, COLOR_PAIR(1));
         }
-        mvwprintw(parent, 0, x, " %s ", menuTitles[i].c_str());
 
+        wattron(parent, A_BOLD);
+        mvwprintw(parent, 0, x, " %s ", menuTitles[i].c_str());
         wattroff(parent, A_BOLD);
+
         if (static_cast<int>(i) == highlight) {
             wattroff(parent, COLOR_PAIR(2));
         } else {

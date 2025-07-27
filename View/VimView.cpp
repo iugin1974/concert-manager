@@ -28,29 +28,21 @@ bool VimView::edit(const std::string &text) {
         close(fd); // Non ci serve più il file descriptor
 
         // 2. Sospendi ncurses prima di lanciare Vim
-        endwin();
+        def_prog_mode();   // Salva lo stato corrente di ncurses
+        endwin();          // Sospende ncurses
 
-        // 3. Fork + exec dell’editor
-        pid_t pid = fork();
-        if (pid == 0) {
-            execlp("vim", "vim", tmpName, (char *)nullptr);
-            _exit(1); // execlp fallito
-        } else if (pid > 0) {
-            int status;
-            if (waitpid(pid, &status, 0) == -1 ||
-                !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-                std::remove(tmpName);
-                refresh(); // Ripristina ncurses
-                return false;
-            }
-        } else {
+        // 3. Lancia Vim con system()
+        std::string command = "vim " + std::string(tmpName);
+        int status = system(command.c_str());
+        if (status != 0) {
             std::remove(tmpName);
             refresh();
-            return false; // Fork fallito
+            return false;
         }
 
         // 4. Riattiva ncurses
-        refresh();
+        reset_prog_mode(); // Ripristina modalità ncurses
+        refresh();         // Ridisegna
 
         // 5. Leggi il contenuto modificato
         {

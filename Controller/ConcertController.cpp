@@ -94,6 +94,7 @@ void ConcertController::manageConcerts() {
 	form.setMenuBar(menuBar);
 
 	while (true) {
+		clear();
 		form.setConcert(*concert);
 		form.show();
 		MenuCommand command = form.getCommand();
@@ -111,7 +112,6 @@ void ConcertController::manageConcerts() {
 		case MenuCommand::DeleteConcert:
 			deleteConcert(concert);
 			save();
-
 			return;
 		case MenuCommand::AddMusician:
 			createMusician(concert);
