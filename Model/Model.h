@@ -40,7 +40,8 @@ public:
     void clear(); // rimuove tutto
 	void sortConcerts();
     size_t concertCount() const;
-
+    static void calculateMusicianSalary(int rehearsal, int concerts, bool soloist,
+    		double* baseSalary, double* vacationCompensation, double* insurances, double* salary);
 private:
     std::vector<Concert> concerts;
 

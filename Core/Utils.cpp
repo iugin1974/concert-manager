@@ -10,10 +10,22 @@
 
 std::string trim(const char* buffer) {
     std::string str(buffer);
-    str.erase(str.find_last_not_of(" \n") + 1);
-    str.erase(0, str.find_first_not_of(" "));
+
+    // Rimuove spazi finali e newline
+    size_t end = str.find_last_not_of(" \n");
+    if (end != std::string::npos)
+        str.erase(end + 1);
+    else
+        str.clear(); // Solo spazi → svuota tutta la stringa
+
+    // Rimuove spazi iniziali
+    size_t start = str.find_first_not_of(" ");
+    if (start != std::string::npos)
+        str.erase(0, start);
+
     return str;
 }
+
 // Converte std::tm in stringa "DD.MM.YYYY"
 std::string dateToString(const std::tm& date) {
     std::ostringstream oss;

@@ -72,3 +72,13 @@ void Musician::print() const {
 std::string Musician::toString() const {
     return name;
 }
+
+Musician::SalaryDetails Musician::calculateSalary(int rehearsals, int concerts, bool soloist) {
+    SalaryDetails details;
+    details.baseSalary = rehearsals * 175 + concerts * 203 + (soloist ? 100 : 0);
+    details.vacationCompensation = details.baseSalary * 8.33 / 100;
+    details.insurances = details.baseSalary * 6.25 / 100;
+    details.totalSalary = details.baseSalary + details.vacationCompensation + details.insurances;
+    return details;
+}
+

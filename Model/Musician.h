@@ -30,6 +30,14 @@ public:
     const std::string& getMail() const;
     const std::string& getAddress() const;
     double getGage() const;
+    struct SalaryDetails {
+            double baseSalary;
+            double vacationCompensation;
+            double insurances;
+            double totalSalary;
+        };
+
+        static SalaryDetails calculateSalary(int rehearsals, int concerts, bool soloist);
 
     // Setter
     void setName(const std::string& newName);
