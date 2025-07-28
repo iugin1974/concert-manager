@@ -34,10 +34,11 @@ public:
             double baseSalary;
             double vacationCompensation;
             double insurances;
+            double travelCosts;
             double totalSalary;
         };
 
-        static SalaryDetails calculateSalary(int rehearsals, int concerts, bool soloist);
+        static SalaryDetails calculateSalary(int rehearsals, int concerts, bool soloist, double travelCosts);
 
     // Setter
     void setName(const std::string& newName);

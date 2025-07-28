@@ -73,12 +73,13 @@ std::string Musician::toString() const {
     return name;
 }
 
-Musician::SalaryDetails Musician::calculateSalary(int rehearsals, int concerts, bool soloist) {
+Musician::SalaryDetails Musician::calculateSalary(int rehearsals, int concerts, bool soloist, double travelC) {
     SalaryDetails details;
     details.baseSalary = rehearsals * 175 + concerts * 203 + (soloist ? 100 : 0);
     details.vacationCompensation = details.baseSalary * 8.33 / 100;
     details.insurances = details.baseSalary * 6.25 / 100;
     details.totalSalary = details.baseSalary + details.vacationCompensation + details.insurances;
+    details.travelCosts = travelC * ((rehearsals * 2) + (concerts * 2));
     return details;
 }
 

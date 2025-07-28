@@ -22,7 +22,7 @@ public:
 	double getGage();
 
 private:
-	static constexpr int NUMBER_OF_FIELDS = 10;
+	static constexpr int NUMBER_OF_FIELDS = 11;
 	const Musician *existing = nullptr;
 	void init_form() override;
 	void closeForm() override;
@@ -37,6 +37,7 @@ private:
 	double vacationCompensation = 0.0;
 	double insurances = 0.0;
 	double salary = 0.0;
+	double travelCosts = 0.0;
 	double gage;
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;
