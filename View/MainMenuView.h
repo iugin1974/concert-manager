@@ -7,5 +7,8 @@ public:
 	};
 
 	Action show();  // mostra il menu, ritorna l’azione scelta
+
+private:
+	int displayLogo(int row);
 };
 
