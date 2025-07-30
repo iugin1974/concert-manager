@@ -20,6 +20,23 @@ std::optional<std::string> ScoreSelectView::show() {
 
     while (true) {
         int ch = getch();
+        if (std::isalpha(ch)) {
+                   char target = std::tolower(ch);
+                   for (size_t i = 0; i < availablePaths.size(); ++i) {
+                       std::string filename = fs::path(availablePaths[i]).filename().string();
+                       if (!filename.empty() && std::tolower(filename[0]) == target) {
+                           currentSelection = static_cast<int>(i);
+                           // Scroll so selection is visible
+                           if (currentSelection < offset)
+                               offset = currentSelection;
+                           else if (currentSelection >= offset + windowHeight - 2)
+                               offset = currentSelection - (windowHeight - 2) + 1;
+                           draw();
+                           break;
+                       }
+                   }
+                   continue;
+               }
         switch (ch) {
             case KEY_UP:
                 if (currentSelection > 0) {
@@ -110,6 +127,7 @@ void ScoreSelectView::loadScores() {
 
 
 void ScoreSelectView::draw() {
+	clear();
     int maxDisplay = windowHeight - 2;
     mvprintw(0, 0, "Select a score file (ENTER to confirm, ESC to cancel):");
 
