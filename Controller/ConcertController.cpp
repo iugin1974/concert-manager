@@ -5,6 +5,7 @@
 #include "ScoreSelectView.h"
 #include "Score.h"
 #include "FileIO.h"
+#include "MuttView.h"
 #include "ConcertSummaryView.h"
 #include "concert_info_form.h"
 #include "rehearsal_form.h"
@@ -82,8 +83,9 @@ void ConcertController::manageConcerts() {
 							"Delete Rehearsal", MenuCommand::DeleteRehearsal } },
 
 					{ // Misc
-					{ "Comment", MenuCommand::Comment }, { "TODO",
-							MenuCommand::Todo } } };
+					{ "Comment", MenuCommand::Comment },
+					{ "Mail", MenuCommand::Mail },
+					{ "TODO", MenuCommand::Todo } } };
 
 	clear();
 	MenuBar menuBar(stdscr);
@@ -154,6 +156,9 @@ void ConcertController::manageConcerts() {
 			if (commentConcert(concert)) {
 				save();
 			}
+			break;
+		case MenuCommand::Mail:
+			sendMail(concert);
 			break;
 		case MenuCommand::Todo:
 			break;
@@ -498,6 +503,24 @@ bool ConcertController::commentConcert(Concert *concert) {
 		model.addComment(comment, concert);
 	}
 	return commented;
+}
+
+void ConcertController::sendMail(Concert *concert) {
+	// memorizza tutti i musicisti che hanno una mail
+	std::vector<Musician> musicians = concert->getMusicians();
+	std::vector<Musician> musicianWithMail;
+	for (const Musician& m : musicians) {
+		if (!empty(m.getMail())) musicianWithMail.push_back(m);
+	}
+
+	clear();
+	SelectionView selectionView;
+	int choice = selectionView.runChoiceForm(musicianWithMail);
+	if (choice == -1) return;
+	std::string mail = musicianWithMail.at(choice).getMail();
+
+	MuttView muttView;
+	muttView.launchMutt(mail);
 }
 
 void ConcertController::sort() {

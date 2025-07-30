@@ -41,6 +41,7 @@ private:
 	void viewScore(const MusicalPiece* piece);
 
 	bool commentConcert(Concert* concert);
+	void sendMail(Concert *concert);
 
 	void save();
 	void load();

@@ -24,6 +24,7 @@ enum class MenuCommand {
 	DeleteScore,
 	ViewScore,
     Comment,
+	Mail,
     Todo,
     None
 };

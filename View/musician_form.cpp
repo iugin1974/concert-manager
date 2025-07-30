@@ -3,6 +3,7 @@
 #include <form.h>
 #include <string>
 #include <locale.h>
+#include <sstream>
 
 MusicianForm::~MusicianForm() {
 closeForm();
@@ -43,7 +44,10 @@ void MusicianForm::init_form() {
 		set_field_buffer(fields[2], 0, existing->getInstrument().c_str());
 		set_field_buffer(fields[3], 0, existing->getMail().c_str());
 		set_field_buffer(fields[4], 0, existing->getAddress().c_str());
-		set_field_buffer(fields[5], 0, std::to_string(existing->getGage()).c_str());
+		std::ostringstream oss;
+		oss.precision(2);
+		oss << std::fixed << existing->getGage();
+		set_field_buffer(fields[5], 0, oss.str().c_str());
 		set_field_buffer(fields[6], 0, std::to_string(existing->getRehearsalNumber()).c_str());
 		set_field_buffer(fields[7], 0, std::to_string(existing->getConcertNumber()).c_str());
 		isSoloistChecked = existing->isSoloist();
