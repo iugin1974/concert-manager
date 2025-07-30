@@ -84,18 +84,31 @@ void ConcertSummaryView::show() {
 		attron(A_BOLD);
 		mvprintw(row++, 2, "Musicians:");
 		attroff(A_BOLD);
-		mvprintw(row++, 2, "%-20s %-20s %10s", "Name", "Instrument", "Gage");
-		mvhline(row++, 2, ACS_HLINE, 55);
+		mvprintw(row++, 2, "%-20s %-20s %10s %20s", "Name", "Instrument", "Gage", "Total with expenses");
+		mvhline(row++, 2, ACS_HLINE, 90);
 
 		double totalGage = 0.0;
+		double totalGageWithTravelCosts = 0.0;
+
 		for (const auto &m : concert.getMusicians()) {
-			mvprintw(row++, 2, "%-20s %-20s %10.2f", m.getName().c_str(),
-					m.getInstrument().c_str(), m.getGage());
+			double travelCosts = m.getTravelCosts() * (
+				(m.getRehearsalNumber() * 2) +
+				(m.getConcertNumber() * 2));
+
+			double fullPayment = m.getGage() + travelCosts;
+
+			mvprintw(row++, 2, "%-20s %-20s %10.2f %20.2f",
+				m.getName().c_str(),
+				m.getInstrument().c_str(),
+				m.getGage(),
+				fullPayment);
+
 			totalGage += m.getGage();
+			totalGageWithTravelCosts += fullPayment;
 		}
 
-		mvhline(row++, 2, ACS_HLINE, 55);
-		mvprintw(row++, 38, "Total gage: %.2f CHF", totalGage);
+		mvhline(row++, 2, ACS_HLINE, 90);
+		mvprintw(row++, 2, "%-41s %10.2f %20.2f", "Total:", totalGage, totalGageWithTravelCosts);
 
 		if (!concert.getComment().empty()) {
 			row += 2;

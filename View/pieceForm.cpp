@@ -24,7 +24,9 @@ void PieceForm::init_form() {
 	fields[0] = new_field(1, 40, row++, 20, 0, 0);  // Composer
 	fields[1] = new_field(1, 40, row++, 20, 0, 0);  // Title
 	fields[2] = new_field(1, 10, row++, 20, 0, 0);  // Duration (MM:SS)
-	fields[3] = new_field(1, 1, row++, 20, 0, 0);  // Choir (Yes/No)
+	fields[3] = new_field(1, 4, row++, 20, 0, 0);  // Choir (Yes/No)
+	set_field_buffer(fields[3], 0, "[ ]");
+	field_opts_off(fields[3], O_EDIT); // Non editabile manualmente
 	fields[4] = new_field(1, 40, row++, 20, 0, 0); // Singer part
 	fields[5] = new_field(1, 40, row++, 20, 0, 0); // Instruments
 	fields[6] = nullptr;
@@ -40,7 +42,8 @@ void PieceForm::init_form() {
 		set_field_buffer(fields[1], 0, existing->getTitle().c_str());
 		set_field_buffer(fields[2], 0,
 				convertToMMSS(existing->getDuration()).c_str());
-		set_field_buffer(fields[3], 0, existing->hasChoir() ? "X" : "");
+		hasChoiristChecked = existing->hasChoir();
+		set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
 		set_field_buffer(fields[4], 0, existing->getSingerPart().c_str());
 		set_field_buffer(fields[5], 0, existing->getInstruments().c_str());
 	}
@@ -111,6 +114,12 @@ MenuCommand PieceForm::getCommand() {
 		case KEY_DC:
 			form_driver(form, REQ_DEL_CHAR);
 			break;
+		case ' ': // Barra spaziatrice per toggle
+		    if (current_field(form) == fields[3]) {
+		        hasChoiristChecked = !hasChoiristChecked;
+		        set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
+		    }
+		    break;
 		default:
 			form_driver(form, ch);
 			break;
@@ -129,10 +138,9 @@ void PieceForm::validateFields() {
 	duration = convertToSeconds(durationStr); // se la conversione non e' possibile, ritorna -1
 	if (duration == -1)
 		duration = 0;  // allora va cambiato il valore a 0
-	std::string choirStr = trim(field_buffer(fields[3], 0));
 	singer = trim(field_buffer(fields[4], 0));
 	instruments = trim(field_buffer(fields[5], 0));
-	choir = !choirStr.empty();
+	choir = hasChoiristChecked;
 }
 void PieceForm::closeForm() {
 	unpost_form(form);

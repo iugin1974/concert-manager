@@ -27,6 +27,18 @@ const std::string& Musician::getInstrument() const { return instrument; }
 const std::string& Musician::getMail() const       { return email; }
 const std::string& Musician::getAddress() const    { return address; }
 double Musician::getGage() const                   { return gage; }
+bool Musician::isSoloist() const				   { return soloist; }
+int Musician::getRehearsalNumber() const {
+    return rehearsalNumber;
+}
+
+int Musician::getConcertNumber() const {
+    return concertNumber;
+}
+
+double Musician::getTravelCosts() const {
+    return travelCosts;
+}
 
 // Setter (rigenerano il timestamp, perché "modifica")
 void Musician::setName(const std::string& newName) {
@@ -54,6 +66,24 @@ void Musician::setGage(double newGage) {
     regenerateTimestamp();
 }
 
+void Musician::setRehearsalNumber(int number) {
+    rehearsalNumber = number;
+    regenerateTimestamp();
+}
+
+void Musician::setConcertNumber(int number) {
+    concertNumber = number;
+    regenerateTimestamp();
+}
+
+void Musician::setTravelCosts(double costs) {
+    travelCosts = costs;
+    regenerateTimestamp();
+}
+
+void Musician::setSoloist(bool soloist) {
+	this->soloist = soloist;
+}
 bool Musician::isEmpty() const {
     return name.empty();
 }

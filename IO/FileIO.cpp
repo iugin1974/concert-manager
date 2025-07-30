@@ -105,8 +105,31 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
             mfield("address", m.getAddress());
 
             XMLElement* g = doc.NewElement("gage");
-            g->SetText(std::to_string(m.getGage()).c_str());
+            std::ostringstream oss;
+            oss << m.getGage();
+            g->SetText(oss.str().c_str());
             mElem->InsertEndChild(g);
+
+            // Campi aggiuntivi
+
+            XMLElement* soloistElem = doc.NewElement("soloist");
+            soloistElem->SetText(m.isSoloist() ? "1" : "0");
+            mElem->InsertEndChild(soloistElem);
+
+            XMLElement* rehearsalNum = doc.NewElement("rehearsalNumber");
+            rehearsalNum->SetText(std::to_string(m.getRehearsalNumber()).c_str());
+            mElem->InsertEndChild(rehearsalNum);
+
+            XMLElement* concertNum = doc.NewElement("concertNumber");
+            concertNum->SetText(std::to_string(m.getConcertNumber()).c_str());
+            mElem->InsertEndChild(concertNum);
+
+            XMLElement* travelCost = doc.NewElement("travelCosts");
+            oss.str("");           // svuota il contenuto
+            oss.clear();           // resetta eventuali flag di errore
+            oss << m.getTravelCosts();
+            travelCost->SetText(oss.str().c_str());
+            mElem->InsertEndChild(travelCost);
 
             // ✅ timestamp
             XMLElement* ts = doc.NewElement("timestamp");
@@ -116,6 +139,7 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
             musiciansElem->InsertEndChild(mElem);
         }
         concertElem->InsertEndChild(musiciansElem);
+
 
         // Program
         XMLElement* programElem = doc.NewElement("program");
@@ -258,11 +282,44 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
             m.setMail(getSafeText(mElem->FirstChildElement("email")));
             m.setAddress(getSafeText(mElem->FirstChildElement("address")));
 
+            XMLElement* soloistElem = mElem->FirstChildElement("soloist");
+            if (soloistElem) {
+                std::string soloistStr = getSafeText(soloistElem);
+                bool isSolo = (soloistStr == "1" || soloistStr == "true" || soloistStr == "yes");
+                m.setSoloist(isSolo);
+            } else {
+                m.setSoloist(false);
+            }
+
             try {
                 m.setGage(std::stod(getSafeText(mElem->FirstChildElement("gage"))));
             } catch (...) {
                 m.setGage(0.0);
                 LOG_MSG("Invalid gage value, set to 0");
+            }
+
+            // Parsing rehearsalNumber
+            try {
+                m.setRehearsalNumber(std::stoi(getSafeText(mElem->FirstChildElement("rehearsalNumber"))));
+            } catch (...) {
+                m.setRehearsalNumber(0);
+                LOG_MSG("Invalid rehearsalNumber value, set to 0");
+            }
+
+            // Parsing concertNumber
+            try {
+                m.setConcertNumber(std::stoi(getSafeText(mElem->FirstChildElement("concertNumber"))));
+            } catch (...) {
+                m.setConcertNumber(0);
+                LOG_MSG("Invalid concertNumber value, set to 0");
+            }
+
+            // Parsing travelCosts
+            try {
+                m.setTravelCosts(std::stod(getSafeText(mElem->FirstChildElement("travelCosts"))));
+            } catch (...) {
+                m.setTravelCosts(0.0);
+                LOG_MSG("Invalid travelCosts value, set to 0.0");
             }
 
             // Lettura del timestamp
@@ -279,6 +336,7 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
             musicians.push_back(m);
         }
         concert.setMusicians(musicians);
+
 
 
         // Program

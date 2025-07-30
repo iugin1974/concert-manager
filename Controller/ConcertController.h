@@ -45,6 +45,7 @@ private:
 	void save();
 	void load();
 	void sort();
+
 	Model model;
 };
 

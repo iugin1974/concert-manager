@@ -266,7 +266,10 @@ std::optional<Musician> ConcertController::createEditMusician(
 		m.setMail(form.getMail());
 		m.setAddress(form.getAddress());
 		m.setGage(form.getGage());
-
+		m.setSoloist(form.getSoloist());
+		m.setRehearsalNumber(form.getRehearsalNumber());
+		m.setConcertNumber(form.getConcertNumber());
+		m.setTravelCosts(form.getTravelCosts());
 		return m;
 	}
 	case MenuCommand::Quit: {

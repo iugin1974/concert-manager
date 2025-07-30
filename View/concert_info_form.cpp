@@ -22,10 +22,10 @@ void ConcertInfoForm::setConcert(const Concert *existing) {
 void ConcertInfoForm::init_form() {
 	if (form != nullptr)
 		return;
-
-	fields[0] = new_field(1, 40, 2, 30, 0, 0); // Title
-	fields[1] = new_field(1, 40, 4, 30, 0, 0); // Places
-	fields[2] = new_field(1, 40, 6, 30, 0, 0); // Dates
+	int row = 5;
+	fields[0] = new_field(1, 40, row++, 30, 0, 0); // Title
+	fields[1] = new_field(1, 40, row++, 30, 0, 0); // Places
+	fields[2] = new_field(1, 40, row++, 30, 0, 0); // Dates
 	fields[3] = nullptr;
 
 	for (int i = 0; i < NUMBER_OF_FIELDS - 1; ++i) {
@@ -56,10 +56,14 @@ void ConcertInfoForm::show() {
 
 	init_form();
 	post_form(form);
-
-	mvprintw(2, 5, "Title:");
-	mvprintw(4, 5, "Places (comma-separated):");
-	mvprintw(6, 5, "Dates  (comma-separated):");
+	int row = 2;
+	attron(A_BOLD);
+	mvprintw(row++, 2, "Concert Info:");
+	attroff(A_BOLD);
+	row += 2;
+	mvprintw(row++, 2, "Title:");
+	mvprintw(row++, 2, "Places (comma-separated):");
+	mvprintw(row++, 2, "Dates  (comma-separated):");
 
 	refresh();
 	form_driver(form, REQ_FIRST_FIELD);

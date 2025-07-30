@@ -31,4 +31,5 @@ private:
 	bool choir = false;
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;
+	bool hasChoiristChecked = false;
 };
