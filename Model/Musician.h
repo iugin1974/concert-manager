@@ -20,9 +20,11 @@ public:
 	// Costruttori
 	Musician();
 	Musician(const std::string &name, const std::string &phone,
-			const std::string &instrument, const std::string &email,
-			const std::string &address, double gage, long long ts = 0); // opzionale timestamp
-
+	         const std::string &instrument, const std::string &email,
+	         const std::string &address, double gage,
+	         int rehearsalNumber = 0, int concertNumber = 0,
+	         bool soloist = false, double travelCosts = 0.0,
+	         long long ts = 0);
 	// Getter
 	const std::string& getName() const;
 	const std::string& getPhone() const;

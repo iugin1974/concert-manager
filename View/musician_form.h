@@ -19,12 +19,12 @@ public:
 	std::string getInstrument();
 	std::string getMail();
 	std::string getAddress();
-	 int getRehearsalNumber() const;
-	    int getConcertNumber() const;
-	    double getTravelCosts() const;
+	int getRehearsalNumber() const;
+	int getConcertNumber() const;
+	double getTravelCosts() const;
 	double getGage() const;
 	bool getSoloist() const;
-
+	std::vector<Musician> getMusicians();
 private:
 	static constexpr int NUMBER_OF_FIELDS = 11;
 	const Musician *existing = nullptr;
@@ -32,6 +32,7 @@ private:
 	void closeForm() override;
 	void validateFields() override;
 	void handleFieldChange();
+	void clearFormFields();
 	std::string name;
 	std::string phone;
 	std::string instrument;
@@ -48,6 +49,7 @@ private:
 	double gage;
 	bool isSoloistChecked = false;
 
+	std::vector<Musician> musicians;
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;
 };

@@ -5,12 +5,11 @@
 Musician::Musician()
     : Timestamped(), gage (0.0) {}
 
-Musician::Musician(const std::string& name,
-                   const std::string& phone,
-                   const std::string& instrument,
-                   const std::string& email,
-                   const std::string& address,
-                   double gage,
+Musician::Musician(const std::string &name, const std::string &phone,
+                   const std::string &instrument, const std::string &email,
+                   const std::string &address, double gage,
+                   int rehearsalNumber, int concertNumber,
+                   bool soloist, double travelCosts,
                    long long ts)
     : Timestamped(ts == 0 ? generateTimestamp() : ts),
       name(name),
@@ -18,8 +17,13 @@ Musician::Musician(const std::string& name,
       instrument(instrument),
       email(email),
       address(address),
-      gage(gage)
+      rehearsalNumber(rehearsalNumber),
+      concertNumber(concertNumber),
+      travelCosts(travelCosts),
+      gage(gage),
+      soloist(soloist)
 {}
+
 // Getter
 const std::string& Musician::getName() const       { return name; }
 const std::string& Musician::getPhone() const      { return phone; }

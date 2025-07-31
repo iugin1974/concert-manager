@@ -17,8 +17,7 @@ void PieceForm::setPiece(const MusicalPiece *piece) {
 }
 
 void PieceForm::init_form() {
-	if (form != nullptr)
-		return;  // Già inizializzata
+	if (form == nullptr) {
 	// 1. Crea campi
 	int row = 2;
 	fields[0] = new_field(1, 40, row++, 20, 0, 0);  // Composer
@@ -35,7 +34,7 @@ void PieceForm::init_form() {
 		set_field_back(fields[i], A_UNDERLINE);
 		field_opts_off(fields[i], O_AUTOSKIP);
 	}
-
+	}
 	// 2. Pre-compila se già esistente
 	if (existing) {
 		set_field_buffer(fields[0], 0, existing->getComposer().c_str());
@@ -81,15 +80,33 @@ void PieceForm::show() {
 	form_driver(form, REQ_FIRST_FIELD);
 }
 
+void PieceForm::clearFormFields() {
+    existing = nullptr;
+    for (int i = 0; i < NUMBER_OF_FIELDS; ++i) {
+        set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
+    }
+    hasChoiristChecked = false;
+    set_field_buffer(fields[3], 0, "[ ]");  // Aggiorna il campo "Choir" a non selezionato
+
+    form_driver(form, REQ_FIRST_FIELD);  // Posiziona il cursore sul primo campo
+    refresh();
+}
+
+
 MenuCommand PieceForm::getCommand() {
 	int ch;
 	while ((ch = getch())) {
 		switch (ch) {
-		case KEY_F(2): {
-			validateFields();
-			MenuCommand result = menuBar.show();
-			return result;
-			break;
+		case KEY_F(2): { // MENU AZIONI
+		    MenuCommand result = menuBar.show();
+		    if (result == MenuCommand::AddPiece) {
+		        validateFields();
+		        clearFormFields();
+		    } else {
+		        validateFields();
+		        return result;
+		    }
+		    break;
 		}
 
 		case KEY_DOWN:
@@ -130,18 +147,26 @@ MenuCommand PieceForm::getCommand() {
 }
 
 void PieceForm::validateFields() {
-	form_driver(form, REQ_VALIDATION);
+    form_driver(form, REQ_VALIDATION);
 
-	composer = trim(field_buffer(fields[0], 0));
-	title = trim(field_buffer(fields[1], 0));
-	std::string durationStr = trim(field_buffer(fields[2], 0));
-	duration = convertToSeconds(durationStr); // se la conversione non e' possibile, ritorna -1
-	if (duration == -1)
-		duration = 0;  // allora va cambiato il valore a 0
-	singer = trim(field_buffer(fields[4], 0));
-	instruments = trim(field_buffer(fields[5], 0));
-	choir = hasChoiristChecked;
+    std::string composer = trim(field_buffer(fields[0], 0));
+    std::string title = trim(field_buffer(fields[1], 0));
+    std::string durationStr = trim(field_buffer(fields[2], 0));
+    int duration = convertToSeconds(durationStr);
+    if (duration == -1)
+        duration = 0;
+
+    std::string singer = trim(field_buffer(fields[4], 0));
+    std::string instruments = trim(field_buffer(fields[5], 0));
+    bool choir = hasChoiristChecked;
+
+    MusicalPiece p(composer, title, duration, choir, singer, instruments);
+    if (existing && !existing->getScores().empty()) {
+        p.setScores(existing->getScores());
+    }
+    pieces.push_back(p);
 }
+
 void PieceForm::closeForm() {
 	unpost_form(form);
 	free_form(form);
@@ -149,21 +174,6 @@ void PieceForm::closeForm() {
 		free_field(fields[i]);
 }
 
-const std::string PieceForm::getTitle() const {
-	return title;
-}
-const std::string PieceForm::getComposer() const {
-	return composer;
-}
-int PieceForm::getDuration() const {
-	return duration;
-}
-const std::string PieceForm::getSinger() const {
-	return singer;
-}
-const std::string PieceForm::getInstruments() const {
-	return instruments;
-}
-bool PieceForm::hasChoir() const {
-	return choir;
+std::vector<MusicalPiece> PieceForm::getPieces() {
+	return pieces;
 }

@@ -15,10 +15,7 @@ public:
 	    MenuCommand getCommand() override;
 	~RehearsalForm() override;
 	void setRehearsal(const Rehearsal *rehearsal);
-	std::tm getDate() const;
-	std::string getStartTime() const;
-	std::string getPlace() const;
-	std::string getMusicians() const;
+	std::vector<Rehearsal> getRehearsals() const;
 
 private:
 	static constexpr int NUMBER_OF_FIELDS = 5;
@@ -26,10 +23,8 @@ private:
 	void init_form() override;
 	void closeForm() override;
 	void validateFields() override;
-	std::tm date;
-	std::string startTime;
-	std::string place;
-	std::string musicians;
+	void clearFormFields();
+	std::vector<Rehearsal> rehearsals;
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;
 };

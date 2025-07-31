@@ -20,8 +20,8 @@ void ConcertInfoForm::setConcert(const Concert *existing) {
 }
 
 void ConcertInfoForm::init_form() {
-	if (form != nullptr)
-		return;
+	if (form == nullptr) {
+
 	int row = 5;
 	fields[0] = new_field(1, 40, row++, 30, 0, 0); // Title
 	fields[1] = new_field(1, 40, row++, 30, 0, 0); // Places
@@ -32,7 +32,7 @@ void ConcertInfoForm::init_form() {
 		set_field_back(fields[i], A_UNDERLINE);
 		field_opts_off(fields[i], O_AUTOSKIP);
 	}
-
+}
 	if (existing) {
 		set_field_buffer(fields[0], 0, existing->getTitle().c_str());
 

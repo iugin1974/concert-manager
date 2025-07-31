@@ -23,18 +23,18 @@ private:
 	void deleteConcert(Concert* concert);
 	void createMusician(Concert* concert);
 	void editMusician(Concert* concert);
-	std::optional<Musician> createEditMusician(const Musician *musicians);
+	std::optional<std::vector<Musician>> createEditMusician(const Musician *musicians);
 	void deleteMusician(Concert* concert);
 
 	void createPiece(Concert* concert);
 	void editPiece(Concert* concert);
-	std::optional<MusicalPiece> createEditPiece(MusicalPiece *MusicalPieces);
+	std::optional<std::vector<MusicalPiece>> createEditPiece(MusicalPiece *MusicalPieces);
 	void deletePiece(Concert* concert);
 
 	void createRehearsal(Concert* concert);
 	void editRehearsal(Concert* concert);
 	void deleteRehearsal(Concert* concert);
-	std::optional<Rehearsal> createEditRehearsal(const Rehearsal* rehearsal);
+	std::optional<std::vector<Rehearsal>> createEditRehearsal(const Rehearsal* rehearsal);
 
 	bool addScore(MusicalPiece* piece);
 	bool deleteScore(MusicalPiece* piece);

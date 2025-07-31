@@ -10,12 +10,7 @@ public:
 	MenuCommand getCommand() override;
 	~PieceForm() override;
 	void setPiece(const MusicalPiece *piece);
-	const std::string getTitle() const;
-	const std::string getComposer() const;
-	int getDuration() const;
-	const std::string getSinger() const;
-	const std::string getInstruments() const;
-	bool hasChoir() const;
+	std::vector<MusicalPiece> getPieces();
 
 private:
 	static constexpr int NUMBER_OF_FIELDS = 7;
@@ -23,12 +18,8 @@ private:
 	void init_form() override;
 	void closeForm() override;
 	void validateFields() override;
-	std::string title;
-	std::string composer;
-	int duration = 0;
-	std::string singer;
-	std::string instruments;
-	bool choir = false;
+	void clearFormFields();
+	std::vector<MusicalPiece> pieces;
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;
 	bool hasChoiristChecked = false;
