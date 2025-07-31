@@ -18,6 +18,9 @@
 #include <cstdlib>  // per system()
 
 void ConcertController::start() {
+	clear();
+	mvprintw(2, 2, "Load scores. Wait please...");
+	refresh();
 	load();
 	while (true) {
 		MainMenuView mainMenuView;
@@ -484,8 +487,9 @@ bool ConcertController::deleteScore(MusicalPiece *piece) {
 
 bool ConcertController::addScore(MusicalPiece *piece) {
 	clear();
+	std::vector<std::string> scorePaths = model.getScorePaths();
 	ScoreSelectView scoreSelectView;
-	std::optional<std::string> path = scoreSelectView.show();
+	std::optional<std::string> path = scoreSelectView.show(scorePaths);
 	if (path == std::nullopt)
 		return false;
 	Score s;
@@ -532,5 +536,6 @@ void ConcertController::save() {
 }
 
 void ConcertController::load() {
+	model.loadScorePaths();
 	model.loadFromFile(FileIO::savePath + "/concerts.xml");
 }

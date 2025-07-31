@@ -9,13 +9,11 @@ class ScoreSelectView {
 public:
     // Mostra l'interfaccia di selezione delle partiture e ritorna
     // la path selezionata oppure std::nullopt se l'utente annulla.
-    std::optional<std::string> show();
+    std::optional<std::string> show(std::vector<std::string> availablePaths);
 
 private:
-    void loadScores();
-    void draw();
+    void draw(std::vector<std::string>& availablePaths);
 
-    std::vector<std::string> availablePaths;
     int windowHeight = 0;
     int currentSelection = 0;
     int offset = 0;

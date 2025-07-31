@@ -22,10 +22,11 @@ void RehearsalForm::setRehearsal(const Rehearsal *rehearsal) {
 void RehearsalForm::init_form() {
 	if (form != nullptr) return;
 
-	fields[0] = new_field(1, 20, 2, 20, 0, 0); // Date
-	fields[1] = new_field(1, 10, 4, 20, 0, 0); // Start time
-	fields[2] = new_field(1, 40, 6, 20, 0, 0); // Place
-	fields[3] = new_field(1, 40, 8, 20, 0, 0); // Musicians
+	int row = 2;
+		fields[0] = new_field(1, 20, row++, 25, 0, 0); // Date
+		fields[1] = new_field(1, 10, row++, 25, 0, 0); // Start time
+		fields[2] = new_field(1, 40, row++, 25, 0, 0); // Place
+		fields[3] = new_field(1, 40, row++, 25, 0, 0); // Musicians
 	fields[4] = nullptr;
 
 	for (int i = 0; i < 4; ++i) {
@@ -41,10 +42,11 @@ init_form();
 	post_form(form);
 	refresh();
 
-	mvprintw(2, 2, "Date (DD.MM.YYYY):");
-	mvprintw(4, 2, "Start time (HH:MM):");
-	mvprintw(6, 2, "Place:");
-	mvprintw(8, 2, "Musicians:");
+	int row = 2;
+		mvprintw(row++, 2, "Date (DD.MM.YYYY):");
+		mvprintw(row++, 2, "Start time (HH:MM):");
+		mvprintw(row++, 2, "Place:");
+		mvprintw(row++, 2, "Musicians:");
 
 	if (existing) {
 		set_field_buffer(fields[0], 0,

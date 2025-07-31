@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <vector>
 #include <optional>
+#include <filesystem>
 
 using namespace tinyxml2;
 std::string FileIO::savePath = "";
@@ -435,3 +436,33 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
     LOG_MSG("Finished loading concerts");
     return concerts;
 }
+
+
+
+void FileIO::loadScores(std::vector<std::string>& availablePaths) {
+
+    if (Score::basePathScores.empty()) {
+        LOG_MSG("basePathScores is empty");
+        return;
+    }
+
+    namespace fs = std::filesystem;
+
+    for (const auto& dir : Score::scoresDir) {
+        fs::path fullPath = fs::path(Score::basePathScores) / dir;
+
+        if (!fs::exists(fullPath) || !fs::is_directory(fullPath)) {
+            LOG_MSG(fullPath.string() + " doesn't exist or is not a directory");
+            continue;
+        }
+
+        for (const auto& entry : fs::recursive_directory_iterator(fullPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".pdf") {
+                availablePaths.push_back(entry.path().string());
+            }
+        }
+    }
+
+
+}
+

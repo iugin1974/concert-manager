@@ -39,11 +39,14 @@ public:
     void addComment(const std::string& comment, Concert* concert);
     void clear(); // rimuove tutto
 	void sortConcerts();
+	void loadScorePaths();
+	const std::vector<std::string>& getScorePaths() const;
     size_t concertCount() const;
     static void calculateMusicianSalary(int rehearsal, int concerts, bool soloist,
     		double* baseSalary, double* vacationCompensation, double* insurances, double* salary);
 private:
     std::vector<Concert> concerts;
+    std::vector<std::string> scorePaths;
 
 
 };

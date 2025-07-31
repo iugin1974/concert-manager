@@ -13,7 +13,7 @@ public:
 			const std::string &path) const;
 	std::vector<Concert> loadConcertsFromXML(const std::string &filename);
 	std::optional<std::string> loadBasePathFromRcFile();
-
+	void loadScores(std::vector<std::string>& availablePaths);
 private:
 	std::string getSafeText(tinyxml2::XMLElement *elem);
 };

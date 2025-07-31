@@ -2,21 +2,19 @@
 #include "ScoreSelectView.h"
 #include "Concert.h"
 #include "logMessage.h"
-#include <filesystem>
 #include <ncurses.h>
-#include <algorithm>
+#include <filesystem>
 
 namespace fs = std::filesystem;
 
-std::optional<std::string> ScoreSelectView::show() {
-    loadScores();
+std::optional<std::string> ScoreSelectView::show(std::vector<std::string> availablePaths) {
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
 
     getmaxyx(stdscr, windowHeight, std::ignore);
 
-    draw();
+    draw(availablePaths);
 
     while (true) {
         int ch = getch();
@@ -31,7 +29,7 @@ std::optional<std::string> ScoreSelectView::show() {
                                offset = currentSelection;
                            else if (currentSelection >= offset + windowHeight - 2)
                                offset = currentSelection - (windowHeight - 2) + 1;
-                           draw();
+                           draw(availablePaths);
                            break;
                        }
                    }
@@ -43,21 +41,21 @@ std::optional<std::string> ScoreSelectView::show() {
                     --currentSelection;
                     if (currentSelection < offset) --offset;
                 }
-                draw();
+                draw(availablePaths);
                 break;
             case KEY_DOWN:
                 if (currentSelection < (int)availablePaths.size() - 1) {
                     ++currentSelection;
                     if (currentSelection >= offset + windowHeight - 2) ++offset;
                 }
-                draw();
+                draw(availablePaths);
                 break;
 
             case KEY_PPAGE:  // Page Up
                 currentSelection -= (windowHeight - 2);
                 if (currentSelection < 0) currentSelection = 0;
                 if (currentSelection < offset) offset = currentSelection;
-                draw();
+                draw(availablePaths);
                 break;
 
             case KEY_NPAGE:  // Page Down
@@ -66,19 +64,19 @@ std::optional<std::string> ScoreSelectView::show() {
                     currentSelection = (int)availablePaths.size() - 1;
                 if (currentSelection >= offset + windowHeight - 2)
                     offset = currentSelection - (windowHeight - 2) + 1;
-                draw();
+                draw(availablePaths);
                 break;
 
             case KEY_HOME:
                 currentSelection = 0;
                 offset = 0;
-                draw();
+                draw(availablePaths);
                 break;
 
             case KEY_END:
                 currentSelection = (int)availablePaths.size() - 1;
                 offset = (currentSelection >= windowHeight - 2) ? currentSelection - (windowHeight - 2) + 1 : 0;
-                draw();
+                draw(availablePaths);
                 break;
 
             case 10: // Enter
@@ -90,43 +88,10 @@ std::optional<std::string> ScoreSelectView::show() {
 }
 
 
-void ScoreSelectView::loadScores() {
-    availablePaths.clear();
-
-    if (Score::basePathScores.empty()) {
-        LOG_MSG("basePathScores is empty");
-        return;
-    }
-
-    namespace fs = std::filesystem;
-
-    for (const auto& dir : Score::scoresDir) {
-        fs::path fullPath = fs::path(Score::basePathScores) / dir;
-
-        if (!fs::exists(fullPath) || !fs::is_directory(fullPath)) {
-            LOG_MSG(fullPath.string() + " doesn't exist or is not a directory");
-            continue;
-        }
-
-        for (const auto& entry : fs::recursive_directory_iterator(fullPath)) {
-            if (entry.is_regular_file() && entry.path().extension() == ".pdf") {
-                availablePaths.push_back(entry.path().string());
-            }
-        }
-    }
-
-    // Ordina alfabeticamente (lexicograficamente)
-    std::sort(availablePaths.begin(), availablePaths.end(),
-        [](const std::string& a, const std::string& b) {
-            std::string fileA = fs::path(a).filename().string();
-            std::string fileB = fs::path(b).filename().string();
-            return fileA < fileB;
-        });
-}
 
 
 
-void ScoreSelectView::draw() {
+void ScoreSelectView::draw(std::vector<std::string>& availablePaths) {
 	clear();
     int maxDisplay = windowHeight - 2;
     mvprintw(0, 0, "Select a score file (ENTER to confirm, ESC to cancel):");

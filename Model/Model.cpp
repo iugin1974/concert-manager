@@ -1,9 +1,11 @@
 #include "Model.h"
 #include "logMessage.h"
 #include <string>
+#include <filesystem>
 #include <algorithm> // std::sort
 #include <stdexcept> // per std::out_of_range
 #include "FileIO.h"
+namespace fs = std::filesystem;
 
 bool compareConcertByFirstDate(const Concert &a, const Concert &b)
 {
@@ -189,6 +191,23 @@ void Model::deleteScore(const Score &score, MusicalPiece &piece) {
 
 void Model::addComment(const std::string& comment, Concert* concert) {
 	concert->setComment(comment);
+}
+
+
+void Model::loadScorePaths() {
+	FileIO f;
+	f.loadScores(scorePaths);
+	// Ordina alfabeticamente (lexicograficamente)
+	    std::sort(scorePaths.begin(), scorePaths.end(),
+	        [](const std::string& a, const std::string& b) {
+	            std::string fileA = fs::path(a).filename().string();
+	            std::string fileB = fs::path(b).filename().string();
+	            return fileA < fileB;
+	        });
+}
+
+const std::vector<std::string>& Model::getScorePaths() const {
+	return scorePaths;
 }
 
 void Model::clear() {
