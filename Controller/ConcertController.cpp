@@ -486,17 +486,23 @@ bool ConcertController::deleteScore(MusicalPiece *piece) {
 }
 
 bool ConcertController::addScore(MusicalPiece *piece) {
-	clear();
-	std::vector<std::string> scorePaths = model.getScorePaths();
-	ScoreSelectView scoreSelectView;
-	std::optional<std::string> path = scoreSelectView.show(scorePaths);
-	if (path == std::nullopt)
-		return false;
-	Score s;
-	s.setPath(path.value());
-	model.addScore(s, *piece);
-	return true;
+    clear();
+    std::vector<std::string> scorePaths = model.getScorePaths();
+    ScoreSelectView scoreSelectView;
+    std::vector<std::string> paths = scoreSelectView.show(scorePaths);
+
+    if (paths.empty())
+        return false;
+
+    for (const auto& path : paths) {
+        Score s;
+        s.setPath(path);
+        model.addScore(s, *piece);
+    }
+
+    return true;
 }
+
 
 bool ConcertController::commentConcert(Concert *concert) {
 	std::string comment = concert->getComment();
