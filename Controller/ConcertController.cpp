@@ -14,6 +14,7 @@
 #include "logMessage.h"
 #include <ncurses.h>
 #include "SelectionView.h"
+#include "AbookImporter.h"
 #include <optional> // per std::optional
 #include <cstdlib>  // per system()
 
@@ -544,6 +545,14 @@ void ConcertController::sendMail(Concert *concert) {
 
 	MuttView muttView;
 	muttView.launchMutt(mail);
+}
+
+void ConcertController::autofillFromAbook(const std::string& name, MusicianForm& form) {
+    auto maybeM = AbookImporter::lookupByName(name);
+    if (maybeM.has_value()) {
+        const Musician& m = maybeM.value();
+        form.setAutoFilledFields(m);
+    }
 }
 
 void ConcertController::sort() {

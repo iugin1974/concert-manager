@@ -14,7 +14,7 @@ SRCS = main.cpp \
        View/musician_form.cpp View/concert_info_form.cpp View/MainMenuView.cpp View/ConcertSummaryView.cpp View/pieceForm.cpp View/rehearsal_form.cpp \
        View/MenuBar.cpp View/SelectionView.cpp View/ScoreSelectView.cpp View/VimView.cpp View/MuttView.cpp \
        Controller/ConcertController.cpp \
-       Core/Utils.cpp Core/logMessage.cpp \
+       Core/Utils.cpp Core/logMessage.cpp Core/AbookImporter.cpp \
        IO/FileIO.cpp \
        External/tinyxml2.cpp
 

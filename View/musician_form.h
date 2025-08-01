@@ -3,6 +3,7 @@
 #include <string>
 #include "MenuBar.h"
 #include "Musician.h"
+#include "ConcertController.h" // TODO elimina
 #include "View.h"
 #include <vector>
 #include <form.h>
@@ -13,6 +14,7 @@ public:
 	void show() override;
 	MenuCommand getCommand() override;
 	~MusicianForm() override;
+	void setController(ConcertController& controller); // TODO elimina
 	void setMusician(const Musician *musician);
 	std::string getName();
 	std::string getPhone();
@@ -25,6 +27,7 @@ public:
 	double getGage() const;
 	bool getSoloist() const;
 	std::vector<Musician> getMusicians();
+	void setAutoFilledFields(const Musician& m);
 private:
 	static constexpr int NUMBER_OF_FIELDS = 11;
 	const Musician *existing = nullptr;
@@ -33,6 +36,7 @@ private:
 	void validateFields() override;
 	void handleFieldChange();
 	void clearFormFields();
+	
 	std::string name;
 	std::string phone;
 	std::string instrument;
@@ -49,6 +53,7 @@ private:
 	double gage;
 	bool isSoloistChecked = false;
 
+	ConcertController controller;
 	std::vector<Musician> musicians;
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;

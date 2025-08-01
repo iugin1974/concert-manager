@@ -13,9 +13,12 @@
 #include "Concert.h"
 #include "Model.h"
 
+class MusicianForm;
+
 class ConcertController {
 public:
 	void start();
+	void autofillFromAbook(const std::string& name, MusicianForm& form);
 private:
 	bool createEditConcert(Concert *concert);
 	void manageConcerts();

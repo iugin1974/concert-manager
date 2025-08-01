@@ -1,9 +1,15 @@
 #include "musician_form.h"
 #include "Utils.h"
+#include "ConcertController.h" // TODO elimina
 #include <form.h>
 #include <string>
 #include <locale.h>
 #include <sstream>
+
+void MusicianForm::setController(ConcertController& c) {
+// TODO elimina la dipendenza dal controller
+controller = c;
+}
 
 MusicianForm::~MusicianForm() {
 	closeForm();
@@ -11,6 +17,13 @@ MusicianForm::~MusicianForm() {
 
 void MusicianForm::setMusician(const Musician *m) {
 	existing = m;
+}
+
+void MusicianForm::setAutoFilledFields(const Musician& m) {
+    set_field_buffer(fields[1], 0, m.getPhone().c_str());
+    set_field_buffer(fields[2], 0, m.getInstrument().c_str());
+    set_field_buffer(fields[3], 0, m.getMail().c_str());
+    set_field_buffer(fields[4], 0, m.getAddress().c_str());
 }
 
 void MusicianForm::init_form() {
@@ -211,6 +224,11 @@ void MusicianForm::closeForm() {
 void MusicianForm::handleFieldChange() {
 	form_driver(form, REQ_VALIDATION);
 
+  std::string name = trim(field_buffer(fields[0], 0));
+    if (!name.empty()) {
+        controller.autofillFromAbook(name, *this);
+    }
+    
 	std::string prove_str = trim(field_buffer(fields[6], 0));
 	std::string concerti_str = trim(field_buffer(fields[7], 0));
 	std::string soloista_str = trim(field_buffer(fields[8], 0));
