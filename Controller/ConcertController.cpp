@@ -15,6 +15,7 @@
 #include <ncurses.h>
 #include "SelectionView.h"
 #include "AbookImporter.h"
+#include "Utils.h"
 #include <optional> // per std::optional
 #include <cstdlib>  // per system()
 
@@ -66,29 +67,28 @@ void ConcertController::manageConcerts() {
 	std::vector<std::string> menuTitles = { "File", "Concert", "Musician",
 			"Piece", "Rehearsal", "Tools" };
 
-	std::vector<std::vector<MenuItem>> menuItems =
-			{ { { "Exit", MenuCommand::Quit } },
+	std::vector<std::vector<MenuItem>> menuItems = { { { "Exit",
+			MenuCommand::Quit } },
 
-			{ { "Edit Concert Info", MenuCommand::EditConcertInfo }, {
-					"Delete Concert", MenuCommand::DeleteConcert } },
+	{ { "Edit Concert Info", MenuCommand::EditConcertInfo }, { "Delete Concert",
+			MenuCommand::DeleteConcert } },
 
-			{ { "Add Musician", MenuCommand::AddMusician }, { "Edit Musician",
-					MenuCommand::EditMusician }, { "Delete Musician",
-					MenuCommand::DeleteMusician } },
+	{ { "Add Musician", MenuCommand::AddMusician }, { "Edit Musician",
+			MenuCommand::EditMusician }, { "Delete Musician",
+			MenuCommand::DeleteMusician } },
 
-			{   // Piece
-					{ "Add Piece", MenuCommand::AddPiece }, {
-							"Edit / View Piece", MenuCommand::EditPiece }, {
-							"Delete Piece", MenuCommand::DeletePiece } },
+	{   // Piece
+			{ "Add Piece", MenuCommand::AddPiece }, { "Edit / View Piece",
+					MenuCommand::EditPiece }, { "Delete Piece",
+					MenuCommand::DeletePiece } },
 
-					{   // Rehearsal
-					{ "Add Rehearsal", MenuCommand::AddRehearsal }, {
-							"Edit Rehearsal", MenuCommand::EditRehearsal }, {
-							"Delete Rehearsal", MenuCommand::DeleteRehearsal } },
+			{   // Rehearsal
+			{ "Add Rehearsal", MenuCommand::AddRehearsal }, { "Edit Rehearsal",
+					MenuCommand::EditRehearsal }, { "Delete Rehearsal",
+					MenuCommand::DeleteRehearsal } },
 
-					{ // Misc
-					{ "Comment", MenuCommand::Comment },
-					{ "Mail", MenuCommand::Mail },
+			{ // Misc
+			{ "Comment", MenuCommand::Comment }, { "Mail", MenuCommand::Mail },
 					{ "TODO", MenuCommand::Todo } } };
 
 	clear();
@@ -196,9 +196,9 @@ bool ConcertController::createEditConcert(Concert *existing) {
 		concert.setPlaces(form.getPlacesAsVector());
 
 		if (existing) {
-		    model.updateConcertInfo(concert, *existing);  // source: concert, target: existing
+			model.updateConcertInfo(concert, *existing); // source: concert, target: existing
 		} else {
-		    model.addConcert(concert); // nuovo concerto
+			model.addConcert(concert); // nuovo concerto
 		}
 		return true;
 	}
@@ -214,40 +214,42 @@ bool ConcertController::createEditConcert(Concert *existing) {
 }
 
 void ConcertController::deleteConcert(Concert *concert) {
-	model.deleteConcert(concert);
+	bool confirm = confirmDialog(stdscr);
+	if (confirm)
+		model.deleteConcert(concert);
 }
 
 void ConcertController::createMusician(Concert *concert) {
 	clear();
 	if (auto musiciansOpt = createEditMusician(nullptr)) {
-	    for (const auto& musician : *musiciansOpt) {
-	        model.addMusician(musician, *concert);
-	    }
+		for (const auto &musician : *musiciansOpt) {
+			model.addMusician(musician, *concert);
+		}
 	}
 }
 
 void ConcertController::editMusician(Concert *concert) {
-    clear();
-    SelectionView view;
-    const std::vector<Musician> &musicians = concert->getMusicians();
-    int choice = view.runChoiceForm(musicians);
-    if (choice == -1)
-        return;
+	clear();
+	SelectionView view;
+	const std::vector<Musician> &musicians = concert->getMusicians();
+	int choice = view.runChoiceForm(musicians);
+	if (choice == -1)
+		return;
 
-    const Musician oldMusician = musicians.at(choice);
-    std::optional<std::vector<Musician>> updated = createEditMusician(&oldMusician);
+	const Musician oldMusician = musicians.at(choice);
+	std::optional<std::vector<Musician>> updated = createEditMusician(
+			&oldMusician);
 
-    if (updated && !updated->empty()) {
-        // Aggiorna il musicista selezionato con il primo elemento
-        model.updateMusician(oldMusician, updated->at(0), *concert);
+	if (updated && !updated->empty()) {
+		// Aggiorna il musicista selezionato con il primo elemento
+		model.updateMusician(oldMusician, updated->at(0), *concert);
 
-        // Aggiungi eventuali altri musicisti nuovi
-        for (size_t i = 1; i < updated->size(); ++i) {
-            model.addMusician(updated->at(i), *concert);
-        }
-    }
+		// Aggiungi eventuali altri musicisti nuovi
+		for (size_t i = 1; i < updated->size(); ++i) {
+			model.addMusician(updated->at(i), *concert);
+		}
+	}
 }
-
 
 void ConcertController::deleteMusician(Concert *concert) {
 	clear();
@@ -256,18 +258,20 @@ void ConcertController::deleteMusician(Concert *concert) {
 	int choice = view.runChoiceForm(musicians);
 	if (choice == -1)
 		return;
-
-	Musician m = concert->getMusicians().at(choice);
-	model.deleteMusician(m, *concert);
+	bool confirm = confirmDialog(stdscr);
+	if (confirm) {
+		Musician m = concert->getMusicians().at(choice);
+		model.deleteMusician(m, *concert);
+	}
 }
 
 std::optional<std::vector<Musician>> ConcertController::createEditMusician(
 		const Musician *musician) {
 	std::vector<std::string> menuTitles = { "File" };
-	std::vector<std::vector<MenuItem>> menuItems = { {
-			{ "New Musician", MenuCommand::AddMusician },
-			{ "Save and Exit", MenuCommand::SaveExit },
-			{ "Exit without saving", MenuCommand::Quit } } };
+	std::vector<std::vector<MenuItem>> menuItems = { { { "New Musician",
+			MenuCommand::AddMusician },
+			{ "Save and Exit", MenuCommand::SaveExit }, { "Exit without saving",
+					MenuCommand::Quit } } };
 	MenuBar menuBar(stdscr);
 	menuBar.setTitles(menuTitles);
 	menuBar.setItems(menuItems);
@@ -295,9 +299,10 @@ std::optional<std::vector<Musician>> ConcertController::createEditMusician(
 
 void ConcertController::createPiece(Concert *concert) {
 	clear();
-	std::optional<std::vector<MusicalPiece>> piecesOpt = createEditPiece(nullptr);
+	std::optional<std::vector<MusicalPiece>> piecesOpt = createEditPiece(
+			nullptr);
 	if (piecesOpt) {
-		for (const auto& piece : *piecesOpt) {
+		for (const auto &piece : *piecesOpt) {
 			model.addPiece(piece, *concert);
 		}
 	}
@@ -312,11 +317,12 @@ void ConcertController::editPiece(Concert *concert) {
 		return;
 
 	MusicalPiece oldPiece = pieces.at(choice);
-	std::optional<std::vector<MusicalPiece>> updatedPiecesOpt = createEditPiece(&oldPiece);
+	std::optional<std::vector<MusicalPiece>> updatedPiecesOpt = createEditPiece(
+			&oldPiece);
 	if (updatedPiecesOpt) {
 		// Aggiorna il pezzo modificato e aggiungi gli eventuali nuovi pezzi
 		if (!updatedPiecesOpt->empty()) {
-			model.updatePiece(oldPiece, (*updatedPiecesOpt)[0], *concert);  // Primo elemento è il pezzo modificato
+			model.updatePiece(oldPiece, (*updatedPiecesOpt)[0], *concert); // Primo elemento è il pezzo modificato
 			for (size_t i = 1; i < updatedPiecesOpt->size(); ++i) {
 				model.addPiece((*updatedPiecesOpt)[i], *concert);
 			}
@@ -332,16 +338,18 @@ void ConcertController::deletePiece(Concert *concert) {
 	if (choice == -1)
 		return;
 
-	MusicalPiece p = pieces.at(choice);
-	model.deletePiece(p, *concert);
+	bool confirm = confirmDialog(stdscr);
+	if (confirm) {
+		MusicalPiece p = pieces.at(choice);
+		model.deletePiece(p, *concert);
+	}
 }
 
 std::optional<std::vector<MusicalPiece>> ConcertController::createEditPiece(
 		MusicalPiece *piece) {
 	std::vector<std::string> menuTitles = { "File", "Score" };
-	std::vector<std::vector<MenuItem>> menuItems = { {
-			{ "New Piece", MenuCommand::AddPiece },
-			{ "Save and Exit", MenuCommand::SaveExit },
+	std::vector<std::vector<MenuItem>> menuItems = { { { "New Piece",
+			MenuCommand::AddPiece }, { "Save and Exit", MenuCommand::SaveExit },
 			{ "Exit without saving", MenuCommand::Quit } }, {   // Scores
 			{ "Add Score", MenuCommand::AddScore }, { "Delete Score",
 					MenuCommand::DeleteScore }, { "View Score",
@@ -363,8 +371,8 @@ std::optional<std::vector<MusicalPiece>> ConcertController::createEditPiece(
 		switch (command) {
 		case MenuCommand::SaveExit: {
 			std::vector<MusicalPiece> pieces;
-			        pieces = form.getPieces();
-			        return pieces;
+			pieces = form.getPieces();
+			return pieces;
 		}
 		case MenuCommand::Quit:
 
@@ -388,9 +396,9 @@ std::optional<std::vector<MusicalPiece>> ConcertController::createEditPiece(
 void ConcertController::createRehearsal(Concert *concert) {
 	clear();
 	if (auto rehearsalsOpt = createEditRehearsal(nullptr)) {
-	    for (const auto& rehearsal : *rehearsalsOpt) {
-	        model.addRehearsal(rehearsal, *concert);
-	    }
+		for (const auto &rehearsal : *rehearsalsOpt) {
+			model.addRehearsal(rehearsal, *concert);
+		}
 	}
 }
 
@@ -403,7 +411,8 @@ void ConcertController::editRehearsal(Concert *concert) {
 		return;
 
 	const Rehearsal oldRehearsal = rehearsals.at(choice);
-	std::optional<std::vector<Rehearsal>> updated = createEditRehearsal(&oldRehearsal);
+	std::optional<std::vector<Rehearsal>> updated = createEditRehearsal(
+			&oldRehearsal);
 
 	if (updated && !updated->empty()) {
 		// Aggiorna la prova selezionata con il primo elemento
@@ -424,16 +433,18 @@ void ConcertController::deleteRehearsal(Concert *concert) {
 	if (choice == -1)
 		return;
 
-	Rehearsal r = rehearsals.at(choice);
-	model.deleteRehearsal(r, *concert);
+	bool confirm = confirmDialog(stdscr);
+	if (confirm) {
+		Rehearsal r = rehearsals.at(choice);
+		model.deleteRehearsal(r, *concert);
+	}
 }
 
 std::optional<std::vector<Rehearsal>> ConcertController::createEditRehearsal(
 		const Rehearsal *rehearsal) {
 	std::vector<std::string> menuTitles = { "File" };
-	std::vector<std::vector<MenuItem>> menuItems = { {
-			{ "New Rehearsal" , MenuCommand::AddRehearsal },
-			{ "Save and Exit",
+	std::vector<std::vector<MenuItem>> menuItems = { { { "New Rehearsal",
+			MenuCommand::AddRehearsal }, { "Save and Exit",
 			MenuCommand::SaveExit },
 			{ "Exit without saving", MenuCommand::Quit } } };
 
@@ -448,16 +459,16 @@ std::optional<std::vector<Rehearsal>> ConcertController::createEditRehearsal(
 
 	MenuCommand command = form.getCommand();
 	switch (command) {
-		case MenuCommand::SaveExit: {
-			std::vector<Rehearsal> rehearsals = form.getRehearsals();
-			return rehearsals;
-		}
-		case MenuCommand::Quit: {
-			return std::nullopt;
-		}
-		default: {
-			break;
-		}
+	case MenuCommand::SaveExit: {
+		std::vector<Rehearsal> rehearsals = form.getRehearsals();
+		return rehearsals;
+	}
+	case MenuCommand::Quit: {
+		return std::nullopt;
+	}
+	default: {
+		break;
+	}
 	}
 	return std::nullopt;
 }
@@ -494,29 +505,31 @@ bool ConcertController::deleteScore(MusicalPiece *piece) {
 	if (choice == -1)
 		return false;
 
-	Score s = scores.at(choice);
-	model.deleteScore(s, *piece);
-	return true;
+	bool confirm = confirmDialog(stdscr);
+	if (confirm) {
+		Score s = scores.at(choice);
+		model.deleteScore(s, *piece);
+	}
+	return confirm;
 }
 
 bool ConcertController::addScore(MusicalPiece *piece) {
-    clear();
-    std::vector<std::string> scorePaths = model.getScorePaths();
-    ScoreSelectView scoreSelectView;
-    std::vector<std::string> paths = scoreSelectView.show(scorePaths);
+	clear();
+	std::vector<std::string> scorePaths = model.getScorePaths();
+	ScoreSelectView scoreSelectView;
+	std::vector<std::string> paths = scoreSelectView.show(scorePaths);
 
-    if (paths.empty())
-        return false;
+	if (paths.empty())
+		return false;
 
-    for (const auto& path : paths) {
-        Score s;
-        s.setPath(path);
-        model.addScore(s, *piece);
-    }
+	for (const auto &path : paths) {
+		Score s;
+		s.setPath(path);
+		model.addScore(s, *piece);
+	}
 
-    return true;
+	return true;
 }
-
 
 bool ConcertController::commentConcert(Concert *concert) {
 	std::string comment = concert->getComment();
@@ -533,26 +546,29 @@ void ConcertController::sendMail(Concert *concert) {
 	// memorizza tutti i musicisti che hanno una mail
 	std::vector<Musician> musicians = concert->getMusicians();
 	std::vector<Musician> musicianWithMail;
-	for (const Musician& m : musicians) {
-		if (!empty(m.getMail())) musicianWithMail.push_back(m);
+	for (const Musician &m : musicians) {
+		if (!empty(m.getMail()))
+			musicianWithMail.push_back(m);
 	}
 
 	clear();
 	SelectionView selectionView;
 	int choice = selectionView.runChoiceForm(musicianWithMail);
-	if (choice == -1) return;
+	if (choice == -1)
+		return;
 	std::string mail = musicianWithMail.at(choice).getMail();
 
 	MuttView muttView;
 	muttView.launchMutt(mail);
 }
 
-void ConcertController::autofillFromAbook(const std::string& name, MusicianForm& form) {
-    auto maybeM = AbookImporter::lookupByName(name);
-    if (maybeM.has_value()) {
-        const Musician& m = maybeM.value();
-        form.setAutoFilledFields(m);
-    }
+void ConcertController::autofillFromAbook(const std::string &name,
+		MusicianForm &form) {
+	auto maybeM = AbookImporter::lookupByName(name);
+	if (maybeM.has_value()) {
+		const Musician &m = maybeM.value();
+		form.setAutoFilledFields(m);
+	}
 }
 
 void ConcertController::sort() {
