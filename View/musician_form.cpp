@@ -150,6 +150,8 @@ MenuCommand MusicianForm::getCommand() {
 				isSoloistChecked = !isSoloistChecked;
 				set_field_buffer(fields[8], 0,
 						isSoloistChecked ? "[X]" : "[ ]");
+			}  else {
+				form_driver(form, ch);
 			}
 			break;
 		default:

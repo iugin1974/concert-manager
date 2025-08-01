@@ -135,7 +135,9 @@ MenuCommand PieceForm::getCommand() {
 		    if (current_field(form) == fields[3]) {
 		        hasChoiristChecked = !hasChoiristChecked;
 		        set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
-		    }
+		    }  else {
+				form_driver(form, ch);
+			}
 		    break;
 		default:
 			form_driver(form, ch);
