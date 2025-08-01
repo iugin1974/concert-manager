@@ -23,7 +23,7 @@ void ConcertSummaryView::show() {
 
 		attron(A_BOLD);
 		mvprintw(row++, 2, "Concert Summary");
-		mvprintw(row++, 2, "---------------");
+		mvhline(row++, 2, ACS_HLINE, 15);
 		mvprintw(row++, 2, "%s", concert.getTitle().c_str());
 		row++;
 		attroff(A_BOLD);
@@ -59,9 +59,9 @@ void ConcertSummaryView::show() {
 		attron(A_BOLD);
 		mvprintw(row++, 2, "Program:");
 		attroff(A_BOLD);
-		mvprintw(row++, 2, "%-20s %-30s %-8s %s", "Composer", "Title",
-				"Duration", "Instruments");
-		mvhline(row++, 2, ACS_HLINE, 90);
+		mvprintw(row++, 2, "%-20s %-40s %-8s %-35s %-3s", "Composer", "Title",
+				"Duration", "Instruments", "Scores");
+		mvhline(row++, 2, ACS_HLINE, 130);
 
 		for (const auto &p : pieces) {
 			std::stringstream org;
@@ -71,12 +71,12 @@ void ConcertSummaryView::show() {
 			if (p.hasChoir())
 				org << " - Choir";
 
-			mvprintw(row++, 2, "%-20s %-30s %-8s %s", p.getComposer().c_str(),
+			mvprintw(row++, 2, "%-20s %-40s %-8s %-35s %-3zu", p.getComposer().c_str(),
 					p.getTitle().c_str(),
-					convertToMMSS(p.getDuration()).c_str(), org.str().c_str());
+					convertToMMSS(p.getDuration()).c_str(), org.str().c_str(), p.getScores().size());
 		}
 
-		mvhline(row++, 2, ACS_HLINE, 90);
+		mvhline(row++, 2, ACS_HLINE, 130);
 		mvprintw(row++, 54, "%-8s",
 				convertToMMSS(concert.getDuration()).c_str());
 
@@ -139,4 +139,4 @@ void ConcertSummaryView::show() {
 void ConcertSummaryView::closeForm() {
 }
 
-void ConcertSummaryView::validateFields() {}
+void ConcertSummaryView::saveDataFromForm() {}

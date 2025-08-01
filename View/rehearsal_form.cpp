@@ -49,13 +49,17 @@ void RehearsalForm::init_form() {
 void RehearsalForm::show() {
 	init_form();
 	post_form(form);
-	refresh();
 
 	int row = 2;
 	mvprintw(row++, 2, "Date (DD.MM.YYYY):");
 	mvprintw(row++, 2, "Start time (HH:MM):");
 	mvprintw(row++, 2, "Place:");
 	mvprintw(row++, 2, "Musicians:");
+
+	set_current_field(form, fields[0]);
+	form_driver(form, REQ_FIRST_FIELD);
+	form_driver(form, REQ_END_LINE);  // posiziona alla fine del buffer
+	refresh();
 
 }
 
@@ -83,10 +87,10 @@ MenuCommand RehearsalForm::getCommand() {
 		case KEY_F(2): {
 			MenuCommand result = menuBar.show();
 			if (result == MenuCommand::AddRehearsal) {
-				validateFields();
+				saveDataFromForm();
 				clearFormFields();
 			} else {
-				validateFields();
+				saveDataFromForm();
 			return result;
 			}
 		}
@@ -108,7 +112,7 @@ void RehearsalForm::clearFormFields() {
 	    refresh();
 }
 
-void RehearsalForm::validateFields() {
+void RehearsalForm::saveDataFromForm() {
 	form_driver(form, REQ_VALIDATION);
 	std::string dateStr = trim(field_buffer(fields[0], 0));
 	std::tm date;

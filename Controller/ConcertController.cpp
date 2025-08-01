@@ -517,16 +517,16 @@ bool ConcertController::addScore(MusicalPiece *piece) {
 	clear();
 	std::vector<std::string> scorePaths = model.getScorePaths();
 	ScoreSelectView scoreSelectView;
-	std::vector<std::string> paths = scoreSelectView.show(scorePaths);
+	std::optional<std::vector<std::string>> paths = scoreSelectView.show(scorePaths);
 
-	if (paths.empty())
-		return false;
+	if (!paths || paths->empty())
+	    return false;
 
-	for (const auto &path : paths) {
-		Score s;
-		s.setPath(path);
-		model.addScore(s, *piece);
-	}
+	for (const auto &path : *paths) {
+	        Score s;
+	        s.setPath(path);
+	        model.addScore(s, *piece);
+	    }
 
 	return true;
 }

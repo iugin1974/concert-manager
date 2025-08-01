@@ -6,9 +6,9 @@
 #include <locale.h>
 #include <sstream>
 
-void MusicianForm::setController(ConcertController& c) {
+void MusicianForm::setController(ConcertController &c) {
 // TODO elimina la dipendenza dal controller
-controller = c;
+	controller = c;
 }
 
 MusicianForm::~MusicianForm() {
@@ -19,11 +19,11 @@ void MusicianForm::setMusician(const Musician *m) {
 	existing = m;
 }
 
-void MusicianForm::setAutoFilledFields(const Musician& m) {
-    set_field_buffer(fields[1], 0, m.getPhone().c_str());
-    set_field_buffer(fields[2], 0, m.getInstrument().c_str());
-    set_field_buffer(fields[3], 0, m.getMail().c_str());
-    set_field_buffer(fields[4], 0, m.getAddress().c_str());
+void MusicianForm::setAutoFilledFields(const Musician &m) {
+	set_field_buffer(fields[1], 0, m.getPhone().c_str());
+	set_field_buffer(fields[2], 0, m.getInstrument().c_str());
+	set_field_buffer(fields[3], 0, m.getMail().c_str());
+	set_field_buffer(fields[4], 0, m.getAddress().c_str());
 }
 
 void MusicianForm::init_form() {
@@ -90,7 +90,6 @@ void MusicianForm::clearFormFields() {
 void MusicianForm::show() {
 	init_form();
 	post_form(form);
-	refresh();
 
 	int row = 2;
 	mvprintw(row++, 2, "Name:");
@@ -117,9 +116,10 @@ void MusicianForm::show() {
 	mvprintw(row++, 2, "Total costs:\t\t%4.2f", salary + travelCosts);
 	attroff(A_BOLD);
 
-	refresh();
-
+	set_current_field(form, fields[0]);
 	form_driver(form, REQ_FIRST_FIELD);
+	form_driver(form, REQ_END_LINE);  // posiziona alla fine del buffer
+	refresh();
 }
 
 MenuCommand MusicianForm::getCommand() {
@@ -131,10 +131,10 @@ MenuCommand MusicianForm::getCommand() {
 		case KEY_F(2): { // MENU AZIONI
 			MenuCommand result = menuBar.show();
 			if (result == MenuCommand::AddMusician) {
-				validateFields();
+				saveDataFromForm();
 				clearFormFields();
 			} else {
-				validateFields();
+				saveDataFromForm();
 				return result;
 			}
 			break;
@@ -163,7 +163,7 @@ MenuCommand MusicianForm::getCommand() {
 				isSoloistChecked = !isSoloistChecked;
 				set_field_buffer(fields[8], 0,
 						isSoloistChecked ? "[X]" : "[ ]");
-			}  else {
+			} else {
 				form_driver(form, ch);
 			}
 			break;
@@ -182,7 +182,7 @@ MenuCommand MusicianForm::getCommand() {
 	}
 }
 
-void MusicianForm::validateFields() {
+void MusicianForm::saveDataFromForm() {
 	form_driver(form, REQ_VALIDATION);
 
 	std::string name = trim(field_buffer(fields[0], 0));
@@ -224,11 +224,11 @@ void MusicianForm::closeForm() {
 void MusicianForm::handleFieldChange() {
 	form_driver(form, REQ_VALIDATION);
 
-  std::string name = trim(field_buffer(fields[0], 0));
-    if (!name.empty()) {
-        controller.autofillFromAbook(name, *this);
-    }
-    
+	std::string name = trim(field_buffer(fields[0], 0));
+	if (!name.empty()) {
+		controller.autofillFromAbook(name, *this);
+	}
+
 	std::string prove_str = trim(field_buffer(fields[6], 0));
 	std::string concerti_str = trim(field_buffer(fields[7], 0));
 	std::string soloista_str = trim(field_buffer(fields[8], 0));

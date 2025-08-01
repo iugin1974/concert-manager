@@ -22,17 +22,17 @@ void ConcertInfoForm::setConcert(const Concert *existing) {
 void ConcertInfoForm::init_form() {
 	if (form == nullptr) {
 
-	int row = 5;
-	fields[0] = new_field(1, 40, row++, 30, 0, 0); // Title
-	fields[1] = new_field(1, 40, row++, 30, 0, 0); // Places
-	fields[2] = new_field(1, 40, row++, 30, 0, 0); // Dates
-	fields[3] = nullptr;
+		int row = 5;
+		fields[0] = new_field(1, 40, row++, 30, 0, 0); // Title
+		fields[1] = new_field(1, 40, row++, 30, 0, 0); // Places
+		fields[2] = new_field(1, 40, row++, 30, 0, 0); // Dates
+		fields[3] = nullptr;
 
-	for (int i = 0; i < NUMBER_OF_FIELDS - 1; ++i) {
-		set_field_back(fields[i], A_UNDERLINE);
-		field_opts_off(fields[i], O_AUTOSKIP);
+		for (int i = 0; i < NUMBER_OF_FIELDS - 1; ++i) {
+			set_field_back(fields[i], A_UNDERLINE);
+			field_opts_off(fields[i], O_AUTOSKIP);
+		}
 	}
-}
 	if (existing) {
 		set_field_buffer(fields[0], 0, existing->getTitle().c_str());
 
@@ -56,6 +56,7 @@ void ConcertInfoForm::show() {
 
 	init_form();
 	post_form(form);
+
 	int row = 2;
 	attron(A_BOLD);
 	mvprintw(row++, 2, "Concert Info:");
@@ -65,8 +66,10 @@ void ConcertInfoForm::show() {
 	mvprintw(row++, 2, "Places (comma-separated):");
 	mvprintw(row++, 2, "Dates  (comma-separated):");
 
-	refresh();
+	set_current_field(form, fields[0]);
 	form_driver(form, REQ_FIRST_FIELD);
+	form_driver(form, REQ_END_LINE);  // posiziona alla fine del buffer
+	refresh();
 }
 
 MenuCommand ConcertInfoForm::getCommand() {
@@ -74,7 +77,7 @@ MenuCommand ConcertInfoForm::getCommand() {
 	while ((ch = getch())) {
 		switch (ch) {
 		case KEY_F(2): {
-			validateFields();
+			saveDataFromForm();
 			MenuCommand result = menuBar.show();
 			return result;
 		}
@@ -110,7 +113,7 @@ MenuCommand ConcertInfoForm::getCommand() {
 	return MenuCommand::Quit;
 }
 
-void ConcertInfoForm::validateFields() {
+void ConcertInfoForm::saveDataFromForm() {
 	form_driver(form, REQ_VALIDATION);
 	title = trim(field_buffer(fields[0], 0));
 	places = trim(field_buffer(fields[1], 0));

@@ -14,7 +14,7 @@ public:
     // Esegue la visualizzazione e ritorna il comando scelto dall'utente
     virtual void show() = 0;
     virtual MenuCommand getCommand() = 0;
-    virtual void validateFields() = 0;
+    virtual void saveDataFromForm() = 0;
 
 protected:
     MenuBar menuBar; // comune a tutte le view

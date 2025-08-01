@@ -22,7 +22,7 @@ private:
     static constexpr int NUMBER_OF_FIELDS = 4;
     void init_form() override;
     void closeForm() override;
-    void validateFields() override;
+    void saveDataFromForm() override;
     const Concert* existing = nullptr;
     std::string title;
     std::string places;

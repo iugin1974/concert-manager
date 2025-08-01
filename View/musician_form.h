@@ -33,7 +33,7 @@ private:
 	const Musician *existing = nullptr;
 	void init_form() override;
 	void closeForm() override;
-	void validateFields() override;
+	void saveDataFromForm() override;
 	void handleFieldChange();
 	void clearFormFields();
 	

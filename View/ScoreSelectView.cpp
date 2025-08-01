@@ -5,10 +5,11 @@
 #include <ncurses.h>
 #include <filesystem>
 #include <algorithm>
+#include <optional>
 
 namespace fs = std::filesystem;
 
-std::vector<std::string> ScoreSelectView::show(std::vector<std::string> availablePaths) {
+std::optional<std::vector<std::string>> ScoreSelectView::show(std::vector<std::string> availablePaths) {
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
@@ -76,7 +77,7 @@ std::vector<std::string> ScoreSelectView::show(std::vector<std::string> availabl
                 offset = (currentSelection >= windowHeight - 2) ? currentSelection - (windowHeight - 2) + 1 : 0;
                 draw(availablePaths, selectedFiles);
                 break;
-            case 10: // Enter
+            case ' ':
                 {
                     std::string chosen = availablePaths[currentSelection];
                     if (std::find(selectedFiles.begin(), selectedFiles.end(), chosen) == selectedFiles.end()) {
@@ -85,8 +86,10 @@ std::vector<std::string> ScoreSelectView::show(std::vector<std::string> availabl
                     draw(availablePaths, selectedFiles);
                 }
                 break;
+            case 10: // Enter
+            	return selectedFiles;
             case 27: // ESC
-                return selectedFiles;
+                return std::nullopt;
         }
     }
 }
@@ -99,7 +102,7 @@ std::vector<std::string> ScoreSelectView::show(std::vector<std::string> availabl
 void ScoreSelectView::draw(const std::vector<std::string>& availablePaths, const std::vector<std::string>& selectedFiles) {
     clear();
     int maxDisplay = windowHeight - 2;
-    mvprintw(0, 0, "Select a score file (ENTER to select, ESC to finish):");
+    mvprintw(0, 0, "Select a score file (SPACE: select - ENTER: finish - ESC: cancel):");
 
     for (int i = 0; i < maxDisplay && i + offset < (int)availablePaths.size(); ++i) {
         int index = i + offset;

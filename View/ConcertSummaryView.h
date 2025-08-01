@@ -15,7 +15,7 @@ private:
 	Concert concert;
 	void init_form() override;
 	void closeForm() override;
-	void validateFields() override;
+	void saveDataFromForm() override;
 
 
 };

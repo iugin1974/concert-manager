@@ -100,11 +100,13 @@ MenuCommand PieceForm::getCommand() {
 		case KEY_F(2): { // MENU AZIONI
 		    MenuCommand result = menuBar.show();
 		    if (result == MenuCommand::AddPiece) {
-		        validateFields();
+		        saveDataFromForm();
 		        clearFormFields();
-		    } else {
-		        validateFields();
+		    } else if (result == MenuCommand::SaveExit || result == MenuCommand::Quit) {
+		        saveDataFromForm();
 		        return result;
+		    } else {
+		        return result;  // Nessuna validazione per AddScore, DeleteScore, ViewScore
 		    }
 		    break;
 		}
@@ -148,7 +150,7 @@ MenuCommand PieceForm::getCommand() {
 	return MenuCommand::None;
 }
 
-void PieceForm::validateFields() {
+void PieceForm::saveDataFromForm() {
     form_driver(form, REQ_VALIDATION);
 
     std::string composer = trim(field_buffer(fields[0], 0));
@@ -162,11 +164,25 @@ void PieceForm::validateFields() {
     std::string instruments = trim(field_buffer(fields[5], 0));
     bool choir = hasChoiristChecked;
 
-    MusicalPiece p(composer, title, duration, choir, singer, instruments);
+    MusicalPiece newPiece(composer, title, duration, choir, singer, instruments);
     if (existing && !existing->getScores().empty()) {
-        p.setScores(existing->getScores());
+    	newPiece.setScores(existing->getScores());
     }
-    pieces.push_back(p);
+
+    if (existing) {
+        // Sovrascrive la piece esistente nel vettore
+        for (auto &p : pieces) {
+            if (&p == existing) {
+                p = newPiece;
+                return;  // Uscita: aggiornata, non aggiungere
+            }
+        }
+        // Se existing non trovata nel vettore, allora aggiungi
+        pieces.push_back(newPiece);
+    } else {
+        // Nuova piece
+        pieces.push_back(newPiece);
+    }
 }
 
 void PieceForm::closeForm() {

@@ -22,7 +22,7 @@ private:
 	const Rehearsal *existing = nullptr;
 	void init_form() override;
 	void closeForm() override;
-	void validateFields() override;
+	void saveDataFromForm() override;
 	void clearFormFields();
 	std::vector<Rehearsal> rehearsals;
 	FIELD *fields[NUMBER_OF_FIELDS];
