@@ -1,5 +1,6 @@
 #include "MusicalPiece.h"
 #include "Score.h"
+#include "Utils.h"
 #include <iostream>
 #include <vector>
 
@@ -76,5 +77,34 @@ void MusicalPiece::print() const {
 }
 
 std::string MusicalPiece::toString() const {
-	return composer + ": " + title;
-}
+        std::ostringstream oss;
+        oss << std::left
+            << std::setw(20) << getComposer()
+            << std::setw(40) << getTitle()
+            << std::setw(8)  << convertToMMSS(getDuration());
+
+        // Costruzione campo Instruments (con SingerPart e Choir)
+        std::ostringstream org;
+        org << getInstruments();
+        if (!getSingerPart().empty())
+            org << " - " << getSingerPart();
+        if (hasChoir())
+            org << " - Choir";
+
+        oss << std::setw(35) << org.str()
+            << std::setw(3) << getScores().size();
+
+        return oss.str();
+    }
+
+std::string MusicalPiece::header() {
+        std::ostringstream oss;
+        oss << std::left
+            << std::setw(20) << "Composer"
+            << std::setw(40) << "Title"
+            << std::setw(8)  << "Duration"
+            << std::setw(35) << "Instruments"
+            << std::setw(3)  << "Scores";
+        return oss.str();
+    }
+

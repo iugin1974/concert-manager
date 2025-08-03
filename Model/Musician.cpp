@@ -92,20 +92,36 @@ bool Musician::isEmpty() const {
     return name.empty();
 }
 
-// Print
-void Musician::print() const {
-    std::cout << "Nome: " << name << "\n"
-              << "Strumento: " << instrument << "\n"
-              << "Telefono: " << phone << "\n"
-              << "Email: " << email << "\n"
-              << "Indirizzo: " << address << "\n"
-              << "Cachet: €" << gage << "\n"
-              << "Timestamp: " << getTimestamp() << "\n";
-}
+double Musician::getFullPayment() const {
+        double travelCosts = getTravelCosts() * (
+            (getRehearsalNumber() * 2) +
+            (getConcertNumber() * 2));
+        return getGage() + travelCosts;
+    }
 
+
+// Print
 std::string Musician::toString() const {
-    return name;
-}
+      std::ostringstream oss;
+      oss << std::left
+          << std::setw(20) << getName()
+          << std::setw(20) << getInstrument()
+          << std::right
+          << std::setw(10) << std::fixed << std::setprecision(2) << getGage()
+          << std::setw(20) << std::fixed << std::setprecision(2) << getFullPayment();
+      return oss.str();
+  }
+
+std::string Musician::header() {
+        std::ostringstream oss;
+        oss << std::left
+            << std::setw(20) << "Name"
+            << std::setw(20) << "Instrument"
+            << std::right
+            << std::setw(10) << "Gage"
+            << std::setw(20) << "Total with expenses";
+        return oss.str();
+    }
 
 Musician::SalaryDetails Musician::calculateSalary(int rehearsals, int concerts, bool soloist, double travelC) {
     SalaryDetails details;

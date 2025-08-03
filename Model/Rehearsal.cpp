@@ -1,4 +1,5 @@
 #include "Rehearsal.h"
+#include "Utils.h"
 #include <iomanip>
 #include <sstream>
 
@@ -47,8 +48,21 @@ void Rehearsal::setMusicians(const std::string &m) {
 
 // toString
 std::string Rehearsal::toString() const {
-	char buf[20];
-	std::strftime(buf, sizeof(buf), "%Y-%m-%d", &date);
-	return std::string(buf) + ", " + startTime + " - " + place + " ["
-			+ musicians + "]";
-}
+        std::ostringstream oss;
+        oss << std::left
+            << std::setw(12) << dateToString(getDate())
+            << std::setw(6)  << getStartTime()
+            << std::setw(20) << getPlace()
+            << std::setw(20) << getMusicians();
+        return oss.str();
+    }
+
+    std::string Rehearsal::header() {
+        std::ostringstream oss;
+        oss << std::left
+            << std::setw(12) << "Date"
+            << std::setw(6)  << "Time"
+            << std::setw(20) << "Place"
+            << std::setw(20) << "Musicians";
+        return oss.str();
+    }

@@ -53,17 +53,6 @@ public:
 	    }
 	}
 
-	template<typename T>
-	std::string join(const std::vector<T>& vec, const std::string& sep) {
-	    if (vec.empty()) return "";
-
-	    std::string result = vec[0];
-	    for (size_t i = 1; i < vec.size(); ++i) {
-	        result += sep + vec[i];
-	    }
-	    return result;
-	}
-
 private:
 	int promptNumber(WINDOW *win, int y, int x, int min, int max);
 	void showErrorMessage(WINDOW* win, int y, int x, const std::string& message);

@@ -3,8 +3,9 @@
 #include <string>
 #include <ctime>
 #include "Timestamped.h"
+#include "Printable.h"
 
-class Rehearsal : public Timestamped {
+class Rehearsal : public Timestamped, Printable {
 private:
     std::tm date{};              // solo parte data (YYYY-MM-DD)
     std::string startTime;       // orario in formato "HH:MM"
@@ -24,6 +25,7 @@ public:
     std::string getStartTime() const;
     std::string getPlace() const;
     std::string getMusicians() const;
+    static std::string header();
 
     // Setters
     void setDate(const std::tm& d);

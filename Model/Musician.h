@@ -2,8 +2,9 @@
 
 #include <string>
 #include "Timestamped.h"
+#include "Printable.h"
 
-class Musician: public Timestamped {
+class Musician: public Timestamped, Printable {
 private:
 	std::string name;
 	std::string phone;
@@ -36,6 +37,7 @@ public:
 	int getConcertNumber() const;
 	double getTravelCosts() const;
 	bool isSoloist() const;
+	double getFullPayment() const;
 	struct SalaryDetails {
 		double baseSalary;
 		double vacationCompensation;
@@ -63,4 +65,5 @@ public:
 	// Output
 	void print() const;
 	std::string toString() const;
+	static std::string header();
 };

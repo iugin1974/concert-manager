@@ -3,10 +3,12 @@
 
 #include <string>
 #include <vector>
+
+#include "Printable.h"
 #include "Score.h"
 #include "Timestamped.h"
 
-class MusicalPiece: public Timestamped {
+class MusicalPiece: public Timestamped, Printable {
 private:
 	std::string composer;
 	std::string title;
@@ -45,7 +47,8 @@ public:
 		void addScore(const Score &s);
 	// Stampa a terminale
 	void print() const;
-	std::string toString() const;
+	std::string toString() const override;
+	static std::string header();
 };
 
 #endif // MUSICALPIECE_H
