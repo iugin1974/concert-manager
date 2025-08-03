@@ -13,7 +13,7 @@ public:
 	std::vector<MusicalPiece> getPieces();
 
 private:
-	static constexpr int NUMBER_OF_FIELDS = 7;
+	static constexpr int NUMBER_OF_FIELDS = 8;
 	const MusicalPiece *existing = nullptr;
 	void init_form() override;
 	void closeForm() override;

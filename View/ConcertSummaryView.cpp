@@ -31,9 +31,6 @@ void ConcertSummaryView::show() {
 		const auto &places = concert.getPlaces();
 		const auto &dates = concert.getDatesAsString();
 
-		LOG_MSG("places.size() = " + std::to_string(places.size()));
-		LOG_MSG("dates.size() = " + std::to_string(dates.size()));
-
 		for (size_t i = 0; i < places.size(); ++i) {
 			mvprintw(row++, 2, "- %s - %s", dates[i].c_str(),
 					places[i].c_str());

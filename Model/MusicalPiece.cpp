@@ -9,13 +9,22 @@ MusicalPiece::MusicalPiece() {
 	choir = false;
 }
 MusicalPiece::MusicalPiece(const std::string &composer,
-		const std::string &title, int duration, bool choir,
-		const std::string &singerPart, const std::string &instruments,
-		long long ts) :
-		Timestamped(ts), composer(composer), title(title), duration(duration), choir(
-				choir), singerPart(singerPart), instruments(instruments) {
+                           const std::string &title,
+                           int duration,
+                           bool choir,
+                           const std::string &singerPart,
+                           const std::string &instruments,
+						   const std::string &youtubeLink,
+                           long long ts)
+    : Timestamped(ts),
+      composer(composer),
+      title(title),
+      duration(duration),
+      choir(choir),
+      singerPart(singerPart),
+      instruments(instruments),
+      youtubeLink(youtubeLink) {
 }
-
 // Getter
 const std::string& MusicalPiece::getComposer() const {
 	return composer;
@@ -68,6 +77,15 @@ void MusicalPiece::setScores(const std::vector<Score> &s) {
 void MusicalPiece::addScore(const Score &s) {
 	scores.push_back(s);
 }
+
+const std::string& MusicalPiece::getYoutubeLink() const {
+    return youtubeLink;
+}
+
+void MusicalPiece::setYoutubeLink(const std::string &link) {
+    youtubeLink = link;
+}
+
 // Print
 void MusicalPiece::print() const {
 	std::cout << "Title: " << title << "\n" << "Composer: " << composer << "\n"

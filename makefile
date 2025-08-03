@@ -36,3 +36,10 @@ clean:
 
 install:
 	cp $(TARGET) /usr/bin/
+	
+
+valgrind: CXX=g++
+valgrind: CXXFLAGS=-std=c++17 -Wall -Wextra -g -gdwarf-4 -O0 \
+                   -fno-omit-frame-pointer \
+                   -I./Model -I./View -I./Controller -I./Core -I./IO -I./External
+valgrind: clean all

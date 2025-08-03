@@ -28,7 +28,8 @@ void PieceForm::init_form() {
 	field_opts_off(fields[3], O_EDIT); // Non editabile manualmente
 	fields[4] = new_field(1, 40, row++, 20, 0, 0); // Singer part
 	fields[5] = new_field(1, 40, row++, 20, 0, 0); // Instruments
-	fields[6] = nullptr;
+	fields[6] = new_field(1, 140, row++, 20, 0, 0);  // YouTube link
+	fields[7] = nullptr;  // Terminatore
 
 	for (int i = 0; i < NUMBER_OF_FIELDS; ++i) {
 		set_field_back(fields[i], A_UNDERLINE);
@@ -45,6 +46,8 @@ void PieceForm::init_form() {
 		set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
 		set_field_buffer(fields[4], 0, existing->getSingerPart().c_str());
 		set_field_buffer(fields[5], 0, existing->getInstruments().c_str());
+		set_field_buffer(fields[6], 0, existing->getYoutubeLink().c_str());
+
 	}
 
 	form = new_form(fields);
@@ -61,6 +64,7 @@ void PieceForm::show() {
 	mvprintw(row++, 2, "Choir [X]:");
 	mvprintw(row++, 2, "Singer Part:");
 	mvprintw(row++, 2, "Instruments:");
+	mvprintw(row++, 2, "YouTube Link:");
 	row += 2;
 	attron(A_BOLD);
 	mvprintw(row++, 2, "Scores:");
@@ -162,9 +166,11 @@ void PieceForm::saveDataFromForm() {
 
     std::string singer = trim(field_buffer(fields[4], 0));
     std::string instruments = trim(field_buffer(fields[5], 0));
+    std::string youtube = trim(field_buffer(fields[6], 0));
+
     bool choir = hasChoiristChecked;
 
-    MusicalPiece newPiece(composer, title, duration, choir, singer, instruments);
+    MusicalPiece newPiece(composer, title, duration, choir, singer, instruments, youtube);
     if (existing && !existing->getScores().empty()) {
     	newPiece.setScores(existing->getScores());
     }

@@ -17,13 +17,14 @@ private:
 	std::string singerPart;
 	std::string instruments;  // es. "Vl1, Vl2, Vla, Kb"
 	std::vector<Score> scores;
+	std::string youtubeLink;
 
 public:
 	// Costruttore
 	MusicalPiece();
 	MusicalPiece(const std::string &composer, const std::string &title,
-			const int duration, bool choir, const std::string &singerPart,
-			const std::string &instruments, long long ts = 0);
+	             int duration, bool choir, const std::string &singerPart,
+	             const std::string &instruments, const std::string &youtubeLink = "", long long ts = 0);
 
 	// Getter
 	const std::string& getComposer() const;
@@ -45,6 +46,8 @@ public:
 
 		void setScores(const std::vector<Score> &s);
 		void addScore(const Score &s);
+		const std::string& getYoutubeLink() const;
+		void setYoutubeLink(const std::string &link);
 	// Stampa a terminale
 	void print() const;
 	std::string toString() const override;

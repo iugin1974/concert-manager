@@ -159,6 +159,7 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
             pelem("choir", p.hasChoir() ? "1" : "0");
             pelem("singerPart", p.getSingerPart());
             pelem("instruments", p.getInstruments());
+            pelem("youtube", p.getYoutubeLink());
 
             // ✅ timestamp
             XMLElement* ts = doc.NewElement("timestamp");
@@ -347,7 +348,7 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
              pieceElem;
              pieceElem = pieceElem->NextSiblingElement("piece")) {
 
-            MusicalPiece p("", "", 0, false, "", "");
+            MusicalPiece p("", "", 0, false, "", "", "");
             p.setComposer(getSafeText(pieceElem->FirstChildElement("composer")));
             p.setTitle(getSafeText(pieceElem->FirstChildElement("title")));
 
@@ -361,6 +362,7 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
             p.setChoir(getSafeText(pieceElem->FirstChildElement("choir")) == "1");
             p.setSingerPart(getSafeText(pieceElem->FirstChildElement("singerPart")));
             p.setInstruments(getSafeText(pieceElem->FirstChildElement("instruments")));
+            p.setYoutubeLink(getSafeText(pieceElem->FirstChildElement("youtube")));
 
             // Lettura del timestamp
             std::string tsStr = getSafeText(pieceElem->FirstChildElement("timestamp"));

@@ -349,7 +349,9 @@ std::optional<std::vector<MusicalPiece>> ConcertController::createEditPiece(
 		MusicalPiece *piece) {
 	std::vector<std::string> menuTitles = { "File", "Score" };
 	std::vector<std::vector<MenuItem>> menuItems = { { { "New Piece",
-			MenuCommand::AddPiece }, { "Save and Exit", MenuCommand::SaveExit },
+			MenuCommand::AddPiece },
+			{ "Youtube", MenuCommand::Youtube },
+			{ "Save and Exit", MenuCommand::SaveExit },
 			{ "Exit without saving", MenuCommand::Quit } }, {   // Scores
 			{ "Add Score", MenuCommand::AddScore }, { "Delete Score",
 					MenuCommand::DeleteScore }, { "View Score",
@@ -375,8 +377,10 @@ std::optional<std::vector<MusicalPiece>> ConcertController::createEditPiece(
 			return pieces;
 		}
 		case MenuCommand::Quit:
-
 			return std::nullopt;
+		case MenuCommand::Youtube:
+			openInBrowser(piece);
+			break;
 		case MenuCommand::AddScore:
 			addScore(piece);
 			break;
@@ -471,6 +475,22 @@ std::optional<std::vector<Rehearsal>> ConcertController::createEditRehearsal(
 	}
 	}
 	return std::nullopt;
+}
+
+void ConcertController::openInBrowser(const MusicalPiece *piece) {
+	std::string url = piece->getYoutubeLink();
+	if (url.empty() || url.find("http") != 0) {
+	    LOG_MSG("Invalid or missing YouTube URL");
+	    return;
+	}
+#ifdef _WIN32
+	std::string command = "start \"\" \"" + url + "\"";
+#elif __APPLE__
+	std::string command = "open \"" + url + "\"";
+#else // Linux, Unix-like
+	std::string command = "xdg-open \"" + url + "\"";
+#endif
+	system(command.c_str());
 }
 
 void ConcertController::viewScore(const MusicalPiece *piece) {
