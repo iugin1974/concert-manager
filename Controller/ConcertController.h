@@ -43,7 +43,7 @@ private:
 	bool deleteScore(MusicalPiece* piece);
 	void viewScore(const MusicalPiece* piece);
 	void openInBrowser(const MusicalPiece *piece);
-
+	void generateHTML(Concert* c);
 	bool commentConcert(Concert* concert);
 	void sendMail(Concert *concert);
 

@@ -27,6 +27,7 @@ enum class MenuCommand {
 	Mail,
     Todo,
 	Youtube,
+	HTML,
     None
 };
 

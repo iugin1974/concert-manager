@@ -15,7 +15,7 @@ SRCS = main.cpp \
        View/MenuBar.cpp View/SelectionView.cpp View/ScoreSelectView.cpp View/VimView.cpp View/MuttView.cpp \
        Controller/ConcertController.cpp \
        Core/Utils.cpp Core/logMessage.cpp Core/AbookImporter.cpp \
-       IO/FileIO.cpp \
+       IO/FileIO.cpp IO/HTML.cpp \
        External/tinyxml2.cpp
 
 # File oggetto corrispondenti

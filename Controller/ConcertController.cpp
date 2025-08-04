@@ -5,6 +5,7 @@
 #include "ScoreSelectView.h"
 #include "Score.h"
 #include "FileIO.h"
+#include "HTML.h"
 #include "MuttView.h"
 #include "ConcertSummaryView.h"
 #include "concert_info_form.h"
@@ -67,8 +68,9 @@ void ConcertController::manageConcerts() {
 	std::vector<std::string> menuTitles = { "File", "Concert", "Musician",
 			"Piece", "Rehearsal", "Tools" };
 
-	std::vector<std::vector<MenuItem>> menuItems = { { { "Exit",
-			MenuCommand::Quit } },
+	std::vector<std::vector<MenuItem>> menuItems = { {
+			{ "Exit", MenuCommand::Quit },
+			{ "HTML", MenuCommand::HTML } },
 
 	{ { "Edit Concert Info", MenuCommand::EditConcertInfo }, { "Delete Concert",
 			MenuCommand::DeleteConcert } },
@@ -107,6 +109,10 @@ void ConcertController::manageConcerts() {
 		switch (command) {
 		case MenuCommand::Quit: {
 			return;
+		}
+		case MenuCommand::HTML: {
+			generateHTML(concert);
+			break;
 		}
 		case MenuCommand::EditConcertInfo: {
 			if (createEditConcert(concert)) {
@@ -602,4 +608,10 @@ void ConcertController::save() {
 void ConcertController::load() {
 	model.loadScorePaths();
 	model.loadFromFile(FileIO::savePath + "/concerts.xml");
+}
+
+void ConcertController::generateHTML(Concert* c) {
+	HTML html;
+	html.saveHTML(*c);
+
 }

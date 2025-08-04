@@ -12,6 +12,7 @@ public:
 	void setConcert(const Concert &concert);
 
 private:
+	int firstLine = 1;
 	Concert concert;
 	void init_form() override;
 	void closeForm() override;

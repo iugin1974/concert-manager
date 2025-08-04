@@ -8,6 +8,17 @@
 #include <iomanip>
 #include <vector>
 
+int print(int line, int col, const char *fmt, ...) {
+    if (line < 0)
+        return 0;
+    va_list args;
+    va_start(args, fmt);
+    wmove(stdscr, line, col);
+    int ret = vw_printw(stdscr, fmt, args);
+    va_end(args);
+    return ret;
+}
+
 std::string trim(const char *buffer) {
 	std::string str(buffer);
 

@@ -3,6 +3,7 @@
 #include <vector>
 #include <ctime>
 
+int print(int line, int col, const char *fmt, ...);
 std::string trim(const char* buffer);
 std::string dateToString(const std::tm& date);
 bool stringToDate(const std::string& str, std::tm& result);
