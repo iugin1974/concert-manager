@@ -52,7 +52,7 @@ std::string Rehearsal::toString() const {
         oss << std::left
             << std::setw(12) << dateToString(getDate())
             << std::setw(6)  << getStartTime()
-            << std::setw(20) << getPlace()
+            << std::setw(30) << getPlace()
             << std::setw(20) << getMusicians();
         return oss.str();
     }
@@ -62,7 +62,7 @@ std::string Rehearsal::toString() const {
         oss << std::left
             << std::setw(12) << "Date"
             << std::setw(6)  << "Time"
-            << std::setw(20) << "Place"
+            << std::setw(30) << "Place"
             << std::setw(20) << "Musicians";
         return oss.str();
     }

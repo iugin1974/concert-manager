@@ -63,7 +63,7 @@ void ConcertSummaryView::show() {
 		}
 
 		mvhline(row++, 2, ACS_HLINE, 130);
-		mvprintw(row++, 54, "%-8s",
+		mvprintw(row++, 62, "%-8s",
 				convertToMMSS(concert.getDuration()).c_str());
 
 		row += 2;
