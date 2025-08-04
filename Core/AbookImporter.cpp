@@ -25,20 +25,23 @@ std::optional<Musician> AbookImporter::lookupByName(const std::string& name) {
 
     while (std::getline(infile, line)) {
         if (line.empty()) {
-            // End of one entry
+            // Fine di un record
             if (matched) {
-                std::string addr = entry["address_lines"];
-                if (!entry["zip"].empty()) addr += ", " + entry["zip"];
-                if (!entry["city"].empty()) addr += " " + entry["city"];
-                if (!entry["country"].empty()) addr += " (" + entry["country"] + ")";
+                // Ricava i campi indirizzo separati
+                std::string street = entry["address_lines"];
+                std::string zip = entry["zip"];
+                std::string city = entry["city"];
 
+                // Crea Musician con i nuovi campi
                 Musician m(
                     entry["name"],
                     entry["mobile"],
                     entry["instrument"],
                     entry["email"],
-                    addr,
-                    0.0, 0, 0, false, 0
+                    street,
+                    zip,
+                    city,
+                    0.0, 0, 0, false, 0  // valori di default per gli altri campi
                 );
                 return m;
             }
@@ -58,3 +61,4 @@ std::optional<Musician> AbookImporter::lookupByName(const std::string& name) {
 
     return std::nullopt;
 }
+

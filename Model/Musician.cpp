@@ -1,22 +1,25 @@
 #include "Musician.h"
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 // Costruttori
 Musician::Musician()
-    : Timestamped(), gage (0.0) {}
+    : Timestamped(), gage(0.0) {}
 
 Musician::Musician(const std::string &name, const std::string &phone,
                    const std::string &instrument, const std::string &email,
-                   const std::string &address, double gage,
-                   int rehearsalNumber, int concertNumber,
-                   bool soloist, double travelCosts,
-                   long long ts)
+                   const std::string &street, const std::string &zipCode, const std::string &city,
+                   double gage, int rehearsalNumber, int concertNumber,
+                   bool soloist, double travelCosts, long long ts)
     : Timestamped(ts == 0 ? generateTimestamp() : ts),
       name(name),
       phone(phone),
       instrument(instrument),
       email(email),
-      address(address),
+      street(street),
+      zipCode(zipCode),
+      city(city),
       rehearsalNumber(rehearsalNumber),
       concertNumber(concertNumber),
       travelCosts(travelCosts),
@@ -29,42 +32,59 @@ const std::string& Musician::getName() const       { return name; }
 const std::string& Musician::getPhone() const      { return phone; }
 const std::string& Musician::getInstrument() const { return instrument; }
 const std::string& Musician::getMail() const       { return email; }
-const std::string& Musician::getAddress() const    { return address; }
+const std::string& Musician::getStreet() const     { return street; }
+const std::string& Musician::getZipCode() const        { return zipCode; }
+const std::string& Musician::getCity() const       { return city; }
+
+std::string Musician::getFullAddress() const {
+    std::ostringstream oss;
+    oss << street << "\n" << zipCode << " " << city;
+    return oss.str();
+}
+
 double Musician::getGage() const                   { return gage; }
-bool Musician::isSoloist() const				   { return soloist; }
-int Musician::getRehearsalNumber() const {
-    return rehearsalNumber;
-}
+bool Musician::isSoloist() const                   { return soloist; }
 
-int Musician::getConcertNumber() const {
-    return concertNumber;
-}
+int Musician::getRehearsalNumber() const           { return rehearsalNumber; }
+int Musician::getConcertNumber() const             { return concertNumber; }
+double Musician::getTravelCosts() const            { return travelCosts; }
 
-double Musician::getTravelCosts() const {
-    return travelCosts;
-}
-
-// Setter (rigenerano il timestamp, perché "modifica")
+// Setter (rigenerano il timestamp)
 void Musician::setName(const std::string& newName) {
     name = newName;
     regenerateTimestamp();
 }
+
 void Musician::setPhone(const std::string& newPhone) {
     phone = newPhone;
     regenerateTimestamp();
 }
+
 void Musician::setInstrument(const std::string& newInstrument) {
     instrument = newInstrument;
     regenerateTimestamp();
 }
+
 void Musician::setMail(const std::string& newEmail) {
     email = newEmail;
     regenerateTimestamp();
 }
-void Musician::setAddress(const std::string& newAddress) {
-    address = newAddress;
+
+void Musician::setStreet(const std::string& s) {
+    street = s;
     regenerateTimestamp();
 }
+
+void Musician::setZipCode(const std::string& z) {
+    zipCode = z;
+    regenerateTimestamp();
+}
+
+void Musician::setCity(const std::string& c) {
+    city = c;
+    regenerateTimestamp();
+}
+
 void Musician::setGage(double newGage) {
     gage = newGage;
     regenerateTimestamp();
@@ -85,43 +105,42 @@ void Musician::setTravelCosts(double costs) {
     regenerateTimestamp();
 }
 
-void Musician::setSoloist(bool soloist) {
-	this->soloist = soloist;
+void Musician::setSoloist(bool s) {
+    soloist = s;
+    regenerateTimestamp();
 }
+
 bool Musician::isEmpty() const {
     return name.empty();
 }
 
 double Musician::getFullPayment() const {
-        double travelCosts = getTravelCosts() * (
-            (getRehearsalNumber() * 2) +
-            (getConcertNumber() * 2));
-        return getGage() + travelCosts;
-    }
+    double travel = getTravelCosts() * ((getRehearsalNumber() * 2) + (getConcertNumber() * 2));
+    return getGage() + travel;
+}
 
-
-// Print
+// Output
 std::string Musician::toString() const {
-      std::ostringstream oss;
-      oss << std::left
-          << std::setw(20) << getName()
-          << std::setw(20) << getInstrument()
-          << std::right
-          << std::setw(10) << std::fixed << std::setprecision(2) << getGage()
-          << std::setw(20) << std::fixed << std::setprecision(2) << getFullPayment();
-      return oss.str();
-  }
+    std::ostringstream oss;
+    oss << std::left
+        << std::setw(22) << getName()
+        << std::setw(20) << getInstrument()
+        << std::right
+        << std::setw(10) << std::fixed << std::setprecision(2) << getGage()
+        << std::setw(25) << std::fixed << std::setprecision(2) << getFullPayment();
+    return oss.str();
+}
 
 std::string Musician::header() {
-        std::ostringstream oss;
-        oss << std::left
-            << std::setw(20) << "Name"
-            << std::setw(20) << "Instrument"
-            << std::right
-            << std::setw(10) << "Gage"
-            << std::setw(20) << "Total with expenses";
-        return oss.str();
-    }
+    std::ostringstream oss;
+    oss << std::left
+        << std::setw(22) << "Name"
+        << std::setw(20) << "Instrument"
+        << std::right
+        << std::setw(10) << "Gage"
+        << std::setw(25) << "Total with expenses";
+    return oss.str();
+}
 
 Musician::SalaryDetails Musician::calculateSalary(int rehearsals, int concerts, bool soloist, double travelC) {
     SalaryDetails details;
@@ -132,4 +151,3 @@ Musician::SalaryDetails Musician::calculateSalary(int rehearsals, int concerts, 
     details.travelCosts = travelC * ((rehearsals * 2) + (concerts * 2));
     return details;
 }
-

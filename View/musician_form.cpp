@@ -20,72 +20,91 @@ void MusicianForm::setMusician(const Musician *m) {
 }
 
 void MusicianForm::setAutoFilledFields(const Musician &m) {
-	set_field_buffer(fields[1], 0, m.getPhone().c_str());
-	set_field_buffer(fields[2], 0, m.getInstrument().c_str());
-	set_field_buffer(fields[3], 0, m.getMail().c_str());
-	set_field_buffer(fields[4], 0, m.getAddress().c_str());
+    set_field_buffer(fields[1], 0, m.getPhone().c_str());
+    set_field_buffer(fields[2], 0, m.getInstrument().c_str());
+    set_field_buffer(fields[3], 0, m.getMail().c_str());
+    set_field_buffer(fields[4], 0, m.getStreet().c_str());
+    set_field_buffer(fields[5], 0, m.getZipCode().c_str());
+    set_field_buffer(fields[6], 0, m.getCity().c_str());
 }
+
 
 void MusicianForm::init_form() {
 	if (form == nullptr) {
-		int row = 2;
-		// Crea i campi (posizionati su righe diverse)
-		fields[0] = new_field(1, 40, row++, 30, 0, 0); // Name
-		fields[1] = new_field(1, 40, row++, 30, 0, 0); // Phone
-		fields[2] = new_field(1, 40, row++, 30, 0, 0); // Instrument
-		fields[3] = new_field(1, 40, row++, 30, 0, 0); // Mail
-		fields[4] = new_field(1, 40, row++, 30, 0, 0); // Address
-		fields[5] = new_field(1, 40, row++, 30, 0, 0); // Gage
-		row += 2;
-		fields[6] = new_field(1, 2, row++, 30, 0, 0); // Numero prove
-		fields[7] = new_field(1, 2, row++, 30, 0, 0); // Numero concerti
-		fields[8] = new_field(1, 4, row++, 30, 0, 0); // Solista
-		set_field_buffer(fields[8], 0, "[ ]");
-		field_opts_off(fields[8], O_EDIT); // Non editabile manualmente
-		fields[9] = new_field(1, 5, row++, 30, 0, 0); // Spese viaggio
-		fields[10] = nullptr;
+	    int row = 2;
+	    // Crea i campi (posizionati su righe diverse)
+	    fields[0] = new_field(1, 40, row++, 30, 0, 0); // Name
+	    fields[1] = new_field(1, 40, row++, 30, 0, 0); // Phone
+	    fields[2] = new_field(1, 40, row++, 30, 0, 0); // Instrument
+	    fields[3] = new_field(1, 40, row++, 30, 0, 0); // Mail
 
-		for (int i = 0; i < 10; ++i) {
-			set_field_back(fields[i], A_UNDERLINE);   // Campo visibile
-			field_opts_off(fields[i], O_AUTOSKIP);  // Non salta automaticamente
-		}
+	    // Ora dividi indirizzo in tre campi:
+	    fields[4] = new_field(1, 40, row++, 30, 0, 0); // Street
+	    fields[5] = new_field(1, 10, row++, 30, 0, 0); // Zip Code
+	    fields[6] = new_field(1, 40, row++, 30, 0, 0); // City
+
+	    fields[7] = new_field(1, 40, row++, 30, 0, 0); // Gage
+
+	    row += 2;
+	    fields[8] = new_field(1, 2, row++, 30, 0, 0); // Numero prove
+	    fields[9] = new_field(1, 2, row++, 30, 0, 0); // Numero concerti
+	    fields[10] = new_field(1, 4, row++, 30, 0, 0); // Solista
+	    set_field_buffer(fields[10], 0, "[ ]");
+	    field_opts_off(fields[10], O_EDIT); // Non editabile manualmente
+	    fields[11] = new_field(1, 5, row++, 30, 0, 0); // Spese viaggio
+	    fields[12] = nullptr;
+
+	    for (int i = 0; i < 12; ++i) {
+	        set_field_back(fields[i], A_UNDERLINE);   // Campo visibile
+	        field_opts_off(fields[i], O_AUTOSKIP);  // Non salta automaticamente
+	    }
 	}
+
 	// Precompilazione se "existing" presente
 	if (existing) {
-		set_field_buffer(fields[0], 0, existing->getName().c_str());
-		set_field_buffer(fields[1], 0, existing->getPhone().c_str());
-		set_field_buffer(fields[2], 0, existing->getInstrument().c_str());
-		set_field_buffer(fields[3], 0, existing->getMail().c_str());
-		set_field_buffer(fields[4], 0, existing->getAddress().c_str());
-		std::ostringstream oss;
-		oss.precision(2);
-		oss << std::fixed << existing->getGage();
-		set_field_buffer(fields[5], 0, oss.str().c_str());
-		set_field_buffer(fields[6], 0,
-				std::to_string(existing->getRehearsalNumber()).c_str());
-		set_field_buffer(fields[7], 0,
-				std::to_string(existing->getConcertNumber()).c_str());
-		isSoloistChecked = existing->isSoloist();
-		set_field_buffer(fields[8], 0, isSoloistChecked ? "[X]" : "[ ]");
-		set_field_buffer(fields[9], 0,
-				std::to_string(existing->getTravelCosts()).c_str());
+	    set_field_buffer(fields[0], 0, existing->getName().c_str());
+	    set_field_buffer(fields[1], 0, existing->getPhone().c_str());
+	    set_field_buffer(fields[2], 0, existing->getInstrument().c_str());
+	    set_field_buffer(fields[3], 0, existing->getMail().c_str());
+
+	    set_field_buffer(fields[4], 0, existing->getStreet().c_str());
+	    set_field_buffer(fields[5], 0, existing->getZipCode().c_str());
+	    set_field_buffer(fields[6], 0, existing->getCity().c_str());
+
+	    std::ostringstream oss;
+	    oss.precision(2);
+	    oss << std::fixed << existing->getGage();
+	    set_field_buffer(fields[7], 0, oss.str().c_str());
+
+	    set_field_buffer(fields[8], 0,
+	        std::to_string(existing->getRehearsalNumber()).c_str());
+	    set_field_buffer(fields[9], 0,
+	        std::to_string(existing->getConcertNumber()).c_str());
+
+	    isSoloistChecked = existing->isSoloist();
+	    set_field_buffer(fields[10], 0, isSoloistChecked ? "[X]" : "[ ]");
+
+	    set_field_buffer(fields[11], 0,
+	        std::to_string(existing->getTravelCosts()).c_str());
 	}
+
 
 	// Crea e configura il form
 	form = new_form(fields);
 }
 
 void MusicianForm::clearFormFields() {
-	existing = nullptr;
-	for (int i = 0; i < 10; ++i) {
-		set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
-	}
-	isSoloistChecked = false;
-	set_field_buffer(fields[8], 0, "[ ]"); // Aggiorna il campo "Soloist" a non selezionato
+    existing = nullptr;
+    for (int i = 0; i < 12; ++i) {  // 11 campi più il nullptr a fields[12]
+        set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
+    }
+    isSoloistChecked = false;
+    set_field_buffer(fields[10], 0, "[ ]"); // Aggiorna il campo "Soloist" a non selezionato
 
-	form_driver(form, REQ_FIRST_FIELD);  // Posiziona il cursore sul primo campo
-	refresh();
+    form_driver(form, REQ_FIRST_FIELD);  // Posiziona il cursore sul primo campo
+    refresh();
 }
+
 
 void MusicianForm::show() {
 	init_form();
@@ -96,7 +115,9 @@ void MusicianForm::show() {
 	mvprintw(row++, 2, "Phone:");
 	mvprintw(row++, 2, "Instrument:");
 	mvprintw(row++, 2, "Mail:");
-	mvprintw(row++, 2, "Address:");
+	mvprintw(row++, 2, "Street:");
+	mvprintw(row++, 2, "ZIP Code:");
+	mvprintw(row++, 2, "City:");
 	mvprintw(row++, 2, "Gage:");
 	row += 2;
 	mvprintw(row++, 2, "Number of rehearsals");
@@ -183,41 +204,42 @@ MenuCommand MusicianForm::getCommand() {
 }
 
 void MusicianForm::saveDataFromForm() {
-	form_driver(form, REQ_VALIDATION);
+    form_driver(form, REQ_VALIDATION);
 
-	std::string name = trim(field_buffer(fields[0], 0));
-	std::string phone = trim(field_buffer(fields[1], 0));
-	std::string instrument = trim(field_buffer(fields[2], 0));
-	std::string mail = trim(field_buffer(fields[3], 0));
-	std::string address = trim(field_buffer(fields[4], 0));
+    std::string name = trim(field_buffer(fields[0], 0));
+    std::string phone = trim(field_buffer(fields[1], 0));
+    std::string instrument = trim(field_buffer(fields[2], 0));
+    std::string mail = trim(field_buffer(fields[3], 0));
+    std::string street = trim(field_buffer(fields[4], 0));
+    std::string zip = trim(field_buffer(fields[5], 0));
+    std::string city = trim(field_buffer(fields[6], 0));
 
-	std::string gage_str = trim(field_buffer(fields[5], 0));
-	double gage = std::stod(gage_str.empty() ? "0" : gage_str);
+    std::string gage_str = trim(field_buffer(fields[7], 0));
+    double gage = std::stod(gage_str.empty() ? "0" : gage_str);
 
-	std::string rehearsalNumber_str = trim(field_buffer(fields[6], 0));
-	int rehearsalNumber = std::stoi(
-			rehearsalNumber_str.empty() ? "0" : rehearsalNumber_str);
+    std::string rehearsalNumber_str = trim(field_buffer(fields[8], 0));
+    int rehearsalNumber = std::stoi(rehearsalNumber_str.empty() ? "0" : rehearsalNumber_str);
 
-	std::string concertNumber_str = trim(field_buffer(fields[7], 0));
-	int concertNumber = std::stoi(
-			concertNumber_str.empty() ? "0" : concertNumber_str);
+    std::string concertNumber_str = trim(field_buffer(fields[9], 0));
+    int concertNumber = std::stoi(concertNumber_str.empty() ? "0" : concertNumber_str);
 
-	bool soloist = isSoloistChecked;
+    bool soloist = isSoloistChecked;
 
-	std::string travelCosts_str = trim(field_buffer(fields[9], 0));
-	int travelCosts = std::stoi(
-			travelCosts_str.empty() ? "0" : travelCosts_str);
+    std::string travelCosts_str = trim(field_buffer(fields[11], 0));
+    int travelCosts = std::stoi(travelCosts_str.empty() ? "0" : travelCosts_str);
 
-	Musician m(name, phone, instrument, mail, address, gage, rehearsalNumber,
-			concertNumber, soloist, travelCosts);
-	musicians.push_back(m);
+    Musician m(name, phone, instrument, mail, street, zip, city, gage, rehearsalNumber,
+               concertNumber, soloist, travelCosts);
+    musicians.push_back(m);
 }
+
 
 void MusicianForm::closeForm() {
 	unpost_form(form);
 	free_form(form);
-	for (int i = 0; i < 10; ++i)
-		free_field(fields[i]);
+	for (int i = 0; fields[i] != nullptr; ++i) {
+	    free_field(fields[i]);
+	}
 
 }
 
@@ -229,10 +251,10 @@ void MusicianForm::handleFieldChange() {
 		controller.autofillFromAbook(name, *this);
 	}
 
-	std::string prove_str = trim(field_buffer(fields[6], 0));
-	std::string concerti_str = trim(field_buffer(fields[7], 0));
-	std::string soloista_str = trim(field_buffer(fields[8], 0));
-	std::string travelC_str = trim(field_buffer(fields[9], 0));
+	std::string prove_str = trim(field_buffer(fields[8], 0));       // Numero prove
+	std::string concerti_str = trim(field_buffer(fields[9], 0));   // Numero concerti
+	std::string soloista_str = trim(field_buffer(fields[10], 0));  // Solista (campo checkbox)
+	std::string travelC_str = trim(field_buffer(fields[11], 0));   // Spese viaggio
 
 	int prove = prove_str.empty() ? 0 : std::stoi(prove_str);
 	int concerti = concerti_str.empty() ? 0 : std::stoi(concerti_str);
@@ -249,7 +271,7 @@ void MusicianForm::handleFieldChange() {
 	salary = details.totalSalary;
 	travelCosts = details.travelCosts;
 
-	int row = 2 + 6 + 2 + 3 + 2 + 1;
+	int row = 2 + 8 + 2 + 3 + 2 + 1;
 	mvprintw(row++, 2, "Base salary:\t\t%4.2f", baseSalary);
 	mvprintw(row++, 2, "Vacation compens.:\t%4.2f", vacationCompensation);
 	mvprintw(row++, 2, "Insurances:\t\t%4.2f", insurances);

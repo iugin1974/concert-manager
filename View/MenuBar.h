@@ -28,6 +28,7 @@ enum class MenuCommand {
     Todo,
 	Youtube,
 	HTML,
+	CSV,
     None
 };
 

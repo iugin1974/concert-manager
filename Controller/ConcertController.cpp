@@ -5,7 +5,6 @@
 #include "ScoreSelectView.h"
 #include "Score.h"
 #include "FileIO.h"
-#include "HTML.h"
 #include "MuttView.h"
 #include "ConcertSummaryView.h"
 #include "concert_info_form.h"
@@ -19,6 +18,8 @@
 #include "Utils.h"
 #include <optional> // per std::optional
 #include <cstdlib>  // per system()
+#include "HTML_Exporter.h"
+#include "CSV_Exporter.h"
 
 void ConcertController::start() {
 	clear();
@@ -70,7 +71,8 @@ void ConcertController::manageConcerts() {
 
 	std::vector<std::vector<MenuItem>> menuItems = { {
 			{ "Exit", MenuCommand::Quit },
-			{ "HTML", MenuCommand::HTML } },
+			{ "Exmport Concert as HTML", MenuCommand::HTML },
+			{ "Export Musicians as CSV", MenuCommand::CSV } },
 
 	{ { "Edit Concert Info", MenuCommand::EditConcertInfo }, { "Delete Concert",
 			MenuCommand::DeleteConcert } },
@@ -111,9 +113,13 @@ void ConcertController::manageConcerts() {
 			return;
 		}
 		case MenuCommand::HTML: {
-			generateHTML(concert);
-			break;
-		}
+					generateHTML(concert);
+					break;
+				}
+		case MenuCommand::CSV: {
+					generateCSV(concert);
+					break;
+				}
 		case MenuCommand::EditConcertInfo: {
 			if (createEditConcert(concert)) {
 				sort();
@@ -611,7 +617,9 @@ void ConcertController::load() {
 }
 
 void ConcertController::generateHTML(Concert* c) {
-	HTML html;
-	html.saveHTML(*c);
+	HTML_Exporter::saveHTML(*c, "/tmp/concerts.php");
+}
 
+void ConcertController::generateCSV(Concert* c) {
+	CSV_Exporter::exportCSV(*c, "/tmp/concerts.csv");
 }

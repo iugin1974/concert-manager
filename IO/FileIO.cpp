@@ -103,7 +103,11 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
             mfield("phone", m.getPhone());
             mfield("instrument", m.getInstrument());
             mfield("email", m.getMail());
-            mfield("address", m.getAddress());
+
+            // Address fields separate
+            mfield("street", m.getStreet());
+            mfield("zipCode", m.getZipCode());
+            mfield("city", m.getCity());
 
             XMLElement* g = doc.NewElement("gage");
             std::ostringstream oss;
@@ -111,7 +115,7 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
             g->SetText(oss.str().c_str());
             mElem->InsertEndChild(g);
 
-            // Campi aggiuntivi
+            musiciansElem->InsertEndChild(mElem);
 
             XMLElement* soloistElem = doc.NewElement("soloist");
             soloistElem->SetText(m.isSoloist() ? "1" : "0");
@@ -282,7 +286,9 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
             m.setPhone(getSafeText(mElem->FirstChildElement("phone")));
             m.setInstrument(getSafeText(mElem->FirstChildElement("instrument")));
             m.setMail(getSafeText(mElem->FirstChildElement("email")));
-            m.setAddress(getSafeText(mElem->FirstChildElement("address")));
+            m.setStreet(getSafeText(mElem->FirstChildElement("street")));
+            m.setZipCode(getSafeText(mElem->FirstChildElement("zipCode")));
+            m.setCity(getSafeText(mElem->FirstChildElement("city")));
 
             XMLElement* soloistElem = mElem->FirstChildElement("soloist");
             if (soloistElem) {

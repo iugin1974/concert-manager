@@ -44,6 +44,7 @@ private:
 	void viewScore(const MusicalPiece* piece);
 	void openInBrowser(const MusicalPiece *piece);
 	void generateHTML(Concert* c);
+	void generateCSV(Concert* c);
 	bool commentConcert(Concert* concert);
 	void sendMail(Concert *concert);
 

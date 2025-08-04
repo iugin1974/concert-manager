@@ -123,8 +123,9 @@ void ConcertInfoForm::saveDataFromForm() {
 void ConcertInfoForm::closeForm() {
 	unpost_form(form);
 	free_form(form);
-	for (int i = 0; fields[i]; ++i)
-		free_field(fields[i]);
+	for (int i = 0; fields[i] != nullptr; ++i) {
+	    free_field(fields[i]);
+	}
 }
 
 // Helper: split da stringa separata da virgole

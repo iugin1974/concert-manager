@@ -29,7 +29,7 @@ public:
 	std::vector<Musician> getMusicians();
 	void setAutoFilledFields(const Musician& m);
 private:
-	static constexpr int NUMBER_OF_FIELDS = 11;
+	static constexpr int NUMBER_OF_FIELDS = 13;
 	const Musician *existing = nullptr;
 	void init_form() override;
 	void closeForm() override;

@@ -194,8 +194,9 @@ void PieceForm::saveDataFromForm() {
 void PieceForm::closeForm() {
 	unpost_form(form);
 	free_form(form);
-	for (int i = 0; i < NUMBER_OF_FIELDS; ++i)
-		free_field(fields[i]);
+	for (int i = 0; fields[i] != nullptr; ++i) {
+	    free_field(fields[i]);
+	}
 }
 
 std::vector<MusicalPiece> PieceForm::getPieces() {
