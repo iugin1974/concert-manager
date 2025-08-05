@@ -5,6 +5,7 @@
 
 int print(int line, int col, const char *fmt, ...);
 std::string trim(const char* buffer);
+std::string formatGermanDate(const std::tm &date);
 std::string dateToString(const std::tm& date);
 bool stringToDate(const std::string& str, std::tm& result);
 bool confirmDialog(WINDOW* parent);

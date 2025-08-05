@@ -26,7 +26,8 @@ void ConcertInfoForm::init_form() {
 		fields[0] = new_field(1, 40, row++, 30, 0, 0); // Title
 		fields[1] = new_field(1, 40, row++, 30, 0, 0); // Places
 		fields[2] = new_field(1, 40, row++, 30, 0, 0); // Dates
-		fields[3] = nullptr;
+		fields[3] = new_field(1, 40, row++, 30, 0, 0); // Start Times
+		fields[4] = nullptr;
 
 		for (int i = 0; i < NUMBER_OF_FIELDS - 1; ++i) {
 			set_field_back(fields[i], A_UNDERLINE);
@@ -36,9 +37,10 @@ void ConcertInfoForm::init_form() {
 	if (existing) {
 		set_field_buffer(fields[0], 0, existing->getTitle().c_str());
 
-		std::string placesStr, datesStr;
+		std::string placesStr, datesStr, startTimesStr;
 		const auto &pl = existing->getPlaces();
 		const auto &dt = existing->getDatesAsString();
+		const auto &st = existing->getStartTimesAsString();
 
 		for (size_t i = 0; i < pl.size(); ++i)
 			placesStr += (i ? ", " : "") + pl[i];
@@ -46,8 +48,13 @@ void ConcertInfoForm::init_form() {
 		for (size_t i = 0; i < dt.size(); ++i)
 			datesStr += (i ? ", " : "") + dt[i];
 
+		for (size_t i = 0; i < st.size(); ++i)
+			startTimesStr += (i ? ", " : "") + st[i];
+
+		set_field_buffer(fields[0], 0, existing->getTitle().c_str());
 		set_field_buffer(fields[1], 0, placesStr.c_str());
 		set_field_buffer(fields[2], 0, datesStr.c_str());
+		set_field_buffer(fields[3], 0, startTimesStr.c_str());
 	}
 
 	form = new_form(fields);
@@ -65,6 +72,7 @@ void ConcertInfoForm::show() {
 	mvprintw(row++, 2, "Title:");
 	mvprintw(row++, 2, "Places (comma-separated):");
 	mvprintw(row++, 2, "Dates  (comma-separated):");
+	mvprintw(row++, 2, "Times  (comma-separated):");
 
 	set_current_field(form, fields[0]);
 	form_driver(form, REQ_FIRST_FIELD);
@@ -118,6 +126,7 @@ void ConcertInfoForm::saveDataFromForm() {
 	title = trim(field_buffer(fields[0], 0));
 	places = trim(field_buffer(fields[1], 0));
 	dates = trim(field_buffer(fields[2], 0));
+	startTimes = trim(field_buffer(fields[3], 0));
 }
 
 void ConcertInfoForm::closeForm() {
@@ -148,6 +157,9 @@ const std::vector<std::string> ConcertInfoForm::getDatesAsVector() {
 }
 const std::vector<std::string> ConcertInfoForm::getPlacesAsVector() {
 	return split(places, ',');
+}
+const std::vector<std::string> ConcertInfoForm::getStartTimesAsVector() {
+	return split(startTimes, ',');
 }
 const std::string ConcertInfoForm::getPlaces() const {
 	return places;

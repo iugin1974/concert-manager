@@ -71,7 +71,7 @@ void ConcertController::manageConcerts() {
 
 	std::vector<std::vector<MenuItem>> menuItems = { {
 			{ "Exit", MenuCommand::Quit },
-			{ "Exmport Concert as HTML", MenuCommand::HTML },
+			{ "Export Concert as HTML", MenuCommand::HTML },
 			{ "Export Musicians as CSV", MenuCommand::CSV } },
 
 	{ { "Edit Concert Info", MenuCommand::EditConcertInfo }, { "Delete Concert",
@@ -206,6 +206,7 @@ bool ConcertController::createEditConcert(Concert *existing) {
 		concert.setTitle(form.getTitle());
 		concert.setDatesAsString(form.getDatesAsVector());
 		concert.setPlaces(form.getPlacesAsVector());
+		concert.setStartTimesAsString(form.getStartTimesAsVector());
 
 		if (existing) {
 			model.updateConcertInfo(concert, *existing); // source: concert, target: existing
@@ -617,7 +618,7 @@ void ConcertController::load() {
 }
 
 void ConcertController::generateHTML(Concert* c) {
-	HTML_Exporter::saveHTML(*c, "/tmp/concerts.php");
+	HTML_Exporter::saveHTML(*c, "/var/www/html/concerts.php");
 }
 
 void ConcertController::generateCSV(Concert* c) {

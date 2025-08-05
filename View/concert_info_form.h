@@ -17,9 +17,10 @@ public:
     const std::string getDates() const;
     const std::vector<std::string> getDatesAsVector();
     const std::vector<std::string> getPlacesAsVector();
+    const std::vector<std::string> getStartTimesAsVector();
 
 private:
-    static constexpr int NUMBER_OF_FIELDS = 4;
+    static constexpr int NUMBER_OF_FIELDS = 5;
     void init_form() override;
     void closeForm() override;
     void saveDataFromForm() override;
@@ -27,6 +28,7 @@ private:
     std::string title;
     std::string places;
     std::string dates;
+    std::string startTimes;
     FIELD *fields[NUMBER_OF_FIELDS];
     FORM *form = nullptr;
     std::vector<std::string> split(const std::string &input, char sep);

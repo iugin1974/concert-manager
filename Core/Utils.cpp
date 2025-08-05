@@ -37,6 +37,20 @@ std::string trim(const char *buffer) {
 	return str;
 }
 
+std::string formatGermanDate(const std::tm &date) {
+    std::ostringstream oss;
+    try {
+        std::locale german("de_DE.utf8");
+        oss.imbue(german);
+        oss << std::put_time(&date, "%A, %d. %B %Y");  // Es. Montag, 17. Juni 2025
+    } catch (...) {
+        // fallback in caso locale non disponibile
+        oss << std::put_time(&date, "%A, %d. %B %Y");
+    }
+    return oss.str();
+}
+
+
 // Converte std::tm in stringa "DD.MM.YYYY"
 std::string dateToString(const std::tm &date) {
 	std::ostringstream oss;

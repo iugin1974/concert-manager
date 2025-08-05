@@ -30,11 +30,15 @@ void ConcertSummaryView::show() {
 	attroff(A_BOLD);
 
 	const auto &places = concert.getPlaces();
-	const auto &dates = concert.getDatesAsString();
+	const auto &dates = concert.getDatesAsTm();
+	const auto &startTimes = concert.getStartTimesAsString();
 
 	for (size_t i = 0; i < places.size(); ++i) {
-		print(row++, 2, "- %s - %s", dates[i].c_str(), places[i].c_str());
+	    std::string dateStr = (i < dates.size()) ? formatGermanDate(dates[i]) : "???";
+	    std::string timeStr = (i < startTimes.size()) ? startTimes[i] : "??:??";
+	    print(row++, 2, "- %s, %s - %s", dateStr.c_str(), timeStr.c_str(), places[i].c_str());
 	}
+
 
 	row += 2;
 	attron(A_BOLD);

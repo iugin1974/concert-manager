@@ -75,6 +75,7 @@ void Model::updateConcertInfo(const Concert &source, Concert &target) {
     target.setTitle(source.getTitle());
     target.setPlaces(source.getPlaces());
     target.setDatesAsString(source.getDatesAsString());
+    target.setStartTimesAsString(source.getStartTimesAsString());
 }
 
 void Model::addMusician(const Musician &musician, Concert &concert) {

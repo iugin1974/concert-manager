@@ -5,6 +5,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <cctype>
 
@@ -44,8 +45,8 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 		return;
 	}
 
-	file << "<!DOCTYPE HTML_Exporter>\n";
-	file << "<HTML_Exporter lang=\"de\">\n";
+	file << "<!DOCTYPE HTML>\n";
+	file << "<HTML lang=\"de\">\n";
 	file << "\n";
 	file << "<head>\n";
 	file << "	<meta charset=\"UTF-8\">\n";
@@ -106,36 +107,32 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 	file << "<tr class=\"info-row\">\n";
 	file << "    <td class=\"bold\">Noten</td>\n";
 	file << "    <td>\n";
-	file << "        <?php\n";
-	file << "        $notenDir = '" << rootDir << "/Noten';\n";
-	file
-			<< "        $pieces = array_filter(scandir($notenDir), function($item) use ($notenDir) {\n";
-	file
-			<< "            return $item !== '.' && $item !== '..' && is_dir($notenDir . '/' . $item);\n";
-	file << "        });\n";
-	file << "        if(empty($pieces)) {\n";
-	file
-			<< "            // Se non ci sono sottocartelle, elenca i PDF direttamente\n";
-	file << "            $files = glob($notenDir . '/*.pdf');\n";
-	file << "            foreach($files as $file) {\n";
-	file << "                $fileName = basename($file);\n";
-	file << "                echo \"<a href='$file'>$fileName</a><br>\";\n";
-	file << "            }\n";
-	file << "        } else {\n";
-	file << "            foreach($pieces as $piece) {\n";
-	file
-			<< "                echo \"<p><strong>$piece</strong></p>\\n<ul>\\n\";\n";
-	file
-			<< "                $files = glob($notenDir . '/' . $piece . '/*.pdf');\n";
-	file << "                foreach($files as $file) {\n";
-	file << "                    $fileName = basename($file);\n";
-	file
-			<< "                    echo \"<li><a href='$file'>$fileName</a></li>\\n\";\n";
-	file << "                }\n";
-	file << "                echo \"</ul>\\n\";\n";
-	file << "            }\n";
-	file << "        }\n";
-	file << "        ?>\n";
+	file << "<?php\n";
+	    file << "    $notenDir = '" << rootDir << "/Noten';\n";
+	    file << "    $pieces = array_filter(scandir($notenDir), function($item) use ($notenDir) {\n";
+	    file << "        return $item !== '.' && $item !== '..' && is_dir($notenDir . '/' . $item);\n";
+	    file << "    });\n";
+	    file << "    if(empty($pieces)) {\n";
+	    file << "        // Se non ci sono sottocartelle, elenca i PDF direttamente\n";
+	    file << "        $files = glob($notenDir . '/*.pdf');\n";
+	    file << "        echo \"<ul>\\n\";\n";
+	    file << "        foreach($files as $file) {\n";
+	    file << "            $fileName = basename($file);\n";
+	    file << "            echo \"<li><a href='$file'>$fileName</a></li>\\n\";\n";
+	    file << "        }\n";
+	    file << "        echo \"</ul>\\n\";\n";
+	    file << "    } else {\n";
+	    file << "        foreach($pieces as $piece) {\n";
+	    file << "            echo \"<p><strong>$piece</strong></p>\\n<ul>\\n\";\n";
+	    file << "            $files = glob($notenDir . '/' . $piece . '/*.pdf');\n";
+	    file << "            foreach($files as $file) {\n";
+	    file << "                $fileName = basename($file);\n";
+	    file << "                echo \"<li><a href='$file'>$fileName</a></li>\\n\";\n";
+	    file << "            }\n";
+	    file << "            echo \"</ul>\\n\";\n";
+	    file << "        }\n";
+	    file << "    }\n";
+	    file << "?>\n";
 	file << "    </td>\n";
 	file << "</tr>\n\n\n\n";
 
@@ -172,14 +169,25 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 	file << "				<ul>\n";
 
 	const auto &dates = c.getDatesAsTm();
+	const auto &times = c.getStartTimesAsTm();
 	std::setlocale(LC_TIME, "de_DE.UTF-8"); // per il formato tedesco
 
-	for (const auto &date : dates) {
-		char buffer[100];
-		// Format: "Freitag, 18. April 2025"
-		std::strftime(buffer, sizeof(buffer), "%A, %d. %B %Y", &date);
-		file << "					<li>" << buffer << " Uhr</li>\n";
+	for (size_t i = 0; i < dates.size(); ++i) {
+	    char dateBuffer[100];
+	    char timeBuffer[10];
+	    // Format: "Freitag, 18. April 2025"
+	    std::strftime(dateBuffer, sizeof(dateBuffer), "%A, %d. %B %Y", &dates[i]);
+
+	    // Format orario: "HH:MM"
+	    if (i < times.size()) {
+	        std::strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", &times[i]);
+	    } else {
+	        strcpy(timeBuffer, "??:??");
+	    }
+
+	    file << "					<li>" << dateBuffer << " - " << timeBuffer << " Uhr</li>\n";
 	}
+
 
 	file << "				</ul>\n";
 	file << "			</td>\n";

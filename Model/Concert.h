@@ -9,11 +9,12 @@
 #include "Rehearsal.h"
 #include "Score.h"
 
-class Concert: public Timestamped {
+class Concert: public Timestamped, Printable {
 private:
 	std::string title;
 	std::vector<std::string> places;
 	std::vector<std::tm> dates;
+	std::vector<std::tm> startTimes;
 	std::vector<MusicalPiece> program;
 	std::vector<Musician> musicians;
 	std::vector<Rehearsal> rehearsals;
@@ -36,8 +37,16 @@ public:
 	void setDatesAsString(const std::vector<std::string> &d);
 	std::vector<std::string> getDatesAsString() const;
 
+	void addStartTime(const std::string &t);
+	void setStartTimesAsString(const std::vector<std::string> &t);
+	std::vector<std::string> getStartTimesAsString() const;
+
+	const std::vector<std::tm>& getStartTimesAsTm() const;
+	std::vector<std::tm>& getStartTimesAsTm();  // overload non const
+
 	const std::vector<std::tm>& getDatesAsTm() const;
 	std::vector<std::tm>& getDatesAsTm();  // overload non const
+	bool stringToHourMin(const std::string &timeStr, std::tm &time);
 
 	void setProgram(const std::vector<MusicalPiece> &p);
 	const std::vector<MusicalPiece>& getProgram() const;
@@ -63,10 +72,12 @@ public:
 
 	int getDuration() const;
 
+	static std::string tmToHourMinString(const std::tm &t);
 	static std::string tmToString(const std::tm &date);
 	static bool stringToTm(const std::string &dateStr, std::tm &date);
 	static bool compareTm(const std::tm &a, const std::tm &b);
 
+	static std::string header();
 	std::string toString() const;
 };
 

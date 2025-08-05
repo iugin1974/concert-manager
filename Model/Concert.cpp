@@ -1,5 +1,5 @@
 #include "Concert.h"
-
+#include "logMessage.h"
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
@@ -56,6 +56,50 @@ std::vector<std::string> Concert::getDatesAsString() const {
     }
     return result;
 }
+
+void Concert::addStartTime(const std::string &t) {
+    std::tm time {};
+    if (stringToTm(t, time)) {
+        startTimes.push_back(time);
+    }
+}
+
+void Concert::setStartTimesAsString(const std::vector<std::string> &t) {
+    startTimes.clear();
+    for (const auto &s : t) {
+        std::tm time{};
+        if (stringToHourMin(s, time)) {
+            startTimes.push_back(time);
+        } else {
+            LOG_MSG("Invalid startTime format: " + s);
+        }
+    }
+}
+
+std::string Concert::tmToHourMinString(const std::tm &t) {
+    std::ostringstream oss;
+    oss << std::setw(2) << std::setfill('0') << t.tm_hour
+        << ":" << std::setw(2) << std::setfill('0') << t.tm_min;
+    return oss.str();
+}
+
+
+std::vector<std::string> Concert::getStartTimesAsString() const {
+    std::vector<std::string> result;
+    for (const auto &t : startTimes) {
+        result.push_back(tmToHourMinString(t));
+    }
+    return result;
+}
+
+const std::vector<std::tm>& Concert::getStartTimesAsTm() const {
+    return startTimes;
+}
+
+std::vector<std::tm>& Concert::getStartTimesAsTm() {
+    return startTimes;
+}
+
 
 const std::vector<std::tm> &Concert::getDatesAsTm() const {
     return dates;
@@ -145,6 +189,24 @@ std::string Concert::tmToString(const std::tm &date) {
     return oss.str();
 }
 
+bool Concert::stringToHourMin(const std::string &timeStr, std::tm &time) {
+    std::istringstream iss(timeStr);
+    char colon;
+    int hour, minute;
+
+    if (!(iss >> hour >> colon >> minute))
+        return false;
+    if (colon != ':')
+        return false;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59)
+        return false;
+
+    time = {};
+    time.tm_hour = hour;
+    time.tm_min = minute;
+    return true;
+}
+
 bool Concert::stringToTm(const std::string &dateStr, std::tm &date) {
     std::istringstream iss(dateStr);
     char dot1, dot2;
@@ -176,6 +238,39 @@ bool Concert::compareTm(const std::tm &a, const std::tm &b) {
     return a.tm_mday < b.tm_mday;
 }
 
+std::string Concert::header() {
+    std::ostringstream oss;
+    oss << std::left
+        << std::setw(30) << "Title"
+        << std::setw(30) << "Places"
+        << std::setw(20) << "Dates"
+        << std::setw(15) << "Start Times";
+    return oss.str();
+}
+
 std::string Concert::toString() const {
-    return title;
+    std::ostringstream oss;
+
+    // Unisci places
+    std::string placeStr;
+    for (size_t i = 0; i < places.size(); ++i)
+        placeStr += (i ? ", " : "") + places[i];
+
+    // Unisci dates
+    std::string dateStr;
+    for (size_t i = 0; i < dates.size(); ++i)
+        dateStr += (i ? ", " : "") + tmToString(dates[i]);
+
+    // Unisci startTimes
+    std::string startTimeStr;
+    for (size_t i = 0; i < startTimes.size(); ++i)
+        startTimeStr += (i ? ", " : "") + tmToString(startTimes[i]);
+
+    oss << std::left
+        << std::setw(30) << title
+        << std::setw(30) << placeStr
+        << std::setw(20) << dateStr
+        << std::setw(15) << startTimeStr;
+
+    return oss.str();
 }

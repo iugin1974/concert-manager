@@ -70,6 +70,15 @@ void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::
         append("todo", c.getToDo());
         append("timestamp", c.getTimestampAsString());
 
+        // StartTimes
+        XMLElement* timesElem = doc.NewElement("startTimes");
+        for (const auto& t : c.getStartTimesAsString()) {
+            XMLElement* e = doc.NewElement("time");
+            e->SetText(t.c_str());
+            timesElem->InsertEndChild(e);
+        }
+        concertElem->InsertEndChild(timesElem);
+
         // Places
         XMLElement* placesElem = doc.NewElement("places");
         for (const auto& p : c.getPlaces()) {
@@ -273,6 +282,16 @@ std::vector<Concert> FileIO::loadConcertsFromXML(const std::string& path)
             dates.push_back(getSafeText(dateElem));
         }
         concert.setDatesAsString(dates);
+
+        // StartTimes
+        std::vector<std::string> startTimes;
+        XMLElement* timesElem = concertElem->FirstChildElement("startTimes");
+        for (XMLElement* timeElem = timesElem ? timesElem->FirstChildElement("time") : nullptr;
+             timeElem;
+             timeElem = timeElem->NextSiblingElement("time")) {
+            startTimes.push_back(getSafeText(timeElem));
+        }
+        concert.setStartTimesAsString(startTimes);
 
         // Musicians
         std::vector<Musician> musicians;
