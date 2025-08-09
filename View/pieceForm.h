@@ -11,6 +11,7 @@ public:
 	~PieceForm() override;
 	void setPiece(const MusicalPiece *piece);
 	std::vector<MusicalPiece> getPieces();
+	void savePiece();
 
 private:
 	static constexpr int NUMBER_OF_FIELDS = 8;

@@ -154,6 +154,10 @@ MenuCommand PieceForm::getCommand() {
 	return MenuCommand::None;
 }
 
+void PieceForm::savePiece() {
+	saveDataFromForm();
+}
+
 void PieceForm::saveDataFromForm() {
     form_driver(form, REQ_VALIDATION);
 

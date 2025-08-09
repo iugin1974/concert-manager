@@ -26,6 +26,7 @@ public:
     void addMusician(const Musician& musician, Concert& concert);
     void updateMusician(const Musician& oldM, const Musician& newM, Concert& concert);
     void deleteMusician(Musician& musician, Concert& concert);
+    bool movePiece(int pos, int offset, std::vector<MusicalPiece> &program);
     void addPiece(const MusicalPiece& piece, Concert& concert);
     void updatePiece(const MusicalPiece& oldPiece, const MusicalPiece& newPiece, Concert& concert);
     void deletePiece(const MusicalPiece& piece, Concert& concert);

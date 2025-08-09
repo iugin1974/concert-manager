@@ -19,6 +19,8 @@ class ConcertController {
 public:
 	void start();
 	void autofillFromAbook(const std::string& name, MusicianForm& form);
+	bool movePiece(Concert& concert, int pos, int offset);
+
 private:
 	bool createEditConcert(Concert *concert);
 	void manageConcerts();
@@ -33,6 +35,7 @@ private:
 	void editPiece(Concert* concert);
 	std::optional<std::vector<MusicalPiece>> createEditPiece(MusicalPiece *MusicalPieces);
 	void deletePiece(Concert* concert);
+	void movePiece(Concert* concert);
 
 	void createRehearsal(Concert* concert);
 	void editRehearsal(Concert* concert);

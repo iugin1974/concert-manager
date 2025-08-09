@@ -2,37 +2,35 @@
 #include "logMessage.h"
 #include <string>
 #include <filesystem>
-#include <algorithm> // std::sort
+#include <algorithm> // std::sort, swap
 #include <stdexcept> // per std::out_of_range
 #include "FileIO.h"
 namespace fs = std::filesystem;
 
-bool compareConcertByFirstDate(const Concert &a, const Concert &b)
-{
-  const auto &datesA = a.getDatesAsTm();
-  const auto &datesB = b.getDatesAsTm();
+bool compareConcertByFirstDate(const Concert &a, const Concert &b) {
+	const auto &datesA = a.getDatesAsTm();
+	const auto &datesB = b.getDatesAsTm();
 
-  if (datesA.empty() && datesB.empty())
-    return false; // uguali, non cambia l'ordine
-  if (datesA.empty())
-    return false; // a senza date va dopo b
-  if (datesB.empty())
-    return true; // b senza date va dopo a
+	if (datesA.empty() && datesB.empty())
+		return false; // uguali, non cambia l'ordine
+	if (datesA.empty())
+		return false; // a senza date va dopo b
+	if (datesB.empty())
+		return true; // b senza date va dopo a
 
-  // Confronta la prima data usando lo stesso criterio di prima
-  const std::tm &dA = datesA.front();
-  const std::tm &dB = datesB.front();
+	// Confronta la prima data usando lo stesso criterio di prima
+	const std::tm &dA = datesA.front();
+	const std::tm &dB = datesB.front();
 
-  if (dA.tm_year != dB.tm_year)
-    return dA.tm_year < dB.tm_year;
-  if (dA.tm_mon != dB.tm_mon)
-    return dA.tm_mon < dB.tm_mon;
-  return dA.tm_mday < dB.tm_mday;
+	if (dA.tm_year != dB.tm_year)
+		return dA.tm_year < dB.tm_year;
+	if (dA.tm_mon != dB.tm_mon)
+		return dA.tm_mon < dB.tm_mon;
+	return dA.tm_mday < dB.tm_mday;
 }
 
-void Model::sortConcerts()
-{
-  std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
+void Model::sortConcerts() {
+	std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
 }
 
 // Caricamento da file
@@ -58,13 +56,13 @@ std::vector<Concert>& Model::getConcerts() {
 	return concerts;
 }
 
-	Concert* Model::getConcert(int index) {
-	    if (index < 0 || static_cast<size_t>(index) >= concerts.size()) {
-	        throw std::out_of_range("Index out of range for vector 'concerts'");
-	    }
-
-	    return &concerts[index];
+Concert* Model::getConcert(int index) {
+	if (index < 0 || static_cast<size_t>(index) >= concerts.size()) {
+		throw std::out_of_range("Index out of range for vector 'concerts'");
 	}
+
+	return &concerts[index];
+}
 
 // Operazioni
 void Model::addConcert(const Concert &concert) {
@@ -72,10 +70,10 @@ void Model::addConcert(const Concert &concert) {
 }
 
 void Model::updateConcertInfo(const Concert &source, Concert &target) {
-    target.setTitle(source.getTitle());
-    target.setPlaces(source.getPlaces());
-    target.setDatesAsString(source.getDatesAsString());
-    target.setStartTimesAsString(source.getStartTimesAsString());
+	target.setTitle(source.getTitle());
+	target.setPlaces(source.getPlaces());
+	target.setDatesAsString(source.getDatesAsString());
+	target.setStartTimesAsString(source.getStartTimesAsString());
 }
 
 void Model::addMusician(const Musician &musician, Concert &concert) {
@@ -102,6 +100,19 @@ void Model::deleteMusician(Musician &musician, Concert &concert) {
 			return;
 		}
 	}
+}
+
+// Sposta l'elemento in posizione 'pos' di 'offset' (-1 o +1)
+// Ritorna true se spostamento avvenuto, false se fuori range o impossibile
+bool Model::movePiece(int pos, int offset, std::vector<MusicalPiece> &program) {
+	int newPos = pos + offset;
+	if (pos < 0 || pos >= (int) program.size())
+		return false;
+	if (newPos < 0 || newPos >= (int) program.size())
+		return false;
+
+	std::swap(program[pos], program[newPos]);
+	return true;
 }
 
 void Model::addPiece(const MusicalPiece &piece, Concert &concert) {
@@ -132,7 +143,7 @@ void Model::deletePiece(const MusicalPiece &piece, Concert &concert) {
 	}
 }
 
-void Model::deleteConcert(Concert* concert) {
+void Model::deleteConcert(Concert *concert) {
 	for (auto it = concerts.begin(); it != concerts.end(); it++) {
 		if (it->isSameAs(*concert)) {
 			concerts.erase(it);
@@ -175,36 +186,35 @@ void Model::deleteRehearsal(const Rehearsal &rehearsal, Concert &concert) {
 
 // aggiungi una score al concert
 void Model::addScore(const Score &score, MusicalPiece &piece) {
-    std::vector<Score> &scores = piece.getScores();
-    scores.push_back(score);
+	std::vector<Score> &scores = piece.getScores();
+	scores.push_back(score);
 }
 
 // elimina una score dal concert
 void Model::deleteScore(const Score &score, MusicalPiece &piece) {
-    std::vector<Score> &scores = piece.getScores();
-    for (auto it = scores.begin(); it != scores.end(); ++it) {
-        if (it->getPath() == score.getPath()) {
-            scores.erase(it);
-            return;
-        }
-    }
+	std::vector<Score> &scores = piece.getScores();
+	for (auto it = scores.begin(); it != scores.end(); ++it) {
+		if (it->getPath() == score.getPath()) {
+			scores.erase(it);
+			return;
+		}
+	}
 }
 
-void Model::addComment(const std::string& comment, Concert* concert) {
+void Model::addComment(const std::string &comment, Concert *concert) {
 	concert->setComment(comment);
 }
-
 
 void Model::loadScorePaths() {
 	FileIO f;
 	f.loadScores(scorePaths);
 	// Ordina alfabeticamente (lexicograficamente)
-	    std::sort(scorePaths.begin(), scorePaths.end(),
-	        [](const std::string& a, const std::string& b) {
-	            std::string fileA = fs::path(a).filename().string();
-	            std::string fileB = fs::path(b).filename().string();
-	            return fileA < fileB;
-	        });
+	std::sort(scorePaths.begin(), scorePaths.end(),
+			[](const std::string &a, const std::string &b) {
+				std::string fileA = fs::path(a).filename().string();
+				std::string fileB = fs::path(b).filename().string();
+				return fileA < fileB;
+			});
 }
 
 const std::vector<std::string>& Model::getScorePaths() const {

@@ -2,6 +2,7 @@
 #include "MainMenuView.h"
 #include "musician_form.h"
 #include "MusicalPiece.h"
+#include "MovePieceView.h"
 #include "ScoreSelectView.h"
 #include "Score.h"
 #include "FileIO.h"
@@ -83,8 +84,9 @@ void ConcertController::manageConcerts() {
 
 	{   // Piece
 			{ "Add Piece", MenuCommand::AddPiece }, { "Edit / View Piece",
-					MenuCommand::EditPiece }, { "Delete Piece",
-					MenuCommand::DeletePiece } },
+					MenuCommand::EditPiece },
+					{ "Move Piece", MenuCommand::MovePiece },
+					{ "Delete Piece", MenuCommand::DeletePiece } },
 
 			{   // Rehearsal
 			{ "Add Rehearsal", MenuCommand::AddRehearsal }, { "Edit Rehearsal",
@@ -151,6 +153,9 @@ void ConcertController::manageConcerts() {
 			editPiece(concert);
 			save();
 			form.show();
+			break;
+		case MenuCommand::MovePiece:
+			movePiece(concert);
 			break;
 		case MenuCommand::DeletePiece:
 			deletePiece(concert);
@@ -308,6 +313,15 @@ std::optional<std::vector<Musician>> ConcertController::createEditMusician(
 	}
 	}
 	return std::nullopt;
+}
+
+void ConcertController::movePiece(Concert *concert) {
+	MovePieceView view;
+	view.show(*concert, *this);
+}
+
+bool ConcertController::movePiece(Concert& concert, int pos, int offset) {
+	return model.movePiece(pos, offset, concert.getProgram());
 }
 
 void ConcertController::createPiece(Concert *concert) {
