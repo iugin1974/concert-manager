@@ -68,7 +68,7 @@ void ConcertController::manageConcerts() {
 	concert = model.getConcert(choice);
 // Mostra la finestra con le possibilità di modificare il concerto
 	std::vector<std::string> menuTitles = { "File", "Concert", "Musician",
-			"Piece", "Rehearsal", "Tools" };
+			"Program", "Rehearsal", "Tools" };
 
 	std::vector<std::vector<MenuItem>> menuItems = { {
 			{ "Exit", MenuCommand::Quit },

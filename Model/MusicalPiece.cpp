@@ -97,9 +97,9 @@ void MusicalPiece::print() const {
 std::string MusicalPiece::toString() const {
         std::ostringstream oss;
         oss << std::left
+			<< std::setw(40) << getTitle()
             << std::setw(20) << getComposer()
-            << std::setw(40) << getTitle()
-            << std::setw(12)  << convertToMMSS(getDuration());
+			<< std::setw(12)  << convertToMMSS(getDuration());
 
         // Costruzione campo Instruments (con SingerPart e Choir)
         std::ostringstream org;
@@ -118,8 +118,8 @@ std::string MusicalPiece::toString() const {
 std::string MusicalPiece::header() {
         std::ostringstream oss;
         oss << std::left
+		<< std::setw(40) << "Title"
             << std::setw(20) << "Composer"
-            << std::setw(40) << "Title"
             << std::setw(12)  << "Duration"
             << std::setw(40) << "Instruments"
             << std::setw(3)  << "Scores";

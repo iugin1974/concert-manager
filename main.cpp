@@ -100,11 +100,10 @@ int main() {
 	    signal(SIGBUS,  handle_crash);
 
 	load_config();
+	setlocale(LC_ALL, "");
 	initscr();
 	cbreak();
 	noecho();
-	initscr(); // inizializza ncurses
-	setlocale(LC_ALL, "de_DE.UTF-8");
 	start_color();        // abilita i colori
 	use_default_colors();
 	init_pair(1, COLOR_WHITE, COLOR_BLUE);   // barra principale
