@@ -23,15 +23,15 @@ public:
     // Operazioni sui concerti
     void addConcert(const Concert& concert);
     void updateConcertInfo(const Concert &source, Concert &target);
-    void addMusician(const Musician& musician, Concert& concert);
     void updateMusician(const Musician& oldM, const Musician& newM, Concert& concert);
-    void deleteMusician(Musician& musician, Concert& concert);
     bool movePiece(int pos, int offset, std::vector<MusicalPiece> &program);
     void addPiece(const MusicalPiece& piece, Concert& concert);
     void updatePiece(const MusicalPiece& oldPiece, const MusicalPiece& newPiece, Concert& concert);
     void deletePiece(const MusicalPiece& piece, Concert& concert);
     Rehearsal* createEmptyRehearsal(Concert &concert);
+    Musician* createEmptyMusician(Concert &concert);
     void removeRehearsal(Rehearsal* rehearsal, Concert &concert);
+    void removeMusician(Musician* musician, Concert &concert);
     void updateRehearsal(const Rehearsal& oldRehearsal, const Rehearsal& newRehearsal, Concert& concert);
     void deleteConcert(size_t index);
     void deleteConcert(Concert* c);

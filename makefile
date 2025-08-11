@@ -25,7 +25,8 @@ OBJS = $(SRCS:.cpp=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lncurses -lmenu -lform 2>&1 | c++filt
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lncursesw -lmenuw -lformw 2>&1 | c++filt
+
 
 # Regola per compilare i .o dagli .cpp
 %.o: %.cpp

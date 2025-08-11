@@ -76,31 +76,7 @@ void Model::updateConcertInfo(const Concert &source, Concert &target) {
 	target.setStartTimesAsString(source.getStartTimesAsString());
 }
 
-void Model::addMusician(const Musician &musician, Concert &concert) {
-	std::vector<Musician> &musicians = concert.getMusicians();
-	musicians.push_back(musician);
-}
 
-void Model::updateMusician(const Musician &oldM, const Musician &newM,
-		Concert &concert) {
-	std::vector<Musician> &musicians = concert.getMusicians();
-	for (Musician &m : musicians) {
-		if (m.isSameAs(oldM)) { // usa un confronto adeguato
-			m = newM;
-			return;
-		}
-	}
-}
-
-void Model::deleteMusician(Musician &musician, Concert &concert) {
-	std::vector<Musician> &musicians = concert.getMusicians();
-	for (auto it = musicians.begin(); it != musicians.end(); ++it) {
-		if (it->isSameAs(musician)) {
-			musicians.erase(it);
-			return;
-		}
-	}
-}
 
 // Sposta l'elemento in posizione 'pos' di 'offset' (-1 o +1)
 // Ritorna true se spostamento avvenuto, false se fuori range o impossibile
@@ -163,11 +139,23 @@ Rehearsal* Model::createEmptyRehearsal(Concert &concert) {
     return &concert.getRehearsals().back();
 }
 
+Musician* Model::createEmptyMusician(Concert &concert) {
+	concert.getMusicians().emplace_back();
+	return &concert.getMusicians().back();
+}
+
 void Model::removeRehearsal(Rehearsal* rehearsal, Concert &concert) {
     auto &rehearsals = concert.getRehearsals();
     rehearsals.erase(std::remove_if(rehearsals.begin(), rehearsals.end(),
         [&](const Rehearsal& r) { return &r == rehearsal; }),
         rehearsals.end());
+}
+
+void Model::removeMusician(Musician* musician, Concert &concert) {
+	auto &musicians = concert.getMusicians();
+	musicians.erase(std::remove_if(musicians.begin(), musicians.end(),
+			[&](const Musician& m) { return &m == musician; }),
+			musicians.end());
 }
 
 void Model::updateRehearsal(const Rehearsal &oldRehearsal,
@@ -176,6 +164,17 @@ void Model::updateRehearsal(const Rehearsal &oldRehearsal,
 	for (Rehearsal &r : rehearsals) {
 		if (r.isSameAs(oldRehearsal)) { // Presuppone un metodo isSameAs() in Rehearsal
 			r = newRehearsal;
+			return;
+		}
+	}
+}
+
+void Model::updateMusician(const Musician &oldM, const Musician &newM,
+		Concert &concert) {
+	std::vector<Musician> &musicians = concert.getMusicians();
+	for (Musician &m : musicians) {
+		if (m.isSameAs(oldM)) { // usa un confronto adeguato
+			m = newM;
 			return;
 		}
 	}

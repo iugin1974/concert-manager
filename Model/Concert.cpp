@@ -238,39 +238,6 @@ bool Concert::compareTm(const std::tm &a, const std::tm &b) {
     return a.tm_mday < b.tm_mday;
 }
 
-std::string Concert::header() {
-    std::ostringstream oss;
-    oss << std::left
-        << std::setw(30) << "Title"
-        << std::setw(30) << "Places"
-        << std::setw(20) << "Dates"
-        << std::setw(15) << "Start Times";
-    return oss.str();
-}
-
 std::string Concert::toString() const {
-    std::ostringstream oss;
-
-    // Unisci places
-    std::string placeStr;
-    for (size_t i = 0; i < places.size(); ++i)
-        placeStr += (i ? ", " : "") + places[i];
-
-    // Unisci dates
-    std::string dateStr;
-    for (size_t i = 0; i < dates.size(); ++i)
-        dateStr += (i ? ", " : "") + tmToString(dates[i]);
-
-    // Unisci startTimes
-    std::string startTimeStr;
-    for (size_t i = 0; i < startTimes.size(); ++i)
-        startTimeStr += (i ? ", " : "") + tmToString(startTimes[i]);
-
-    oss << std::left
-        << std::setw(30) << title
-        << std::setw(30) << placeStr
-        << std::setw(20) << dateStr
-        << std::setw(15) << startTimeStr;
-
-    return oss.str();
+       return title;
 }

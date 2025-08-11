@@ -15,7 +15,7 @@ public:
 	MenuCommand getCommand() override;
 	~MusicianForm() override;
 	void setController(ConcertController& controller); // TODO elimina
-	void setMusician(const Musician *musician);
+	void setMusician(Musician *musician);
 	std::string getName();
 	std::string getPhone();
 	std::string getInstrument();
@@ -26,11 +26,10 @@ public:
 	double getTravelCosts() const;
 	double getGage() const;
 	bool getSoloist() const;
-	std::vector<Musician> getMusicians();
 	void setAutoFilledFields(const Musician& m);
 private:
 	static constexpr int NUMBER_OF_FIELDS = 13;
-	const Musician *existing = nullptr;
+	Musician *musician = nullptr;
 	void init_form() override;
 	void closeForm() override;
 	void saveDataFromForm() override;
@@ -54,7 +53,6 @@ private:
 	bool isSoloistChecked = false;
 
 	ConcertController controller;
-	std::vector<Musician> musicians;
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;
 };
