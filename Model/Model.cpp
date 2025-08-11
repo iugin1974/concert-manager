@@ -158,9 +158,16 @@ void Model::deleteConcert(size_t index) {
 	}
 }
 
-void Model::addRehearsal(const Rehearsal &rehearsal, Concert &concert) {
-	std::vector<Rehearsal> &rehearsals = concert.getRehearsals();
-	rehearsals.push_back(rehearsal);
+Rehearsal* Model::createEmptyRehearsal(Concert &concert) {
+    concert.getRehearsals().emplace_back(); // Usa costruttore vuoto
+    return &concert.getRehearsals().back();
+}
+
+void Model::removeRehearsal(Rehearsal* rehearsal, Concert &concert) {
+    auto &rehearsals = concert.getRehearsals();
+    rehearsals.erase(std::remove_if(rehearsals.begin(), rehearsals.end(),
+        [&](const Rehearsal& r) { return &r == rehearsal; }),
+        rehearsals.end());
 }
 
 void Model::updateRehearsal(const Rehearsal &oldRehearsal,
@@ -169,16 +176,6 @@ void Model::updateRehearsal(const Rehearsal &oldRehearsal,
 	for (Rehearsal &r : rehearsals) {
 		if (r.isSameAs(oldRehearsal)) { // Presuppone un metodo isSameAs() in Rehearsal
 			r = newRehearsal;
-			return;
-		}
-	}
-}
-
-void Model::deleteRehearsal(const Rehearsal &rehearsal, Concert &concert) {
-	std::vector<Rehearsal> &rehearsals = concert.getRehearsals();
-	for (auto it = rehearsals.begin(); it != rehearsals.end(); ++it) {
-		if (it->isSameAs(rehearsal)) {
-			rehearsals.erase(it);
 			return;
 		}
 	}

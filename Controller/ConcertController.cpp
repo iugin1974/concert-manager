@@ -424,85 +424,97 @@ std::optional<std::vector<MusicalPiece>> ConcertController::createEditPiece(
 	return std::nullopt;
 }
 
-void ConcertController::createRehearsal(Concert *concert) {
-	clear();
-	if (auto rehearsalsOpt = createEditRehearsal(nullptr)) {
-		for (const auto &rehearsal : *rehearsalsOpt) {
-			model.addRehearsal(rehearsal, *concert);
-		}
-	}
+void ConcertController::createRehearsal(Concert* concert) {
+    clear();
+
+    Rehearsal* r = nullptr;
+
+    RehearsalForm form;
+    std::vector<std::string> menuTitles = { "File" };
+    std::vector<std::vector<MenuItem>> menuItems = { {
+        { "New Rehearsal", MenuCommand::AddRehearsal },
+        { "Save and Exit", MenuCommand::SaveExit },
+        { "Exit without saving", MenuCommand::Quit }
+    } };
+
+    MenuBar menuBar(stdscr);
+    menuBar.setTitles(menuTitles);
+    menuBar.setItems(menuItems);
+
+    form.setMenuBar(menuBar);
+
+    while (true) {
+        if (r == nullptr) {
+            r = model.createEmptyRehearsal(*concert);
+        }
+        form.setRehearsal(r);
+        form.show();
+
+        MenuCommand cmd = form.getCommand();
+
+        if (cmd == MenuCommand::Quit) {
+            model.removeRehearsal(r, *concert);
+            break;
+        }
+        else if (cmd == MenuCommand::SaveExit) {
+            break;
+        }
+        else if (cmd == MenuCommand::AddRehearsal) {
+            // Non rimuovere subito r, lo lasciamo nel modello così com'è.
+            r = nullptr;  // Il prossimo ciclo crea una nuova rehearsal
+        }
+    }
 }
 
-void ConcertController::editRehearsal(Concert *concert) {
-	clear();
-	SelectionView view;
-	const std::vector<Rehearsal> &rehearsals = concert->getRehearsals();
-	int choice = view.runChoiceForm(rehearsals);
-	if (choice == -1)
-		return;
 
-	const Rehearsal oldRehearsal = rehearsals.at(choice);
-	std::optional<std::vector<Rehearsal>> updated = createEditRehearsal(
-			&oldRehearsal);
+void ConcertController::editRehearsal(Concert* concert) {
+    clear();
+    SelectionView view;
+    std::vector<Rehearsal>& rehearsals = concert->getRehearsals();
+    int choice = view.runChoiceForm(rehearsals);
+    if (choice == -1)
+        return;
 
-	if (updated && !updated->empty()) {
-		// Aggiorna la prova selezionata con il primo elemento
-		model.updateRehearsal(oldRehearsal, updated->at(0), *concert);
+    Rehearsal* r = &rehearsals.at(choice);
 
-		// Aggiunge eventuali nuove prove
-		for (size_t i = 1; i < updated->size(); ++i) {
-			model.addRehearsal(updated->at(i), *concert);
-		}
-	}
+    RehearsalForm form;
+    std::vector<std::string> menuTitles = { "File" };
+    std::vector<std::vector<MenuItem>> menuItems = { {
+        { "Save and Exit", MenuCommand::SaveExit },
+        { "Exit without saving", MenuCommand::Quit }
+    } };
+
+    MenuBar menuBar(stdscr);
+    menuBar.setTitles(menuTitles);
+    menuBar.setItems(menuItems);
+
+    form.setMenuBar(menuBar);
+    form.setRehearsal(r);
+    form.show();
+
+    MenuCommand cmd = form.getCommand();
+
+    if (cmd == MenuCommand::Quit) {
+        // Se vogliamo annullare le modifiche, dobbiamo ripristinare i dati originali
+        // In alternativa, si può semplicemente non fare nulla se la form non scrive finché non si salva
+    }
 }
 
 void ConcertController::deleteRehearsal(Concert *concert) {
-	clear();
-	SelectionView view;
-	const std::vector<Rehearsal> &rehearsals = concert->getRehearsals();
-	int choice = view.runChoiceForm(rehearsals);
-	if (choice == -1)
-		return;
+    clear();
+    SelectionView view;
+    auto &rehearsals = concert->getRehearsals();
+    int choice = view.runChoiceForm(rehearsals);
+    if (choice == -1)
+        return;
 
-	bool confirm = confirmDialog(stdscr);
-	if (confirm) {
-		Rehearsal r = rehearsals.at(choice);
-		model.deleteRehearsal(r, *concert);
-	}
+    bool confirm = confirmDialog(stdscr);
+    if (confirm) {
+        Rehearsal* r = &rehearsals.at(choice);
+        model.removeRehearsal(r, *concert);
+    }
 }
 
-std::optional<std::vector<Rehearsal>> ConcertController::createEditRehearsal(
-		const Rehearsal *rehearsal) {
-	std::vector<std::string> menuTitles = { "File" };
-	std::vector<std::vector<MenuItem>> menuItems = { { { "New Rehearsal",
-			MenuCommand::AddRehearsal }, { "Save and Exit",
-			MenuCommand::SaveExit },
-			{ "Exit without saving", MenuCommand::Quit } } };
-
-	MenuBar menuBar(stdscr);
-	menuBar.setTitles(menuTitles);
-	menuBar.setItems(menuItems);
-
-	RehearsalForm form;  // Presuppone l'esistenza di questa form
-	form.setRehearsal(rehearsal);
-	form.setMenuBar(menuBar);
-	form.show();
-
-	MenuCommand command = form.getCommand();
-	switch (command) {
-	case MenuCommand::SaveExit: {
-		std::vector<Rehearsal> rehearsals = form.getRehearsals();
-		return rehearsals;
-	}
-	case MenuCommand::Quit: {
-		return std::nullopt;
-	}
-	default: {
-		break;
-	}
-	}
-	return std::nullopt;
-}
 
 void ConcertController::openInBrowser(const MusicalPiece *piece) {
 	std::string url = piece->getYoutubeLink();

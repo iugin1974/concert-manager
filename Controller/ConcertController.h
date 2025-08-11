@@ -40,7 +40,6 @@ private:
 	void createRehearsal(Concert* concert);
 	void editRehearsal(Concert* concert);
 	void deleteRehearsal(Concert* concert);
-	std::optional<std::vector<Rehearsal>> createEditRehearsal(const Rehearsal* rehearsal);
 
 	bool addScore(MusicalPiece* piece);
 	bool deleteScore(MusicalPiece* piece);

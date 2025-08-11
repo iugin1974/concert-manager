@@ -30,9 +30,9 @@ public:
     void addPiece(const MusicalPiece& piece, Concert& concert);
     void updatePiece(const MusicalPiece& oldPiece, const MusicalPiece& newPiece, Concert& concert);
     void deletePiece(const MusicalPiece& piece, Concert& concert);
-    void addRehearsal(const Rehearsal& rehearsal, Concert& concert);
+    Rehearsal* createEmptyRehearsal(Concert &concert);
+    void removeRehearsal(Rehearsal* rehearsal, Concert &concert);
     void updateRehearsal(const Rehearsal& oldRehearsal, const Rehearsal& newRehearsal, Concert& concert);
-    void deleteRehearsal(const Rehearsal& rehearsal, Concert& concert);
     void deleteConcert(size_t index);
     void deleteConcert(Concert* c);
     void addScore(const Score &score, MusicalPiece &piece);

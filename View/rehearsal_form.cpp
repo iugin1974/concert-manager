@@ -15,8 +15,8 @@ void RehearsalForm::setMenuBar(const MenuBar &bar) {
 	menuBar = bar;
 }
 
-void RehearsalForm::setRehearsal(const Rehearsal *rehearsal) {
-	existing = rehearsal;
+void RehearsalForm::setRehearsal(Rehearsal* r) {
+    rehearsal = r;
 }
 
 void RehearsalForm::init_form() {
@@ -34,12 +34,15 @@ void RehearsalForm::init_form() {
 			field_opts_off(fields[i], O_AUTOSKIP);
 		}
 
-		if (existing) {
-			set_field_buffer(fields[0], 0,
-					dateToString(existing->getDate()).c_str());
-			set_field_buffer(fields[1], 0, existing->getStartTime().c_str());
-			set_field_buffer(fields[2], 0, existing->getPlace().c_str());
-			set_field_buffer(fields[3], 0, existing->getMusicians().c_str());
+		if (rehearsal) {
+			 std::string dateStr = dateToString(rehearsal->getDate());
+			    if (dateStr == "00.01.1900") {
+			        dateStr = "";  // Mostra campo vuoto se la data è quella di default
+			    }
+			set_field_buffer(fields[0], 0, dateStr.c_str());
+			set_field_buffer(fields[1], 0, rehearsal->getStartTime().c_str());
+			set_field_buffer(fields[2], 0, rehearsal->getPlace().c_str());
+			set_field_buffer(fields[3], 0, rehearsal->getMusicians().c_str());
 		}
 
 		form = new_form(fields);
@@ -85,14 +88,11 @@ MenuCommand RehearsalForm::getCommand() {
 			form_driver(form, REQ_DEL_PREV);
 			break;
 		case KEY_F(2): {
-			MenuCommand result = menuBar.show();
-			if (result == MenuCommand::AddRehearsal) {
-				saveDataFromForm();
-				clearFormFields();
-			} else {
-				saveDataFromForm();
-			return result;
-			}
+		    MenuCommand result = menuBar.show();
+		    if (result != MenuCommand::Quit) {
+		        saveDataFromForm();
+		    }
+		    return result;
 		}
 			break;
 		default:
@@ -104,7 +104,6 @@ MenuCommand RehearsalForm::getCommand() {
 }
 
 void RehearsalForm::clearFormFields() {
-	existing = nullptr;
 	for (int i = 0; i < 4; ++i) {
 		set_field_buffer(fields[i], 0, "");
 	}
@@ -113,22 +112,21 @@ void RehearsalForm::clearFormFields() {
 }
 
 void RehearsalForm::saveDataFromForm() {
-	form_driver(form, REQ_VALIDATION);
-	std::string dateStr = trim(field_buffer(fields[0], 0));
-	std::tm date;
-	if (!stringToDate(dateStr, date)) {
-		mvprintw(12, 2, "Invalid date format. Press any key.");
-		getch();
-		return; // TODO
-	}
+    form_driver(form, REQ_VALIDATION);
+    std::string dateStr = trim(field_buffer(fields[0], 0));
+    std::tm date;
+    if (!stringToDate(dateStr, date)) {
+        mvprintw(12, 2, "Invalid date format. Press any key.");
+        getch();
+        return;
+    }
 
-	std::string startTime = trim(field_buffer(fields[1], 0));
-	std::string place = trim(field_buffer(fields[2], 0));
-	std::string musicians = trim(field_buffer(fields[3], 0));
-
-	Rehearsal r(date, startTime, place, musicians);
-	rehearsals.push_back(r);
+    rehearsal->setDate(date);
+    rehearsal->setStartTime(trim(field_buffer(fields[1], 0)));
+    rehearsal->setPlace(trim(field_buffer(fields[2], 0)));
+    rehearsal->setMusicians(trim(field_buffer(fields[3], 0)));
 }
+
 
 void RehearsalForm::closeForm() {
 	unpost_form(form);
@@ -136,8 +134,4 @@ void RehearsalForm::closeForm() {
 	for (int i = 0; fields[i] != nullptr; ++i) {
 	    free_field(fields[i]);
 	}
-}
-
-std::vector<Rehearsal> RehearsalForm::getRehearsals() const {
-	return rehearsals;
 }
