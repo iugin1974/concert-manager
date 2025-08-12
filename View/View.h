@@ -15,9 +15,11 @@ public:
     virtual void show() = 0;
     virtual MenuCommand getCommand() = 0;
     virtual void saveDataFromForm() = 0;
+    virtual void closeForm() = 0;
+    virtual void updateFields() = 0;
+    virtual void init_form() = 0;
+    virtual void clearFormFields() = 0;
 
 protected:
     MenuBar menuBar; // comune a tutte le view
-    virtual void init_form() = 0;
-    virtual void closeForm() = 0;
 };

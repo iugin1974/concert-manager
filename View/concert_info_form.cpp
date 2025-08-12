@@ -19,6 +19,29 @@ void ConcertInfoForm::setConcert(const Concert *existing) {
 	this->existing = existing;
 }
 
+void ConcertInfoForm::updateFields() {
+	if (!form || !existing)
+		return;
+	std::string placesStr, datesStr, startTimesStr;
+	const auto &pl = existing->getPlaces();
+	const auto &dt = existing->getDatesAsString();
+	const auto &st = existing->getStartTimesAsString();
+
+	for (size_t i = 0; i < pl.size(); ++i)
+		placesStr += (i ? ", " : "") + pl[i];
+
+	for (size_t i = 0; i < dt.size(); ++i)
+		datesStr += (i ? ", " : "") + dt[i];
+
+	for (size_t i = 0; i < st.size(); ++i)
+		startTimesStr += (i ? ", " : "") + st[i];
+
+	set_field_buffer(fields[0], 0, existing->getTitle().c_str());
+	set_field_buffer(fields[1], 0, placesStr.c_str());
+	set_field_buffer(fields[2], 0, datesStr.c_str());
+	set_field_buffer(fields[3], 0, startTimesStr.c_str());
+	refresh();
+}
 void ConcertInfoForm::init_form() {
 	if (form == nullptr) {
 
@@ -34,29 +57,6 @@ void ConcertInfoForm::init_form() {
 			field_opts_off(fields[i], O_AUTOSKIP);
 		}
 	}
-	if (existing) {
-		set_field_buffer(fields[0], 0, existing->getTitle().c_str());
-
-		std::string placesStr, datesStr, startTimesStr;
-		const auto &pl = existing->getPlaces();
-		const auto &dt = existing->getDatesAsString();
-		const auto &st = existing->getStartTimesAsString();
-
-		for (size_t i = 0; i < pl.size(); ++i)
-			placesStr += (i ? ", " : "") + pl[i];
-
-		for (size_t i = 0; i < dt.size(); ++i)
-			datesStr += (i ? ", " : "") + dt[i];
-
-		for (size_t i = 0; i < st.size(); ++i)
-			startTimesStr += (i ? ", " : "") + st[i];
-
-		set_field_buffer(fields[0], 0, existing->getTitle().c_str());
-		set_field_buffer(fields[1], 0, placesStr.c_str());
-		set_field_buffer(fields[2], 0, datesStr.c_str());
-		set_field_buffer(fields[3], 0, startTimesStr.c_str());
-	}
-
 	form = new_form(fields);
 }
 void ConcertInfoForm::show() {
@@ -133,7 +133,7 @@ void ConcertInfoForm::closeForm() {
 	unpost_form(form);
 	free_form(form);
 	for (int i = 0; fields[i] != nullptr; ++i) {
-	    free_field(fields[i]);
+		free_field(fields[i]);
 	}
 }
 

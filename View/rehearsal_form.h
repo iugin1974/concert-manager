@@ -15,15 +15,15 @@ public:
 	MenuCommand getCommand() override;
 	~RehearsalForm() override;
 	void setRehearsal(Rehearsal *rehearsal);
-	std::vector<Rehearsal> getRehearsals() const;
+	void updateFields() override;
+	void init_form() override;
+	void clearFormFields() override;
 
 private:
 	static constexpr int NUMBER_OF_FIELDS = 5;
 	Rehearsal *rehearsal = nullptr;
-	void init_form() override;
 	void closeForm() override;
 	void saveDataFromForm() override;
-	void clearFormFields();
 	FIELD *fields[NUMBER_OF_FIELDS];
 	FORM *form = nullptr;
 };

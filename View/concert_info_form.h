@@ -11,7 +11,8 @@ public:
     ~ConcertInfoForm() override;
     ConcertInfoForm();
     void setConcert(const Concert* existing);
-
+    void updateFields() override;
+    void clearFormFields() override;
     const std::string getTitle() const;
     const std::string getPlaces() const;
     const std::string getDates() const;

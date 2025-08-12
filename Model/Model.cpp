@@ -108,17 +108,6 @@ void Model::updatePiece(const MusicalPiece &oldPiece,
 	}
 }
 
-void Model::deletePiece(const MusicalPiece &piece, Concert &concert) {
-	std::vector<MusicalPiece> &pieces = concert.getProgram();
-	for (auto it = pieces.begin(); it != pieces.end(); ++it) {
-		if (it->getTitle() == piece.getTitle()
-				&& it->getComposer() == piece.getComposer()) {
-			pieces.erase(it);
-			break;
-		}
-	}
-}
-
 void Model::deleteConcert(Concert *concert) {
 	for (auto it = concerts.begin(); it != concerts.end(); it++) {
 		if (it->isSameAs(*concert)) {
@@ -144,6 +133,11 @@ Musician* Model::createEmptyMusician(Concert &concert) {
 	return &concert.getMusicians().back();
 }
 
+MusicalPiece* Model::createEmptyPiece(Concert &concert) {
+	concert.getProgram().emplace_back();
+	return &concert.getProgram().back();
+}
+
 void Model::removeRehearsal(Rehearsal* rehearsal, Concert &concert) {
     auto &rehearsals = concert.getRehearsals();
     rehearsals.erase(std::remove_if(rehearsals.begin(), rehearsals.end(),
@@ -156,6 +150,13 @@ void Model::removeMusician(Musician* musician, Concert &concert) {
 	musicians.erase(std::remove_if(musicians.begin(), musicians.end(),
 			[&](const Musician& m) { return &m == musician; }),
 			musicians.end());
+}
+
+void Model::removePiece(MusicalPiece* piece, Concert &concert) {
+	auto &program = concert.getProgram();
+	program.erase(std::remove_if(program.begin(), program.end(),
+			[&](const MusicalPiece& p) { return &p == piece; }),
+			program.end());
 }
 
 void Model::updateRehearsal(const Rehearsal &oldRehearsal,

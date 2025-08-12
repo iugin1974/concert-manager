@@ -24,35 +24,35 @@ void MenuBar::setItems(const std::vector<std::vector<MenuItem>> &items) {
 }
 
 void MenuBar::drawBar(int highlight) const {
-    // Colora tutta la riga di sfondo blu con spazio
-    wattron(parent, COLOR_PAIR(1));
-    for (int x = 0; x < COLS; ++x) {
-        mvwaddch(parent, 0, x, ' ');
-    }
+	// Colora tutta la riga di sfondo blu con spazio
+	wattron(parent, COLOR_PAIR(1));
+	for (int x = 0; x < COLS; ++x) {
+		mvwaddch(parent, 0, x, ' ');
+	}
 
-    // Ora disegna i titoli sopra il background colorato
+	// Ora disegna i titoli sopra il background colorato
 
-    for (size_t i = 0; i < menuTitles.size(); ++i) {
-        int x = menuStartX[i];
-        if (static_cast<int>(i) == highlight) {
-            wattron(parent, COLOR_PAIR(2) | A_BOLD); // titolo selezionato
-        } else {
-            wattron(parent, COLOR_PAIR(1));
-        }
+	for (size_t i = 0; i < menuTitles.size(); ++i) {
+		int x = menuStartX[i];
+		if (static_cast<int>(i) == highlight) {
+			wattron(parent, COLOR_PAIR(2) | A_BOLD); // titolo selezionato
+		} else {
+			wattron(parent, COLOR_PAIR(1));
+		}
 
-        wattron(parent, A_BOLD);
-        mvwprintw(parent, 0, x, " %s ", menuTitles[i].c_str());
-        wattroff(parent, A_BOLD);
+		wattron(parent, A_BOLD);
+		mvwprintw(parent, 0, x, " %s ", menuTitles[i].c_str());
+		wattroff(parent, A_BOLD);
 
-        if (static_cast<int>(i) == highlight) {
-            wattroff(parent, COLOR_PAIR(2));
-        } else {
-            wattroff(parent, COLOR_PAIR(1));
-        }
-    }
+		if (static_cast<int>(i) == highlight) {
+			wattroff(parent, COLOR_PAIR(2));
+		} else {
+			wattroff(parent, COLOR_PAIR(1));
+		}
+	}
 
-    wattroff(parent, COLOR_PAIR(1));
-    wrefresh(parent);
+	wattroff(parent, COLOR_PAIR(1));
+	wrefresh(parent);
 }
 
 int MenuBar::showDropdown(int menuIndex, int startx) const {
@@ -73,16 +73,16 @@ int MenuBar::showDropdown(int menuIndex, int startx) const {
 	int highlight = 0;
 	while (true) {
 		for (size_t i = 0; i < items.size(); ++i) {
-		    if (static_cast<int>(i) == highlight) {
-		        wattron(menuWin, COLOR_PAIR(2)); // selezione
-		    } else {
-		        wattron(menuWin, COLOR_PAIR(0)); // default
-		    }
+			if (static_cast<int>(i) == highlight) {
+				wattron(menuWin, COLOR_PAIR(2)); // selezione
+			} else {
+				wattron(menuWin, COLOR_PAIR(0)); // default
+			}
 
-		    mvwprintw(menuWin, static_cast<int>(i) + 1, 1, "%-*s", width - 2,
-		              items[i].label.c_str());
+			mvwprintw(menuWin, static_cast<int>(i) + 1, 1, "%-*s", width - 2,
+					items[i].label.c_str());
 
-		    wattroff(menuWin, COLOR_PAIR(2));
+			wattroff(menuWin, COLOR_PAIR(2));
 		}
 
 		wrefresh(menuWin);
@@ -125,44 +125,51 @@ int MenuBar::showDropdown(int menuIndex, int startx) const {
 }
 
 MenuCommand MenuBar::show() const {
-    int current = 0;
-    drawBar(current);
-    keypad(parent, TRUE);
+	int current = 0;
+	drawBar(current);
+	keypad(parent, TRUE);
 
-    while (true) {
-        int ch = wgetch(parent);
-        switch (ch) {
-        case KEY_LEFT:
-            current = (current - 1 + static_cast<int>(menuTitles.size()))
-                      % static_cast<int>(menuTitles.size());
-            drawBar(current);
-            break;
-        case KEY_RIGHT:
-            current = (current + 1) % static_cast<int>(menuTitles.size());
-            drawBar(current);
-            break;
-        case KEY_DOWN: {
-            while (true) {
-                int item = showDropdown(current, menuStartX[current]);
+	while (true) {
+		int ch = wgetch(parent);
+		switch (ch) {
+		case KEY_LEFT:
+			current = (current - 1 + static_cast<int>(menuTitles.size()))
+					% static_cast<int>(menuTitles.size());
+			drawBar(current);
+			break;
+		case KEY_RIGHT:
+			current = (current + 1) % static_cast<int>(menuTitles.size());
+			drawBar(current);
+			break;
+		case KEY_DOWN: {
+			while (true) {
+				int item = showDropdown(current, menuStartX[current]);
 
-                if (item >= 0) {
-                    return menuItems[current][item].command;
-                } else if (item == -2) { // freccia destra nella tendina
-                    current = (current + 1) % static_cast<int>(menuTitles.size());
-                    drawBar(current);  // Aggiorna evidenziazione
-                } else if (item == -3) { // freccia sinistra nella tendina
-                    current = (current - 1 + static_cast<int>(menuTitles.size()))
-                              % static_cast<int>(menuTitles.size());
-                    drawBar(current);  // Aggiorna evidenziazione
-                } else { // esc o errore
-                    drawBar(current);
-                    break;
-                }
-            }
-            break;
-        }
-        case KEY_ESC:
-            return MenuCommand::None;
-        }
-    }
+				if (item >= 0) {
+					return menuItems[current][item].command;
+				} else if (item == -2) { // freccia destra nella tendina
+					current = (current + 1)
+							% static_cast<int>(menuTitles.size());
+					drawBar(current);  // Aggiorna evidenziazione
+				} else if (item == -3) { // freccia sinistra nella tendina
+					current =
+							(current - 1 + static_cast<int>(menuTitles.size()))
+									% static_cast<int>(menuTitles.size());
+					drawBar(current);  // Aggiorna evidenziazione
+				} else { // esc o errore
+					drawBar(current);
+					break;
+				}
+			}
+			break;
+		}
+		case KEY_ESC:
+			wmove(parent, 0, 0);
+			for (int x = 0; x < COLS; ++x) {
+				waddch(parent, ' ');
+			}
+			wrefresh(parent);
+			return MenuCommand::None;
+		}
+	}
 }

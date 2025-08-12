@@ -10,6 +10,8 @@ public:
 	    MenuCommand getCommand() override;
 	~ConcertSummaryView() override;
 	void setConcert(const Concert &concert);
+	void updateFields() override;
+	void clearFormFields() override;
 
 private:
 	int firstLine = 1;

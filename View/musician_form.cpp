@@ -28,63 +28,66 @@ void MusicianForm::setAutoFilledFields(const Musician &m) {
 	set_field_buffer(fields[6], 0, m.getCity().c_str());
 }
 
+void MusicianForm::updateFields() {
+	if (!form || !musician)
+		return;
+
+	set_field_buffer(fields[0], 0, musician->getName().c_str());
+	set_field_buffer(fields[1], 0, musician->getPhone().c_str());
+	set_field_buffer(fields[2], 0, musician->getInstrument().c_str());
+	set_field_buffer(fields[3], 0, musician->getMail().c_str());
+
+	set_field_buffer(fields[4], 0, musician->getStreet().c_str());
+	set_field_buffer(fields[5], 0, musician->getZipCode().c_str());
+	set_field_buffer(fields[6], 0, musician->getCity().c_str());
+
+	std::ostringstream oss;
+	oss.precision(2);
+	oss << std::fixed << musician->getGage();
+	set_field_buffer(fields[7], 0, oss.str().c_str());
+
+	set_field_buffer(fields[8], 0,
+			std::to_string(musician->getRehearsalNumber()).c_str());
+	set_field_buffer(fields[9], 0,
+			std::to_string(musician->getConcertNumber()).c_str());
+
+	isSoloistChecked = musician->isSoloist();
+	set_field_buffer(fields[10], 0, isSoloistChecked ? "[X]" : "[ ]");
+
+	set_field_buffer(fields[11], 0,
+			std::to_string(musician->getTravelCosts()).c_str());
+
+	refresh();
+}
+
 void MusicianForm::init_form() {
-	if (form == nullptr) {
-		int row = 2;
-		// Crea i campi (posizionati su righe diverse)
-		fields[0] = new_field(1, 40, row++, 30, 0, 0); // Name
-		fields[1] = new_field(1, 40, row++, 30, 0, 0); // Phone
-		fields[2] = new_field(1, 40, row++, 30, 0, 0); // Instrument
-		fields[3] = new_field(1, 40, row++, 30, 0, 0); // Mail
+	if (form) return;
+	int row = 2;
+	// Crea i campi (posizionati su righe diverse)
+	fields[0] = new_field(1, 40, row++, 30, 0, 0); // Name
+	fields[1] = new_field(1, 40, row++, 30, 0, 0); // Phone
+	fields[2] = new_field(1, 40, row++, 30, 0, 0); // Instrument
+	fields[3] = new_field(1, 40, row++, 30, 0, 0); // Mail
 
-		// Ora dividi indirizzo in tre campi:
-		fields[4] = new_field(1, 40, row++, 30, 0, 0); // Street
-		fields[5] = new_field(1, 10, row++, 30, 0, 0); // Zip Code
-		fields[6] = new_field(1, 40, row++, 30, 0, 0); // City
+	// Ora dividi indirizzo in tre campi:
+	fields[4] = new_field(1, 40, row++, 30, 0, 0); // Street
+	fields[5] = new_field(1, 10, row++, 30, 0, 0); // Zip Code
+	fields[6] = new_field(1, 40, row++, 30, 0, 0); // City
 
-		fields[7] = new_field(1, 40, row++, 30, 0, 0); // Gage
+	fields[7] = new_field(1, 40, row++, 30, 0, 0); // Gage
 
-		row += 2;
-		fields[8] = new_field(1, 2, row++, 30, 0, 0); // Numero prove
-		fields[9] = new_field(1, 2, row++, 30, 0, 0); // Numero concerti
-		fields[10] = new_field(1, 4, row++, 30, 0, 0); // Solista
-		set_field_buffer(fields[10], 0, "[ ]");
-		field_opts_off(fields[10], O_EDIT); // Non editabile manualmente
-		fields[11] = new_field(1, 5, row++, 30, 0, 0); // Spese viaggio
-		fields[12] = nullptr;
+	row += 2;
+	fields[8] = new_field(1, 2, row++, 30, 0, 0); // Numero prove
+	fields[9] = new_field(1, 2, row++, 30, 0, 0); // Numero concerti
+	fields[10] = new_field(1, 4, row++, 30, 0, 0); // Solista
+	set_field_buffer(fields[10], 0, "[ ]");
+	field_opts_off(fields[10], O_EDIT); // Non editabile manualmente
+	fields[11] = new_field(1, 5, row++, 30, 0, 0); // Spese viaggio
+	fields[12] = nullptr;
 
-		for (int i = 0; i < 12; ++i) {
-			set_field_back(fields[i], A_UNDERLINE);   // Campo visibile
-			field_opts_off(fields[i], O_AUTOSKIP);  // Non salta automaticamente
-		}
-	}
-
-	// Precompilazione se "musician" presente
-	if (musician) {
-		set_field_buffer(fields[0], 0, musician->getName().c_str());
-		set_field_buffer(fields[1], 0, musician->getPhone().c_str());
-		set_field_buffer(fields[2], 0, musician->getInstrument().c_str());
-		set_field_buffer(fields[3], 0, musician->getMail().c_str());
-
-		set_field_buffer(fields[4], 0, musician->getStreet().c_str());
-		set_field_buffer(fields[5], 0, musician->getZipCode().c_str());
-		set_field_buffer(fields[6], 0, musician->getCity().c_str());
-
-		std::ostringstream oss;
-		oss.precision(2);
-		oss << std::fixed << musician->getGage();
-		set_field_buffer(fields[7], 0, oss.str().c_str());
-
-		set_field_buffer(fields[8], 0,
-				std::to_string(musician->getRehearsalNumber()).c_str());
-		set_field_buffer(fields[9], 0,
-				std::to_string(musician->getConcertNumber()).c_str());
-
-		isSoloistChecked = musician->isSoloist();
-		set_field_buffer(fields[10], 0, isSoloistChecked ? "[X]" : "[ ]");
-
-		set_field_buffer(fields[11], 0,
-				std::to_string(musician->getTravelCosts()).c_str());
+	for (int i = 0; i < 12; ++i) {
+		set_field_back(fields[i], A_UNDERLINE);   // Campo visibile
+		field_opts_off(fields[i], O_AUTOSKIP);  // Non salta automaticamente
 	}
 
 	// Crea e configura il form
@@ -92,7 +95,6 @@ void MusicianForm::init_form() {
 }
 
 void MusicianForm::clearFormFields() {
-	musician = nullptr;
 	for (int i = 0; i < 12; ++i) {  // 11 campi più il nullptr a fields[12]
 		set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
 	}
@@ -104,7 +106,7 @@ void MusicianForm::clearFormFields() {
 }
 
 void MusicianForm::show() {
-	init_form();
+	if (!form) init_form();
 	post_form(form);
 
 	int row = 2;
@@ -147,40 +149,40 @@ MenuCommand MusicianForm::getCommand() {
 		ch = getch();
 		switch (ch) {
 		case 10: // Enter
-				case KEY_DOWN:
-				case 9: // TAB
-					form_driver(form, REQ_NEXT_FIELD);
-					form_driver(form, REQ_END_LINE);
-					break;
-				case KEY_UP:
-				case KEY_BTAB:
-					form_driver(form, REQ_PREV_FIELD);
-					form_driver(form, REQ_END_LINE);
-					break;
-				case KEY_BACKSPACE:
-				case 127:
-				case '\b':
-					form_driver(form, REQ_DEL_PREV);
-					break;
-				case KEY_DC:
-					form_driver(form, REQ_DEL_CHAR);
-					break;
-				case ' ': // Barra spaziatrice per toggle
-					if (current_field(form) == fields[10]) {
-						isSoloistChecked = !isSoloistChecked;
-						set_field_buffer(fields[10], 0,
-								isSoloistChecked ? "[X]" : "[ ]");
-					} else {
-						form_driver(form, ch);
-					}
-					break;
-				case KEY_F(2): {
-							MenuCommand result = menuBar.show();
-							if (result != MenuCommand::Quit) {
-								saveDataFromForm();
-							}
-							return result;
-						}
+		case KEY_DOWN:
+		case 9: // TAB
+			form_driver(form, REQ_NEXT_FIELD);
+			form_driver(form, REQ_END_LINE);
+			break;
+		case KEY_UP:
+		case KEY_BTAB:
+			form_driver(form, REQ_PREV_FIELD);
+			form_driver(form, REQ_END_LINE);
+			break;
+		case KEY_BACKSPACE:
+		case 127:
+		case '\b':
+			form_driver(form, REQ_DEL_PREV);
+			break;
+		case KEY_DC:
+			form_driver(form, REQ_DEL_CHAR);
+			break;
+		case ' ': // Barra spaziatrice per toggle
+			if (current_field(form) == fields[10]) {
+				isSoloistChecked = !isSoloistChecked;
+				set_field_buffer(fields[10], 0,
+						isSoloistChecked ? "[X]" : "[ ]");
+			} else {
+				form_driver(form, ch);
+			}
+			break;
+		case KEY_F(2): {
+			MenuCommand result = menuBar.show();
+			if (result != MenuCommand::Quit) {
+				saveDataFromForm();
+			}
+			return result;
+		}
 		default:
 			form_driver(form, ch);
 			break;

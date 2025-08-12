@@ -5,19 +5,40 @@
 #include "Utils.h"
 
 PieceForm::~PieceForm() {
-	closeForm();
+	if (form)
+		closeForm();
 }
 
 void PieceForm::setMenuBar(const MenuBar &bar) {
 	menuBar = bar;
 }
 
-void PieceForm::setPiece(const MusicalPiece *piece) {
-	existing = piece;
+void PieceForm::setPiece(MusicalPiece *p) {
+	piece = p;
+}
+
+void PieceForm::updateFields() {
+	if (!form || !piece)
+		return;
+
+	set_field_buffer(fields[0], 0, piece->getComposer().c_str());
+	set_field_buffer(fields[1], 0, piece->getTitle().c_str());
+	set_field_buffer(fields[2], 0, convertToMMSS(piece->getDuration()).c_str());
+	hasChoiristChecked = piece->hasChoir();
+	set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
+	set_field_buffer(fields[4], 0, piece->getSingerPart().c_str());
+	set_field_buffer(fields[5], 0, piece->getInstruments().c_str());
+	set_field_buffer(fields[6], 0, piece->getYoutubeLink().c_str());
+
+	set_current_field(form, fields[0]);
+	form_driver(form, REQ_FIRST_FIELD);
+	form_driver(form, REQ_END_LINE);
+	refresh();
 }
 
 void PieceForm::init_form() {
-	if (form == nullptr) {
+	if (form != nullptr)
+		closeForm();
 	// 1. Crea campi
 	int row = 2;
 	fields[0] = new_field(1, 40, row++, 20, 0, 0);  // Composer
@@ -35,26 +56,14 @@ void PieceForm::init_form() {
 		set_field_back(fields[i], A_UNDERLINE);
 		field_opts_off(fields[i], O_AUTOSKIP);
 	}
-	}
-	// 2. Pre-compila se già esistente
-	if (existing) {
-		set_field_buffer(fields[0], 0, existing->getComposer().c_str());
-		set_field_buffer(fields[1], 0, existing->getTitle().c_str());
-		set_field_buffer(fields[2], 0,
-				convertToMMSS(existing->getDuration()).c_str());
-		hasChoiristChecked = existing->hasChoir();
-		set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
-		set_field_buffer(fields[4], 0, existing->getSingerPart().c_str());
-		set_field_buffer(fields[5], 0, existing->getInstruments().c_str());
-		set_field_buffer(fields[6], 0, existing->getYoutubeLink().c_str());
-
-	}
 
 	form = new_form(fields);
 }
 
 void PieceForm::show() {
-	init_form();
+	if (!form) {
+		init_form();
+	}
 	post_form(form);
 
 	int row = 2;
@@ -70,51 +79,45 @@ void PieceForm::show() {
 	mvprintw(row++, 2, "Scores:");
 	attroff(A_BOLD);
 
-	if (existing) {
-		for (unsigned int i = 0; i < existing->getScores().size(); i++) {
+	if (piece) {
+		for (unsigned int i = 0; i < piece->getScores().size(); i++) {
 			mvprintw(row++, 2, "%i) %s", i + 1,
-					existing->getScores().at(i).getPath().c_str());
+					piece->getScores().at(i).getPath().c_str());
 		}
 	}
 
-	row += 2;
-	mvprintw(row, 2, "Press F2 for menu");
-
-	refresh();
+	set_current_field(form, fields[0]);
 	form_driver(form, REQ_FIRST_FIELD);
+	form_driver(form, REQ_END_LINE);  // posiziona alla fine del buffer
+	refresh();
 }
 
 void PieceForm::clearFormFields() {
-    existing = nullptr;
-    for (int i = 0; i < NUMBER_OF_FIELDS; ++i) {
-        set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
-    }
-    hasChoiristChecked = false;
-    set_field_buffer(fields[3], 0, "[ ]");  // Aggiorna il campo "Choir" a non selezionato
+	for (int i = 0; i < NUMBER_OF_FIELDS; ++i) {
+		set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
+	}
+	hasChoiristChecked = false;
+	set_field_buffer(fields[3], 0, "[ ]"); // Aggiorna il campo "Choir" a non selezionato
 
-    form_driver(form, REQ_FIRST_FIELD);  // Posiziona il cursore sul primo campo
-    refresh();
+	form_driver(form, REQ_FIRST_FIELD);  // Posiziona il cursore sul primo campo
+	refresh();
 }
-
 
 MenuCommand PieceForm::getCommand() {
 	int ch;
-	while ((ch = getch())) {
+	while (true) {
+		ch = getch();
 		switch (ch) {
-		case KEY_F(2): { // MENU AZIONI
-		    MenuCommand result = menuBar.show();
-		    if (result == MenuCommand::AddPiece) {
-		        saveDataFromForm();
-		        clearFormFields();
-		    } else if (result == MenuCommand::SaveExit || result == MenuCommand::Quit) {
-		        saveDataFromForm();
-		        return result;
-		    } else {
-		        return result;  // Nessuna validazione per AddScore, DeleteScore, ViewScore
-		    }
-		    break;
-		}
 
+		case KEY_F(2): { // MENU AZIONI
+			MenuCommand result = menuBar.show();
+			if (result == MenuCommand::SaveExit
+					|| result == MenuCommand::AddPiece) {
+				saveDataFromForm();
+			}
+			return result; // poi ci pensa il controller a cosa fare
+			break;
+		}
 		case KEY_DOWN:
 		case '\t':
 			form_driver(form, REQ_NEXT_FIELD);
@@ -138,71 +141,44 @@ MenuCommand PieceForm::getCommand() {
 			form_driver(form, REQ_DEL_CHAR);
 			break;
 		case ' ': // Barra spaziatrice per toggle
-		    if (current_field(form) == fields[3]) {
-		        hasChoiristChecked = !hasChoiristChecked;
-		        set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
-		    }  else {
+			if (current_field(form) == fields[3]) {
+				hasChoiristChecked = !hasChoiristChecked;
+				set_field_buffer(fields[3], 0,
+						hasChoiristChecked ? "[X]" : "[ ]");
+			} else {
 				form_driver(form, ch);
 			}
-		    break;
+			break;
 		default:
 			form_driver(form, ch);
 			break;
 		}
 		refresh();
 	}
+	closeForm();
 	return MenuCommand::None;
 }
 
-void PieceForm::savePiece() {
-	saveDataFromForm();
-}
-
 void PieceForm::saveDataFromForm() {
-    form_driver(form, REQ_VALIDATION);
+	form_driver(form, REQ_VALIDATION);
 
-    std::string composer = trim(field_buffer(fields[0], 0));
-    std::string title = trim(field_buffer(fields[1], 0));
-    std::string durationStr = trim(field_buffer(fields[2], 0));
-    int duration = convertToSeconds(durationStr);
-    if (duration == -1)
-        duration = 0;
-
-    std::string singer = trim(field_buffer(fields[4], 0));
-    std::string instruments = trim(field_buffer(fields[5], 0));
-    std::string youtube = trim(field_buffer(fields[6], 0));
-
-    bool choir = hasChoiristChecked;
-
-    MusicalPiece newPiece(composer, title, duration, choir, singer, instruments, youtube);
-    if (existing && !existing->getScores().empty()) {
-    	newPiece.setScores(existing->getScores());
-    }
-
-    if (existing) {
-        // Sovrascrive la piece esistente nel vettore
-        for (auto &p : pieces) {
-            if (&p == existing) {
-                p = newPiece;
-                return;  // Uscita: aggiornata, non aggiungere
-            }
-        }
-        // Se existing non trovata nel vettore, allora aggiungi
-        pieces.push_back(newPiece);
-    } else {
-        // Nuova piece
-        pieces.push_back(newPiece);
-    }
+	piece->setComposer(trim(field_buffer(fields[0], 0)));
+	piece->setTitle(trim(field_buffer(fields[1], 0)));
+	std::string durationStr = trim(field_buffer(fields[2], 0));
+	int duration = convertToSeconds(durationStr);
+	if (duration == -1)
+		duration = 0;
+	piece->setDuration(duration);
+	piece->setSingerPart(trim(field_buffer(fields[4], 0)));
+	piece->setInstruments(trim(field_buffer(fields[5], 0)));
+	piece->setYoutubeLink(trim(field_buffer(fields[6], 0)));
+	piece->setChoir(hasChoiristChecked);
 }
 
 void PieceForm::closeForm() {
 	unpost_form(form);
 	free_form(form);
 	for (int i = 0; fields[i] != nullptr; ++i) {
-	    free_field(fields[i]);
+		free_field(fields[i]);
 	}
-}
-
-std::vector<MusicalPiece> PieceForm::getPieces() {
-	return pieces;
 }

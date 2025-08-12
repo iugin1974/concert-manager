@@ -125,3 +125,6 @@ void ConcertSummaryView::closeForm() {
 
 void ConcertSummaryView::saveDataFromForm() {
 }
+
+void ConcertSummaryView::updateFields() {
+}

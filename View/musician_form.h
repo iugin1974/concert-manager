@@ -14,6 +14,7 @@ public:
 	void show() override;
 	MenuCommand getCommand() override;
 	~MusicianForm() override;
+	void init_form() override;
 	void setController(ConcertController& controller); // TODO elimina
 	void setMusician(Musician *musician);
 	std::string getName();
@@ -27,14 +28,15 @@ public:
 	double getGage() const;
 	bool getSoloist() const;
 	void setAutoFilledFields(const Musician& m);
+	void updateFields() override;
+	void clearFormFields() override;
+
 private:
 	static constexpr int NUMBER_OF_FIELDS = 13;
 	Musician *musician = nullptr;
-	void init_form() override;
 	void closeForm() override;
 	void saveDataFromForm() override;
 	void handleFieldChange();
-	void clearFormFields();
 	
 	std::string name;
 	std::string phone;
