@@ -167,3 +167,6 @@ const std::string ConcertInfoForm::getPlaces() const {
 const std::string ConcertInfoForm::getTitle() const {
 	return title;
 }
+
+void ConcertInfoForm::clearFormFields() {}
+

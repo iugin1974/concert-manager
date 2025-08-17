@@ -12,7 +12,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -g -fsanitize=address -fno-omit-frame-pointe
 SRCS = main.cpp \
        Model/Musician.cpp Model/MusicalPiece.cpp Model/Concert.cpp Model/Rehearsal.cpp Model/Score.cpp Model/Timestamped.cpp Model/Model.cpp \
        View/musician_form.cpp View/concert_info_form.cpp View/MainMenuView.cpp View/ConcertSummaryView.cpp View/pieceForm.cpp View/rehearsal_form.cpp \
-       View/MenuBar.cpp View/SelectionView.cpp View/ScoreSelectView.cpp View/VimView.cpp View/MuttView.cpp View/MovePieceView.cpp \
+       View/MenuBar.cpp View/SelectionView.cpp View/ListSelectView.cpp View/VimView.cpp View/MuttView.cpp View/MovePieceView.cpp \
        Controller/ConcertController.cpp \
        Core/Utils.cpp Core/logMessage.cpp Core/AbookImporter.cpp \
        IO/FileIO.cpp IO/HTML_Exporter.cpp IO/CSV_Exporter.cpp \

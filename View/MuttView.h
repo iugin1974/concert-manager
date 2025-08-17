@@ -4,6 +4,6 @@
 class MuttView {
 
 public:
-void launchMutt(std::string& adress);
+void launchMutt(const std::string &args);
 
 };

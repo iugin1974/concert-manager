@@ -3,7 +3,6 @@
 #include "musician_form.h"
 #include "MusicalPiece.h"
 #include "MovePieceView.h"
-#include "ScoreSelectView.h"
 #include "Score.h"
 #include "FileIO.h"
 #include "MuttView.h"
@@ -19,6 +18,8 @@
 #include "Utils.h"
 #include <optional> // per std::optional
 #include <cstdlib>  // per system()
+
+#include "ListSelectView.h"
 #include "HTML_Exporter.h"
 #include "CSV_Exporter.h"
 
@@ -604,7 +605,8 @@ bool ConcertController::deleteScore(MusicalPiece *piece) {
 bool ConcertController::addScore(MusicalPiece *piece) {
 	clear();
 	std::vector<std::string> scorePaths = model.getScorePaths();
-	ScoreSelectView scoreSelectView;
+	ListSelectView scoreSelectView ("Select a score file (SPACE: select - ENTER: finish - ESC: cancel):",
+            false);
 	std::optional<std::vector<std::string>> paths = scoreSelectView.show(
 			scorePaths);
 
@@ -632,23 +634,39 @@ bool ConcertController::commentConcert(Concert *concert) {
 }
 
 void ConcertController::sendMail(Concert *concert) {
-	// memorizza tutti i musicisti che hanno una mail
-	std::vector<Musician> musicians = concert->getMusicians();
-	std::vector<Musician> musicianWithMail;
-	for (const Musician &m : musicians) {
-		if (!empty(m.getMail()))
-			musicianWithMail.push_back(m);
-	}
+    std::vector<Musician> musicians = concert->getMusicians();
+    std::vector<std::string> emails;
 
-	clear();
-	SelectionView selectionView;
-	int choice = selectionView.runChoiceForm(musicianWithMail);
-	if (choice == -1)
-		return;
-	std::string mail = musicianWithMail.at(choice).getMail();
+    for (const Musician &m : musicians) {
+        if (!m.getMail().empty())
+            emails.push_back(m.getMail());
+    }
 
-	MuttView muttView;
-	muttView.launchMutt(mail);
+    if (emails.empty())
+        return;
+
+    clear();
+    ListSelectView view("Select musician(s) to mail (SPACE: select - ENTER: finish - ESC: cancel - A: select all):",
+                        true);
+    auto selected = view.show(emails);
+
+    if (!selected || selected->empty())
+        return;
+
+    MuttView muttView;
+
+    if (selected->size() == 1) {
+        // singolo destinatario → To
+        muttView.launchMutt((*selected)[0]);
+    } else {
+        // multipli → BCC
+        std::string allMails;
+        for (size_t i = 0; i < selected->size(); ++i) {
+            if (i > 0) allMails += ",";
+            allMails += (*selected)[i];
+        }
+        muttView.launchMutt("-b " + allMails);
+    }
 }
 
 void ConcertController::autofillFromAbook(const std::string &name,

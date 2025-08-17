@@ -128,3 +128,6 @@ void ConcertSummaryView::saveDataFromForm() {
 
 void ConcertSummaryView::updateFields() {
 }
+
+void ConcertSummaryView::clearFormFields() {
+}
