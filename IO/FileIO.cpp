@@ -11,6 +11,7 @@
 
 using namespace tinyxml2;
 std::string FileIO::savePath = "";
+bool FileIO::dryRun = false;
 
 std::optional<std::string> FileIO::loadBasePathFromRcFile() {
     const char* homeDir = getenv("HOME");
@@ -48,6 +49,7 @@ std::string FileIO::getSafeText(tinyxml2::XMLElement* elem) {
 
 void FileIO::saveConcertsToXML(const std::vector<Concert> &concerts, const std::string &path) const
 {
+if (dryRun) return;
     XMLDocument doc;
 
     XMLDeclaration* decl = doc.NewDeclaration(R"(xml version="1.0" encoding="UTF-8")");

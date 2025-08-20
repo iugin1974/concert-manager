@@ -8,6 +8,7 @@
 #include <cstring>
 #include <sstream>
 #include <cctype>
+#include <filesystem>
 
 std::string HTML_Exporter::toCamelCase(const std::string& input) {
     std::stringstream ss(input);
@@ -39,6 +40,24 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 	std::vector<Rehearsal> r = c.getRehearsals();
 	std::string rootDir = toCamelCase(c.getTitle());
 
+   // --- CREA LE CARTELLE SE NON ESISTONO ---
+   namespace fs = std::filesystem;
+    try {
+        if (!fs::exists(rootDir)) {
+            fs::create_directory(rootDir);
+        }
+        if (!fs::exists(rootDir + "/Flyer")) {
+            fs::create_directory(rootDir + "/Flyer");
+        }
+        if (!fs::exists(rootDir + "/Noten")) {
+            fs::create_directory(rootDir + "/Noten");
+        }
+    } catch (const fs::filesystem_error &e) {
+        LOG_MSG(std::string("Errore nella creazione delle cartelle: ") + e.what());
+    }
+    // ----------------------------------------
+
+    
 	std::ofstream file(filename);
 	if (!file) {
 		LOG_MSG("Errore nello scrivere il file.");

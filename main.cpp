@@ -91,7 +91,7 @@ void handle_crash(int sig) {
     raise(sig);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 	 // Imposta il crash handler per i segnali più comuni
 	    signal(SIGSEGV, handle_crash);
 	    signal(SIGABRT, handle_crash);
@@ -99,6 +99,13 @@ int main() {
 	    signal(SIGILL,  handle_crash);
 	    signal(SIGBUS,  handle_crash);
 
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-R") {
+            FileIO::dryRun = true;
+        }
+    }
+    
 	load_config();
 	setlocale(LC_ALL, "");
 	initscr();
