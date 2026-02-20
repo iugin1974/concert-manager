@@ -62,6 +62,7 @@ void ConcertInfoForm::init_form() {
 void ConcertInfoForm::show() {
 
 	init_form();
+	if (existing != NULL) updateFields();
 	post_form(form);
 
 	int row = 2;
