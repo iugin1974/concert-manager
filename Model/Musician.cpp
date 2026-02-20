@@ -2,6 +2,8 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <locale>
+#include <codecvt>
 
 // Costruttori
 Musician::Musician()
@@ -121,20 +123,27 @@ double Musician::getFullPayment() const {
 
 // Output
 std::string Musician::toString() const {
-    std::ostringstream oss;
-    oss << std::left
-        << std::setw(22) << getName()
-        << std::setw(20) << getInstrument()
-        << std::right
-        << std::setw(10) << std::fixed << std::setprecision(2) << getGage()
-        << std::setw(25) << std::fixed << std::setprecision(2) << getFullPayment();
-    return oss.str();
+    std::wostringstream woss;
+
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+
+    std::wstring wname = converter.from_bytes(getName());
+    std::wstring winstrument = converter.from_bytes(getInstrument());
+
+    woss << std::left
+         << std::setw(25) << wname
+         << std::setw(20) << winstrument
+         << std::right
+         << std::setw(10) << std::fixed << std::setprecision(2) << getGage()
+         << std::setw(25) << std::fixed << std::setprecision(2) << getFullPayment();
+
+    return converter.to_bytes(woss.str());
 }
 
 std::string Musician::header() {
     std::ostringstream oss;
     oss << std::left
-        << std::setw(22) << "Name"
+        << std::setw(25) << "Name"
         << std::setw(20) << "Instrument"
         << std::right
         << std::setw(10) << "Gage"

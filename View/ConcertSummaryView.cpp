@@ -86,7 +86,7 @@ void ConcertSummaryView::show() {
 	}
 
 	mvhline(row++, 2, ACS_HLINE, 90);
-	print(row++, 2, "%-41s %10.2f %20.2f", "Total:", totalGage,
+	print(row++, 2, "%-41s %13.2f %24.2f", "Total:", totalGage,
 			totalGageWithTravelCosts);
 
 	if (!concert.getComment().empty()) {
