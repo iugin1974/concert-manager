@@ -92,6 +92,12 @@ void handle_crash(int sig) {
 }
 
 int main(int argc, char* argv[]) {
+
+if (!std::setlocale(LC_ALL, "de_DE.UTF-8")) {
+        std::cerr << "Warning: locale de_DE.UTF-8 not available, using system default\n";
+        std::setlocale(LC_ALL, "");
+    }
+    
 	 // Imposta il crash handler per i segnali più comuni
 	    signal(SIGSEGV, handle_crash);
 	    signal(SIGABRT, handle_crash);

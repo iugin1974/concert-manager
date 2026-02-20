@@ -222,13 +222,13 @@ bool Concert::stringToTm(const std::string &dateStr, std::tm &date) {
     date.tm_mon = month - 1;
     date.tm_year = year - 1900;
 
-    // Verifica validità con mktime
-    std::tm temp = date;
-    if (mktime(&temp) == -1)
+    // Verifica validità e calcola tm_wday
+    if (mktime(&date) == -1)
         return false;
 
     return true;
 }
+
 
 bool Concert::compareTm(const std::tm &a, const std::tm &b) {
     if (a.tm_year != b.tm_year)

@@ -34,7 +34,6 @@ std::string HTML_Exporter::toCamelCase(const std::string& input) {
 }
 
 void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
-	std::setlocale(LC_TIME, "de_DE.UTF-8"); // per data in tedesco
 	std::vector<MusicalPiece> p = c.getProgram();
 	std::vector<Musician> m = c.getMusicians();
 	std::vector<Rehearsal> r = c.getRehearsals();
@@ -69,7 +68,7 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 	file << "\n";
 	file << "<head>\n";
 	file << "	<meta charset=\"UTF-8\">\n";
-	file << "	<title>" << c.getTitle() << "a</title>\n";
+	file << "	<title>" << c.getTitle() << "</title>\n";
 	file << "	<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n";
 	file
 			<< "	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
@@ -165,6 +164,7 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 
 	for (const auto &rehearsal : r) {
 		std::tm tm = rehearsal.getDate();
+		mktime(&tm);
 		char buffer[100];
 		std::strftime(buffer, sizeof(buffer), "%A, %d. %B %Y", &tm);
 
@@ -189,7 +189,6 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 
 	const auto &dates = c.getDatesAsTm();
 	const auto &times = c.getStartTimesAsTm();
-	std::setlocale(LC_TIME, "de_DE.UTF-8"); // per il formato tedesco
 
 	for (size_t i = 0; i < dates.size(); ++i) {
 	    char dateBuffer[100];
