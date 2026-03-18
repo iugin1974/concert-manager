@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include <iostream>
 #include <vector>
+#include <codecvt>
 
 // Costruttore
 MusicalPiece::MusicalPiece() {
@@ -95,34 +96,34 @@ void MusicalPiece::print() const {
 }
 
 std::string MusicalPiece::toString() const {
-        std::ostringstream oss;
-        oss << std::left
-			<< std::setw(40) << getTitle()
-            << std::setw(20) << getComposer()
-			<< std::setw(12)  << convertToMMSS(getDuration());
+    std::wostringstream woss;
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 
-        // Costruzione campo Instruments (con SingerPart e Choir)
-        std::ostringstream org;
-        org << getInstruments();
-        if (!getSingerPart().empty())
-            org << " - " << getSingerPart();
-        if (hasChoir())
-            org << " - Choir";
+    // Costruzione campo Instruments (con SingerPart e Choir)
+    std::ostringstream org;
+    org << getInstruments();
+    if (!getSingerPart().empty())
+        org << " - " << getSingerPart();
+    if (hasChoir())
+        org << " - Choir";
 
-        oss << std::setw(40) << org.str()
-            << std::setw(3) << getScores().size();
+    woss << std::left
+         << std::setw(40) << converter.from_bytes(getTitle())
+         << std::setw(20) << converter.from_bytes(getComposer())
+         << std::setw(12) << converter.from_bytes(convertToMMSS(getDuration()))
+         << std::setw(40) << converter.from_bytes(org.str())
+         << std::setw(3)  << getScores().size();
 
-        return oss.str();
-    }
+    return converter.to_bytes(woss.str());
+}
 
 std::string MusicalPiece::header() {
-        std::ostringstream oss;
-        oss << std::left
-		<< std::setw(40) << "Title"
-            << std::setw(20) << "Composer"
-            << std::setw(12)  << "Duration"
-            << std::setw(40) << "Instruments"
-            << std::setw(3)  << "Scores";
-        return oss.str();
-    }
-
+    std::ostringstream oss;
+    oss << std::left
+        << std::setw(40) << "Title"
+        << std::setw(20) << "Composer"
+        << std::setw(12) << "Duration"
+        << std::setw(40) << "Instruments"
+        << std::setw(3)  << "Scores";
+    return oss.str();
+}
