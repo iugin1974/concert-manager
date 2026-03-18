@@ -37,7 +37,9 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 	std::vector<MusicalPiece> p = c.getProgram();
 	std::vector<Musician> m = c.getMusicians();
 	std::vector<Rehearsal> r = c.getRehearsals();
-	std::string rootDir = toCamelCase(c.getTitle());
+	std::string basePath = "/var/www/html/";
+	std::string workDir = toCamelCase(c.getTitle());
+	std::string rootDir = basePath + workDir;
 
    // --- CREA LE CARTELLE SE NON ESISTONO ---
    namespace fs = std::filesystem;
@@ -106,53 +108,57 @@ void HTML_Exporter::saveHTML(const Concert &c, const std::string &filename) {
 	file << "\n";
 	file << "\n";
 
-// FLyer
-	file << "<tr class=\"info-row\">\n";
-	file << "    <td class=\"bold\">Flyer</td>\n";
-	file << "    <td>\n";
-	file << "        <?php\n";
-	file << "        $flyerDir = '" << rootDir << "/Flyer';\n";
-	file << "        $files = glob($flyerDir . '/*.pdf');\n";
-	file << "        foreach ($files as $file) {\n";
-	file << "            $fileName = basename($file);\n";
-	file << "            echo \"<a href='$file'>$fileName</a><br>\";\n";
-	file << "        }\n";
-	file << "        ?>\n";
-	file << "    </td>\n";
-	file << "</tr>\n\n";
+// Flyer
+file << "<tr class=\"info-row\">\n";
+file << "    <td class=\"bold\">Flyer</td>\n";
+file << "    <td>\n";
+file << "        <?php\n";
+file << "        $flyerDir = \"" << workDir << "/Flyer\";\n";
+file << "        $files = glob($flyerDir . '/*.pdf');\n";
+file << "        foreach ($files as $file) {\n";
+file << "            $fileName = basename($file);\n";
+file << "            echo '<a href=\"' . $file . '\">' . $fileName . '</a><br>';\n";
+file << "        }\n";
+file << "        ?>\n";
+file << "    </td>\n";
+file << "</tr>\n\n";
 
 // Noten
-	file << "<tr class=\"info-row\">\n";
-	file << "    <td class=\"bold\">Noten</td>\n";
-	file << "    <td>\n";
-	file << "<?php\n";
-	    file << "    $notenDir = '" << rootDir << "/Noten';\n";
-	    file << "    $pieces = array_filter(scandir($notenDir), function($item) use ($notenDir) {\n";
-	    file << "        return $item !== '.' && $item !== '..' && is_dir($notenDir . '/' . $item);\n";
-	    file << "    });\n";
-	    file << "    if(empty($pieces)) {\n";
-	    file << "        // Se non ci sono sottocartelle, elenca i PDF direttamente\n";
-	    file << "        $files = glob($notenDir . '/*.pdf');\n";
-	    file << "        echo \"<ul>\\n\";\n";
-	    file << "        foreach($files as $file) {\n";
-	    file << "            $fileName = basename($file);\n";
-	    file << "            echo \"<li><a href='$file'>$fileName</a></li>\\n\";\n";
-	    file << "        }\n";
-	    file << "        echo \"</ul>\\n\";\n";
-	    file << "    } else {\n";
-	    file << "        foreach($pieces as $piece) {\n";
-	    file << "            echo \"<p><strong>$piece</strong></p>\\n<ul>\\n\";\n";
-	    file << "            $files = glob($notenDir . '/' . $piece . '/*.pdf');\n";
-	    file << "            foreach($files as $file) {\n";
-	    file << "                $fileName = basename($file);\n";
-	    file << "                echo \"<li><a href='$file'>$fileName</a></li>\\n\";\n";
-	    file << "            }\n";
-	    file << "            echo \"</ul>\\n\";\n";
-	    file << "        }\n";
-	    file << "    }\n";
-	    file << "?>\n";
-	file << "    </td>\n";
-	file << "</tr>\n\n\n\n";
+file << "<tr class=\"info-row\">\n";
+file << "    <td class=\"bold\">Noten</td>\n";
+file << "    <td>\n";
+file << "    <?php\n";
+file << "        $notenDir = \"" << workDir << "/Noten\";\n";
+file << "    $pieces = array_filter(scandir($notenDir), function($item) use ($notenDir) {\n";
+file << "        return $item !== '.' && $item !== '..' && is_dir($notenDir . '/' . $item);\n";
+file << "    });\n";
+
+file << "    if (empty($pieces)) {\n";
+file << "        $files = glob($notenDir . '/*.pdf');\n";
+file << "        echo '<ul>';\n";
+file << "        foreach ($files as $file) {\n";
+file << "            $fileName = basename($file);\n";
+file << "            echo '<li><a href=\"' . $file . '\">' . $fileName . '</a></li>';\n";
+file << "        }\n";
+file << "        echo '</ul>';\n";
+file << "    } else {\n";
+
+file << "        foreach ($pieces as $piece) {\n";
+file << "            echo '<p><strong>' . $piece . '</strong></p><ul>';\n";
+file << "            $files = glob($notenDir . '/' . $piece . '/*.pdf');\n";
+
+file << "            foreach ($files as $file) {\n";
+file << "                $fileName = basename($file);\n";
+file << "                echo '<li><a href=\"' . $file . '\">' . $fileName . '</a></li>';\n";
+file << "            }\n";
+
+file << "            echo '</ul>';\n";
+file << "        }\n";
+file << "    }\n";
+
+file << "    ?>\n";
+file << "    </td>\n";
+file << "</tr>\n\n";
 
 	// Proben
 	file << "		<tr class=\"info-row\">\n";
