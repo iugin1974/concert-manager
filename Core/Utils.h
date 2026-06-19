@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include <vector>
 #include <ctime>
+#include <string>
 
 int print(int line, int col, const char *fmt, ...);
 std::string trim(const char* buffer);

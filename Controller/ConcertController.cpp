@@ -147,7 +147,7 @@ void ConcertController::manageConcerts() {
 		break;
 		}
 		case MenuCommand::DeleteMusician:
-			deleteMusician(concert);
+			deleteElement(concert->getMusicians());
 			save();
 			break;
 		case MenuCommand::AddPiece:
@@ -163,7 +163,7 @@ void ConcertController::manageConcerts() {
 			moveElement(concert->getProgram());
 			break;
 		case MenuCommand::DeletePiece:
-			deletePiece(concert);
+			deleteElement(concert->getProgram());
 			save();
 			break;
 		case MenuCommand::AddRehearsal:
@@ -175,7 +175,7 @@ void ConcertController::manageConcerts() {
 			save();
 			break;
 		case MenuCommand::DeleteRehearsal:
-			deleteRehearsal(concert);
+			deleteElement(concert->getRehearsals());
 			save();
 			break;
 		case MenuCommand::Comment:
@@ -493,51 +493,6 @@ void ConcertController::editPiece(Concert *concert) {
 
 	default:
 		break;
-	}
-}
-
-void ConcertController::deleteRehearsal(Concert *concert) {
-	clear();
-	SelectionView view;
-	auto &rehearsals = concert->getRehearsals();
-	int choice = view.runChoiceForm(rehearsals);
-	if (choice == -1)
-		return;
-
-	bool confirm = confirmDialog(stdscr);
-	if (confirm) {
-		Rehearsal *r = &rehearsals.at(choice);
-		model.removeRehearsal(r, *concert);
-	}
-}
-
-void ConcertController::deleteMusician(Concert *concert) {
-	clear();
-	SelectionView view;
-	auto &musicians = concert->getMusicians();
-	int choice = view.runChoiceForm(musicians);
-	if (choice == -1)
-		return;
-
-	bool confirm = confirmDialog(stdscr);
-	if (confirm) {
-		Musician *m = &musicians.at(choice);
-		model.removeMusician(m, *concert);
-	}
-}
-
-void ConcertController::deletePiece(Concert *concert) {
-	clear();
-	SelectionView view;
-	auto &piece = concert->getProgram();
-	int choice = view.runChoiceForm(piece);
-	if (choice == -1)
-		return;
-
-	bool confirm = confirmDialog(stdscr);
-	if (confirm) {
-		MusicalPiece *p = &piece.at(choice);
-		model.removeElement(p, *concert);
 	}
 }
 
