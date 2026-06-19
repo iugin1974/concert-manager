@@ -78,19 +78,6 @@ void Model::updateConcertInfo(const Concert &source, Concert &target) {
 
 
 
-// Sposta l'elemento in posizione 'pos' di 'offset' (-1 o +1)
-// Ritorna true se spostamento avvenuto, false se fuori range o impossibile
-bool Model::movePiece(int pos, int offset, std::vector<MusicalPiece> &program) {
-	int newPos = pos + offset;
-	if (pos < 0 || pos >= (int) program.size())
-		return false;
-	if (newPos < 0 || newPos >= (int) program.size())
-		return false;
-
-	std::swap(program[pos], program[newPos]);
-	return true;
-}
-
 void Model::addPiece(const MusicalPiece &piece, Concert &concert) {
 	std::vector<MusicalPiece> &pieces = concert.getProgram();
 	pieces.push_back(piece);
@@ -152,7 +139,7 @@ void Model::removeMusician(Musician* musician, Concert &concert) {
 			musicians.end());
 }
 
-void Model::removePiece(MusicalPiece* piece, Concert &concert) {
+void Model::removeElement(MusicalPiece* piece, Concert &concert) {
 	auto &program = concert.getProgram();
 	program.erase(std::remove_if(program.begin(), program.end(),
 			[&](const MusicalPiece& p) { return &p == piece; }),

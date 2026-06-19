@@ -24,7 +24,6 @@ public:
     void addConcert(const Concert& concert);
     void updateConcertInfo(const Concert &source, Concert &target);
     void updateMusician(const Musician& oldM, const Musician& newM, Concert& concert);
-    bool movePiece(int pos, int offset, std::vector<MusicalPiece> &program);
     void addPiece(const MusicalPiece& piece, Concert& concert);
     void updatePiece(const MusicalPiece& oldPiece, const MusicalPiece& newPiece, Concert& concert);
     Rehearsal* createEmptyRehearsal(Concert &concert);
@@ -32,7 +31,7 @@ public:
     MusicalPiece* createEmptyPiece(Concert &concert);
     void removeRehearsal(Rehearsal* rehearsal, Concert &concert);
     void removeMusician(Musician* musician, Concert &concert);
-    void removePiece(MusicalPiece* piece, Concert &concert);
+    void removeElement(MusicalPiece* piece, Concert &concert);
     void updateRehearsal(const Rehearsal& oldRehearsal, const Rehearsal& newRehearsal, Concert& concert);
     void deleteConcert(size_t index);
     void deleteConcert(Concert* c);

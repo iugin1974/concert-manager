@@ -2,7 +2,7 @@
 #include "MainMenuView.h"
 #include "musician_form.h"
 #include "MusicalPiece.h"
-#include "MovePieceView.h"
+#include "MoveElementView.h"
 #include "Score.h"
 #include "FileIO.h"
 #include "MuttView.h"
@@ -81,7 +81,7 @@ void ConcertController::manageConcerts() {
 
 	{ { "Add Musician", MenuCommand::AddMusician }, { "Edit Musician",
 			MenuCommand::EditMusician }, { "Delete Musician",
-			MenuCommand::DeleteMusician } },
+			MenuCommand::DeleteMusician }, { "Move Musician", MenuCommand::MoveMusician } },
 
 	{   // Piece
 			{ "Add Piece", MenuCommand::AddPiece }, { "Edit / View Piece",
@@ -142,6 +142,10 @@ void ConcertController::manageConcerts() {
 			editMusician(concert);
 			save();
 			break;
+		case MenuCommand::MoveMusician: {
+		moveElement(concert->getMusicians());
+		break;
+		}
 		case MenuCommand::DeleteMusician:
 			deleteMusician(concert);
 			save();
@@ -156,7 +160,7 @@ void ConcertController::manageConcerts() {
 			form.show();
 			break;
 		case MenuCommand::MovePiece:
-			movePiece(concert);
+			moveElement(concert->getProgram());
 			break;
 		case MenuCommand::DeletePiece:
 			deletePiece(concert);
@@ -353,7 +357,7 @@ void ConcertController::createPiece(Concert *concert) {
 		MenuCommand cmd = form.getCommand();
 
 		if (cmd == MenuCommand::Quit) {
-			model.removePiece(p, *concert);
+			model.removeElement(p, *concert);
 			break;
 		} else if (cmd == MenuCommand::SaveExit) {
 			// no fa nulla perché la piece è già nel model
@@ -533,17 +537,8 @@ void ConcertController::deletePiece(Concert *concert) {
 	bool confirm = confirmDialog(stdscr);
 	if (confirm) {
 		MusicalPiece *p = &piece.at(choice);
-		model.removePiece(p, *concert);
+		model.removeElement(p, *concert);
 	}
-}
-
-void ConcertController::movePiece(Concert *concert) {
-	MovePieceView view;
-	view.show(*concert, *this);
-}
-
-bool ConcertController::movePiece(Concert &concert, int pos, int offset) {
-	return model.movePiece(pos, offset, concert.getProgram());
 }
 
 void ConcertController::openInBrowser(const MusicalPiece *piece) {

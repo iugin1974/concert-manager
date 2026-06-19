@@ -14,6 +14,7 @@ enum class MenuCommand {
     AddMusician,
     EditMusician,
     DeleteMusician,
+    MoveMusician,
     AddPiece,
     EditPiece,
 	MovePiece,
