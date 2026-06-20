@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "ConcertElement.h"
 #include "Printable.h"
 #include "Score.h"
 #include "Timestamped.h"
 
-class MusicalPiece: public Timestamped, Printable {
+class MusicalPiece: public Timestamped, Printable, ConcertElement {
 private:
 	std::string composer;
 	std::string title;

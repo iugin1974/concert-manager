@@ -1,22 +1,11 @@
 #include "musician_form.h"
 #include "Utils.h"
-#include "ConcertController.h" // TODO elimina
-#include <form.h>
-#include <string>
-#include <locale.h>
 #include <sstream>
+#include <ncurses.h>
 
 void MusicianForm::setController(ConcertController &c) {
-// TODO elimina la dipendenza dal controller
+	// TODO elimina la dipendenza dal controller
 	controller = c;
-}
-
-MusicianForm::~MusicianForm() {
-	closeForm();
-}
-
-void MusicianForm::setMusician(Musician *m) {
-	musician = m;
 }
 
 void MusicianForm::setAutoFilledFields(const Musician &m) {
@@ -29,33 +18,33 @@ void MusicianForm::setAutoFilledFields(const Musician &m) {
 }
 
 void MusicianForm::updateFields() {
-	if (!form || !musician)
+	if (!form || !element)
 		return;
 
-	set_field_buffer(fields[0], 0, musician->getName().c_str());
-	set_field_buffer(fields[1], 0, musician->getPhone().c_str());
-	set_field_buffer(fields[2], 0, musician->getInstrument().c_str());
-	set_field_buffer(fields[3], 0, musician->getMail().c_str());
+	set_field_buffer(fields[0], 0, element->getName().c_str());
+	set_field_buffer(fields[1], 0, element->getPhone().c_str());
+	set_field_buffer(fields[2], 0, element->getInstrument().c_str());
+	set_field_buffer(fields[3], 0, element->getMail().c_str());
 
-	set_field_buffer(fields[4], 0, musician->getStreet().c_str());
-	set_field_buffer(fields[5], 0, musician->getZipCode().c_str());
-	set_field_buffer(fields[6], 0, musician->getCity().c_str());
+	set_field_buffer(fields[4], 0, element->getStreet().c_str());
+	set_field_buffer(fields[5], 0, element->getZipCode().c_str());
+	set_field_buffer(fields[6], 0, element->getCity().c_str());
 
 	std::ostringstream oss;
 	oss.precision(2);
-	oss << std::fixed << musician->getGage();
+	oss << std::fixed << element->getGage();
 	set_field_buffer(fields[7], 0, oss.str().c_str());
 
 	set_field_buffer(fields[8], 0,
-			std::to_string(musician->getRehearsalNumber()).c_str());
+			std::to_string(element->getRehearsalNumber()).c_str());
 	set_field_buffer(fields[9], 0,
-			std::to_string(musician->getConcertNumber()).c_str());
+			std::to_string(element->getConcertNumber()).c_str());
 
-	isSoloistChecked = musician->isSoloist();
+	isSoloistChecked = element->isSoloist();
 	set_field_buffer(fields[10], 0, isSoloistChecked ? "[X]" : "[ ]");
 
 	set_field_buffer(fields[11], 0,
-			std::to_string(musician->getTravelCosts()).c_str());
+			std::to_string(element->getTravelCosts()).c_str());
 
 	refresh();
 }
@@ -63,13 +52,11 @@ void MusicianForm::updateFields() {
 void MusicianForm::init_form() {
 	if (form) return;
 	int row = 2;
-	// Crea i campi (posizionati su righe diverse)
 	fields[0] = new_field(1, 40, row++, 30, 0, 0); // Name
 	fields[1] = new_field(1, 40, row++, 30, 0, 0); // Phone
 	fields[2] = new_field(1, 40, row++, 30, 0, 0); // Instrument
 	fields[3] = new_field(1, 40, row++, 30, 0, 0); // Mail
 
-	// Ora dividi indirizzo in tre campi:
 	fields[4] = new_field(1, 40, row++, 30, 0, 0); // Street
 	fields[5] = new_field(1, 10, row++, 30, 0, 0); // Zip Code
 	fields[6] = new_field(1, 40, row++, 30, 0, 0); // City
@@ -77,8 +64,8 @@ void MusicianForm::init_form() {
 	fields[7] = new_field(1, 40, row++, 30, 0, 0); // Gage
 
 	row += 2;
-	fields[8] = new_field(1, 2, row++, 30, 0, 0); // Numero prove
-	fields[9] = new_field(1, 2, row++, 30, 0, 0); // Numero concerti
+	fields[8] = new_field(1, 2, row++, 30, 0, 0);  // Numero prove
+	fields[9] = new_field(1, 2, row++, 30, 0, 0);  // Numero concerti
 	fields[10] = new_field(1, 4, row++, 30, 0, 0); // Solista
 	set_field_buffer(fields[10], 0, "[ ]");
 	field_opts_off(fields[10], O_EDIT); // Non editabile manualmente
@@ -86,29 +73,23 @@ void MusicianForm::init_form() {
 	fields[12] = nullptr;
 
 	for (int i = 0; i < 12; ++i) {
-		set_field_back(fields[i], A_UNDERLINE);   // Campo visibile
-		field_opts_off(fields[i], O_AUTOSKIP);  // Non salta automaticamente
+		set_field_back(fields[i], A_UNDERLINE);
+		field_opts_off(fields[i], O_AUTOSKIP);
 	}
 
-	// Crea e configura il form
 	form = new_form(fields);
 }
 
 void MusicianForm::clearFormFields() {
-	for (int i = 0; i < 12; ++i) {  // 11 campi più il nullptr a fields[12]
-		set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
-	}
-	isSoloistChecked = false;
-	set_field_buffer(fields[10], 0, "[ ]"); // Aggiorna il campo "Soloist" a non selezionato
-
-	form_driver(form, REQ_FIRST_FIELD);  // Posiziona il cursore sul primo campo
-	refresh();
+	ConcertElementForm<Musician, 13>::clearFormFields(); // svuota i campi + chiama onClearExtra()
 }
 
-void MusicianForm::show() {
-	if (!form) init_form();
-	post_form(form);
+void MusicianForm::onClearExtra() {
+	isSoloistChecked = false;
+	set_field_buffer(fields[10], 0, "[ ]");
+}
 
+void MusicianForm::printLabels() {
 	int row = 2;
 	mvprintw(row++, 2, "Name:");
 	mvprintw(row++, 2, "Phone:");
@@ -135,115 +116,18 @@ void MusicianForm::show() {
 	attron(A_BOLD);
 	mvprintw(row++, 2, "Total costs:\t\t%4.2f", salary + travelCosts);
 	attroff(A_BOLD);
-
-	set_current_field(form, fields[0]);
-	form_driver(form, REQ_FIRST_FIELD);
-	form_driver(form, REQ_END_LINE);  // posiziona alla fine del buffer
-	refresh();
 }
 
-MenuCommand MusicianForm::getCommand() {
-	int ch;
-	FIELD *prevField = current_field(form);
-	while (true) {
-		ch = getch();
-		switch (ch) {
-		case 10: // Enter
-		case KEY_DOWN:
-		case 9: // TAB
-			form_driver(form, REQ_NEXT_FIELD);
-			form_driver(form, REQ_END_LINE);
-			break;
-		case KEY_UP:
-		case KEY_BTAB:
-			form_driver(form, REQ_PREV_FIELD);
-			form_driver(form, REQ_END_LINE);
-			break;
-		case KEY_BACKSPACE:
-		case 127:
-		case '\b':
-			form_driver(form, REQ_DEL_PREV);
-			break;
-		case KEY_DC:
-			form_driver(form, REQ_DEL_CHAR);
-			break;
-		case ' ': // Barra spaziatrice per toggle
-			if (current_field(form) == fields[10]) {
-				isSoloistChecked = !isSoloistChecked;
-				set_field_buffer(fields[10], 0,
-						isSoloistChecked ? "[X]" : "[ ]");
-			} else {
-				form_driver(form, ch);
-			}
-			break;
-		case KEY_F(2): {
-			MenuCommand result = menuBar.show();
-			if (result != MenuCommand::Quit) {
-				saveDataFromForm();
-			}
-			return result;
-		}
-		default:
-			form_driver(form, ch);
-			break;
-		}
-		FIELD *currField = current_field(form);
-
-		if (currField != prevField) {
-			handleFieldChange();  // Aggiungiamo questa funzione
-			prevField = currField;
-		}
-		refresh();  // Aggiorna stdscr dopo ogni input
-
+bool MusicianForm::handleSpecialKey(int ch) {
+	if (ch == ' ' && current_field(form) == fields[10]) {
+		isSoloistChecked = !isSoloistChecked;
+		set_field_buffer(fields[10], 0, isSoloistChecked ? "[X]" : "[ ]");
+		return true; // gestito qui, il driver comune non deve toccare questo tasto
 	}
-	return MenuCommand::Quit;
+	return false;
 }
 
-void MusicianForm::saveDataFromForm() {
-	form_driver(form, REQ_VALIDATION);
-
-	musician->setName(trim(field_buffer(fields[0], 0)));
-	musician->setPhone(trim(field_buffer(fields[1], 0)));
-	musician->setInstrument(trim(field_buffer(fields[2], 0)));
-	musician->setMail(trim(field_buffer(fields[3], 0)));
-	musician->setStreet(trim(field_buffer(fields[4], 0)));
-	musician->setZipCode(trim(field_buffer(fields[5], 0)));
-	musician->setCity(trim(field_buffer(fields[6], 0)));
-
-	std::string gage_str = trim(field_buffer(fields[7], 0));
-	double gage = std::stod(gage_str.empty() ? "0" : gage_str);
-
-	std::string rehearsalNumber_str = trim(field_buffer(fields[8], 0));
-	int rehearsalNumber = std::stoi(
-			rehearsalNumber_str.empty() ? "0" : rehearsalNumber_str);
-
-	std::string concertNumber_str = trim(field_buffer(fields[9], 0));
-	int concertNumber = std::stoi(
-			concertNumber_str.empty() ? "0" : concertNumber_str);
-
-	bool soloist = isSoloistChecked;
-
-	std::string travelCosts_str = trim(field_buffer(fields[11], 0));
-	int travelCosts = std::stoi(
-			travelCosts_str.empty() ? "0" : travelCosts_str);
-
-	musician->setGage(gage);
-	musician->setRehearsalNumber(rehearsalNumber);
-	musician->setConcertNumber(concertNumber);
-	musician->setSoloist(soloist);
-	musician->setTravelCosts(travelCosts);
-}
-
-void MusicianForm::closeForm() {
-	unpost_form(form);
-	free_form(form);
-	for (int i = 0; fields[i] != nullptr; ++i) {
-		free_field(fields[i]);
-	}
-
-}
-
-void MusicianForm::handleFieldChange() {
+void MusicianForm::onFieldChanged() {
 	form_driver(form, REQ_VALIDATION);
 
 	std::string name = trim(field_buffer(fields[0], 0));
@@ -251,10 +135,10 @@ void MusicianForm::handleFieldChange() {
 		controller.autofillFromAbook(name, *this);
 	}
 
-	std::string prove_str = trim(field_buffer(fields[8], 0));    // Numero prove
-	std::string concerti_str = trim(field_buffer(fields[9], 0)); // Numero concerti
-	std::string soloista_str = trim(field_buffer(fields[10], 0)); // Solista (campo checkbox)
-	std::string travelC_str = trim(field_buffer(fields[11], 0)); // Spese viaggio
+	std::string prove_str = trim(field_buffer(fields[8], 0));
+	std::string concerti_str = trim(field_buffer(fields[9], 0));
+	std::string soloista_str = trim(field_buffer(fields[10], 0));
+	std::string travelC_str = trim(field_buffer(fields[11], 0));
 
 	int prove = prove_str.empty() ? 0 : std::stoi(prove_str);
 	int concerti = concerti_str.empty() ? 0 : std::stoi(concerti_str);
@@ -283,6 +167,41 @@ void MusicianForm::handleFieldChange() {
 	attron(A_BOLD);
 	mvprintw(row++, 2, "Total costs:\t\t%4.2f", salary + travelCosts);
 	attroff(A_BOLD);
-	pos_form_cursor(form); // posiziona il cursore
+	pos_form_cursor(form);
 	refresh();
+}
+
+void MusicianForm::saveDataFromForm() {
+	form_driver(form, REQ_VALIDATION);
+
+	element->setName(trim(field_buffer(fields[0], 0)));
+	element->setPhone(trim(field_buffer(fields[1], 0)));
+	element->setInstrument(trim(field_buffer(fields[2], 0)));
+	element->setMail(trim(field_buffer(fields[3], 0)));
+	element->setStreet(trim(field_buffer(fields[4], 0)));
+	element->setZipCode(trim(field_buffer(fields[5], 0)));
+	element->setCity(trim(field_buffer(fields[6], 0)));
+
+	std::string gage_str = trim(field_buffer(fields[7], 0));
+	double gage = std::stod(gage_str.empty() ? "0" : gage_str);
+
+	std::string rehearsalNumber_str = trim(field_buffer(fields[8], 0));
+	int rehearsalNumber = std::stoi(
+			rehearsalNumber_str.empty() ? "0" : rehearsalNumber_str);
+
+	std::string concertNumber_str = trim(field_buffer(fields[9], 0));
+	int concertNumber = std::stoi(
+			concertNumber_str.empty() ? "0" : concertNumber_str);
+
+	bool soloist = isSoloistChecked;
+
+	std::string travelCosts_str = trim(field_buffer(fields[11], 0));
+	int travelCosts = std::stoi(
+			travelCosts_str.empty() ? "0" : travelCosts_str);
+
+	element->setGage(gage);
+	element->setRehearsalNumber(rehearsalNumber);
+	element->setConcertNumber(concertNumber);
+	element->setSoloist(soloist);
+	element->setTravelCosts(travelCosts);
 }

@@ -1,34 +1,18 @@
-#include <form.h>
-#include <ncurses.h>
-#include <string>
 #include "pieceForm.h"
 #include "Utils.h"
 
-PieceForm::~PieceForm() {
-	if (form)
-		closeForm();
-}
-
-void PieceForm::setMenuBar(const MenuBar &bar) {
-	menuBar = bar;
-}
-
-void PieceForm::setPiece(MusicalPiece *p) {
-	piece = p;
-}
-
 void PieceForm::updateFields() {
-	if (!form || !piece)
+	if (!form || !element)
 		return;
 
-	set_field_buffer(fields[0], 0, piece->getComposer().c_str());
-	set_field_buffer(fields[1], 0, piece->getTitle().c_str());
-	set_field_buffer(fields[2], 0, convertToMMSS(piece->getDuration()).c_str());
-	hasChoiristChecked = piece->hasChoir();
+	set_field_buffer(fields[0], 0, element->getComposer().c_str());
+	set_field_buffer(fields[1], 0, element->getTitle().c_str());
+	set_field_buffer(fields[2], 0, convertToMMSS(element->getDuration()).c_str());
+	hasChoiristChecked = element->hasChoir();
 	set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
-	set_field_buffer(fields[4], 0, piece->getSingerPart().c_str());
-	set_field_buffer(fields[5], 0, piece->getInstruments().c_str());
-	set_field_buffer(fields[6], 0, piece->getYoutubeLink().c_str());
+	set_field_buffer(fields[4], 0, element->getSingerPart().c_str());
+	set_field_buffer(fields[5], 0, element->getInstruments().c_str());
+	set_field_buffer(fields[6], 0, element->getYoutubeLink().c_str());
 
 	set_current_field(form, fields[0]);
 	form_driver(form, REQ_FIRST_FIELD);
@@ -39,18 +23,18 @@ void PieceForm::updateFields() {
 void PieceForm::init_form() {
 	if (form != nullptr)
 		closeForm();
-	// 1. Crea campi
+
 	int row = 2;
 	fields[0] = new_field(1, 40, row++, 20, 0, 0);  // Composer
 	fields[1] = new_field(1, 40, row++, 20, 0, 0);  // Title
 	fields[2] = new_field(1, 10, row++, 20, 0, 0);  // Duration (MM:SS)
-	fields[3] = new_field(1, 4, row++, 20, 0, 0);  // Choir (Yes/No)
+	fields[3] = new_field(1, 4, row++, 20, 0, 0);   // Choir (Yes/No)
 	set_field_buffer(fields[3], 0, "[ ]");
 	field_opts_off(fields[3], O_EDIT); // Non editabile manualmente
-	fields[4] = new_field(1, 40, row++, 20, 0, 0); // Singer part
-	fields[5] = new_field(1, 40, row++, 20, 0, 0); // Instruments
-	fields[6] = new_field(1, 140, row++, 20, 0, 0);  // YouTube link
-	fields[7] = nullptr;  // Terminatore
+	fields[4] = new_field(1, 40, row++, 20, 0, 0);  // Singer part
+	fields[5] = new_field(1, 40, row++, 20, 0, 0);  // Instruments
+	fields[6] = new_field(1, 140, row++, 20, 0, 0); // YouTube link
+	fields[7] = nullptr;
 
 	for (int i = 0; i < NUMBER_OF_FIELDS; ++i) {
 		set_field_back(fields[i], A_UNDERLINE);
@@ -60,12 +44,7 @@ void PieceForm::init_form() {
 	form = new_form(fields);
 }
 
-void PieceForm::show() {
-	if (!form) {
-		init_form();
-	}
-	post_form(form);
-
+void PieceForm::printLabels() {
 	int row = 2;
 	mvprintw(row++, 2, "Composer:");
 	mvprintw(row++, 2, "Title*:");
@@ -79,106 +58,40 @@ void PieceForm::show() {
 	mvprintw(row++, 2, "Scores:");
 	attroff(A_BOLD);
 
-	if (piece) {
-		for (unsigned int i = 0; i < piece->getScores().size(); i++) {
+	if (element) {
+		for (unsigned int i = 0; i < element->getScores().size(); i++) {
 			mvprintw(row++, 2, "%i) %s", i + 1,
-					piece->getScores().at(i).getPath().c_str());
+					element->getScores().at(i).getPath().c_str());
 		}
 	}
-
-	set_current_field(form, fields[0]);
-	form_driver(form, REQ_FIRST_FIELD);
-	form_driver(form, REQ_END_LINE);  // posiziona alla fine del buffer
-	refresh();
 }
 
-void PieceForm::clearFormFields() {
-	for (int i = 0; i < NUMBER_OF_FIELDS; ++i) {
-		set_field_buffer(fields[i], 0, "");  // Svuota il contenuto del campo
+bool PieceForm::handleSpecialKey(int ch) {
+	if (ch == ' ' && current_field(form) == fields[3]) {
+		hasChoiristChecked = !hasChoiristChecked;
+		set_field_buffer(fields[3], 0, hasChoiristChecked ? "[X]" : "[ ]");
+		return true;
 	}
+	return false;
+}
+
+void PieceForm::onClearExtra() {
 	hasChoiristChecked = false;
-	set_field_buffer(fields[3], 0, "[ ]"); // Aggiorna il campo "Choir" a non selezionato
-
-	form_driver(form, REQ_FIRST_FIELD);  // Posiziona il cursore sul primo campo
-	refresh();
-}
-
-MenuCommand PieceForm::getCommand() {
-	int ch;
-	while (true) {
-		ch = getch();
-		switch (ch) {
-
-		case KEY_F(2): { // MENU AZIONI
-			MenuCommand result = menuBar.show();
-			if (result == MenuCommand::SaveExit
-					|| result == MenuCommand::AddPiece) {
-				saveDataFromForm();
-			}
-			return result; // poi ci pensa il controller a cosa fare
-			break;
-		}
-		case KEY_DOWN:
-		case '\t':
-			form_driver(form, REQ_NEXT_FIELD);
-			form_driver(form, REQ_END_LINE);
-			break;
-		case KEY_UP:
-		case KEY_BTAB:
-			form_driver(form, REQ_PREV_FIELD);
-			form_driver(form, REQ_END_LINE);
-			break;
-		case 10: // ENTER (comportamento simile a TAB)
-			form_driver(form, REQ_NEXT_FIELD);
-			form_driver(form, REQ_END_LINE);
-			break;
-		case KEY_BACKSPACE:
-		case 127:
-		case '\b':
-			form_driver(form, REQ_DEL_PREV);
-			break;
-		case KEY_DC:
-			form_driver(form, REQ_DEL_CHAR);
-			break;
-		case ' ': // Barra spaziatrice per toggle
-			if (current_field(form) == fields[3]) {
-				hasChoiristChecked = !hasChoiristChecked;
-				set_field_buffer(fields[3], 0,
-						hasChoiristChecked ? "[X]" : "[ ]");
-			} else {
-				form_driver(form, ch);
-			}
-			break;
-		default:
-			form_driver(form, ch);
-			break;
-		}
-		refresh();
-	}
-	closeForm();
-	return MenuCommand::None;
+	set_field_buffer(fields[3], 0, "[ ]");
 }
 
 void PieceForm::saveDataFromForm() {
 	form_driver(form, REQ_VALIDATION);
 
-	piece->setComposer(trim(field_buffer(fields[0], 0)));
-	piece->setTitle(trim(field_buffer(fields[1], 0)));
+	element->setComposer(trim(field_buffer(fields[0], 0)));
+	element->setTitle(trim(field_buffer(fields[1], 0)));
 	std::string durationStr = trim(field_buffer(fields[2], 0));
 	int duration = convertToSeconds(durationStr);
 	if (duration == -1)
 		duration = 0;
-	piece->setDuration(duration);
-	piece->setSingerPart(trim(field_buffer(fields[4], 0)));
-	piece->setInstruments(trim(field_buffer(fields[5], 0)));
-	piece->setYoutubeLink(trim(field_buffer(fields[6], 0)));
-	piece->setChoir(hasChoiristChecked);
-}
-
-void PieceForm::closeForm() {
-	unpost_form(form);
-	free_form(form);
-	for (int i = 0; fields[i] != nullptr; ++i) {
-		free_field(fields[i]);
-	}
+	element->setDuration(duration);
+	element->setSingerPart(trim(field_buffer(fields[4], 0)));
+	element->setInstruments(trim(field_buffer(fields[5], 0)));
+	element->setYoutubeLink(trim(field_buffer(fields[6], 0)));
+	element->setChoir(hasChoiristChecked);
 }

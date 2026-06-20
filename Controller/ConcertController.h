@@ -16,6 +16,7 @@
 #include "MoveElementView.h"
 #include "SelectionView.h"
 #include <algorithm>
+#include "MenuBar.h"
 
 class MusicianForm;
 
@@ -40,11 +41,11 @@ class ConcertController {
 							elements.end());
 				}
 			}
+
 		void deleteConcert(Concert* concert);
 		void createMusician(Concert* concert);
 		void editMusician(Concert* concert);
 		std::optional<std::vector<Musician>> createEditMusician(const Musician *musicians);
-
 		void createPiece(Concert* concert);
 		void editPiece(Concert* concert);
 		std::optional<std::vector<MusicalPiece>> createEditPiece(MusicalPiece *MusicalPieces);

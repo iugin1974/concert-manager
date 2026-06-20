@@ -1,29 +1,17 @@
 #pragma once
-
-#include <string>
-#include "MenuBar.h"
 #include "Rehearsal.h"
-#include "View.h"
-#include <vector>
-#include <form.h>
+#include "ConcertElementForm.h"
 
-class RehearsalForm: public View {
-
+class RehearsalForm : public ConcertElementForm<Rehearsal, 5> {
 public:
-	void setMenuBar(const MenuBar &bar) override;
-	void show() override;
-	MenuCommand getCommand() override;
-	~RehearsalForm() override;
-	void setRehearsal(Rehearsal *rehearsal);
-	void updateFields() override;
-	void init_form() override;
-	void clearFormFields() override;
+    // Wrapper di compatibilità: il vero setter è setElement() nella base.
+    // Valuta se aggiornare i call site ed eliminare questo metodo.
+    void setRehearsal(Rehearsal *r) { setElement(r); }
+
+    void updateFields() override;
+    void init_form() override;
 
 private:
-	static constexpr int NUMBER_OF_FIELDS = 5;
-	Rehearsal *rehearsal = nullptr;
-	void closeForm() override;
-	void saveDataFromForm() override;
-	FIELD *fields[NUMBER_OF_FIELDS];
-	FORM *form = nullptr;
+    void printLabels() override;
+    void saveDataFromForm() override;
 };

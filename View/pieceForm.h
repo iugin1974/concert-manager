@@ -1,24 +1,22 @@
 #pragma once
 #include "MusicalPiece.h"
-#include "View.h"
+#include "ConcertElementForm.h"
 
-class PieceForm: public View {
-
+class PieceForm : public ConcertElementForm<MusicalPiece, 8> {
 public:
-	void setMenuBar(const MenuBar &bar) override;
-	void show() override;
-	MenuCommand getCommand() override;
-	~PieceForm() override;
-	void setPiece(MusicalPiece *piece);
-	void updateFields() override;
-	void clearFormFields() override;
-	void init_form() override;
+    // Wrapper di compatibilità: il vero setter è setElement() nella base.
+    void setPiece(MusicalPiece *p) { setElement(p); }
+
+    void init_form() override;
+    void updateFields() override;
+
 private:
-	static constexpr int NUMBER_OF_FIELDS = 8;
-	MusicalPiece *piece = nullptr;
-	void closeForm() override;
-	void saveDataFromForm() override;
-	FIELD *fields[NUMBER_OF_FIELDS];
-	FORM *form = nullptr;
-	bool hasChoiristChecked = false;
+    void printLabels() override;
+    void saveDataFromForm() override;
+    bool handleSpecialKey(int ch) override;          // toggle spazio sul checkbox coro
+    void onClearExtra() override;                     // reset hasChoiristChecked
+    // shouldSaveOnCommand non overridato: usa il default della base
+    // (salva su qualsiasi comando diverso da Quit, incluso AddScore/DeleteScore)
+
+    bool hasChoiristChecked = false;
 };
