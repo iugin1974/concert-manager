@@ -1,5 +1,6 @@
 /// ConcertSummaryView.cpp
 #include "ConcertSummaryView.h"
+#include "Mainmenushortcuts.h"
 #include "logMessage.h"
 #include "Utils.h"
 #include <ncurses.h>
@@ -103,7 +104,16 @@ void ConcertSummaryView::show() {
 MenuCommand ConcertSummaryView::getCommand() {
 	while (true) {
 		int ch = getch();
-		if (ch == KEY_F(2)) {
+ 
+		if (isShortcutPrefix(ch)) {
+			// Riga in basso come status bar per il prompt della shortcut.
+			// Adatta promptRow/promptCol se preferisci un'altra posizione.
+			auto cmd = readShortcutSecondKey(static_cast<char>(ch), LINES - 1, 2);
+			if (cmd) {
+				return *cmd;
+			}
+			// nullopt (ESC o combinazione non valida): torna al loop, non fare nulla
+		} else if (ch == KEY_F(2)) {
 			MenuCommand result = menuBar.show();
 			if (result != MenuCommand::None)
 				return result;
@@ -111,7 +121,6 @@ MenuCommand ConcertSummaryView::getCommand() {
 			firstLine++;
 			clear();
 			show();
-
 		} else if (ch == KEY_DOWN) {
 			firstLine--;
 			clear();
