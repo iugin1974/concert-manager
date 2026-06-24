@@ -113,7 +113,6 @@ if (!std::setlocale(LC_ALL, "de_DE.UTF-8")) {
     }
     
 	load_config();
-	setlocale(LC_ALL, "");
 	initscr();
 	cbreak();
 	noecho();
