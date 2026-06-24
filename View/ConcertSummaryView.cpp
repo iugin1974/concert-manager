@@ -105,7 +105,10 @@ MenuCommand ConcertSummaryView::getCommand() {
 	while (true) {
 		int ch = getch();
  
-		if (isShortcutPrefix(ch)) {
+		if (auto cmd = matchSingleKeyShortcut(ch)) {
+return *cmd;
+		}
+					if (isShortcutPrefix(ch)) {
 			// Riga in basso come status bar per il prompt della shortcut.
 			// Adatta promptRow/promptCol se preferisci un'altra posizione.
 			auto cmd = readShortcutSecondKey(static_cast<char>(ch), LINES - 1, 2);
