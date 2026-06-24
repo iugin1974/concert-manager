@@ -59,6 +59,12 @@ public:
 
             if (!handleSpecialKey(ch)) {   // hook: tasti specifici (es. spazio checkbox)
                 switch (ch) {
+case KEY_LEFT:
+form_driver(form, REQ_LEFT_CHAR);
+break;
+case KEY_RIGHT:
+form_driver(form, REQ_RIGHT_CHAR);
+break;
                 case 10:        // Enter
                 case KEY_DOWN:
                 case 9:         // TAB
