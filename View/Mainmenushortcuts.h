@@ -50,6 +50,7 @@ inline std::optional<MenuCommand> readShortcutSecondKey(char firstKey, int promp
 
 inline const std::map<char, MenuCommand> mainMenuSingleKeyShortcuts = {
     { 'c', MenuCommand::Comment },
+    { 'q', MenuCommand::SaveExit },
     // qui in futuro altri comandi a tasto singolo
 };
 

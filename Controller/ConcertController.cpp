@@ -112,6 +112,10 @@ void ConcertController::manageConcerts() {
 		form.show();
 		MenuCommand command = form.getCommand();
 		switch (command) {
+			case MenuCommand::SaveExit: {
+save();
+return;
+			}
 			case MenuCommand::Quit: {
 							return;
 						}
