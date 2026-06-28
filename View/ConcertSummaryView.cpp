@@ -35,9 +35,9 @@ void ConcertSummaryView::show() {
 	const auto &startTimes = concert.getStartTimesAsString();
 
 	for (size_t i = 0; i < places.size(); ++i) {
-	    std::string dateStr = (i < dates.size()) ? formatGermanDate(dates[i]) : "???";
-	    std::string timeStr = (i < startTimes.size()) ? startTimes[i] : "??:??";
-	    print(row++, 2, "- %s, %s - %s", dateStr.c_str(), timeStr.c_str(), places[i].c_str());
+		std::string dateStr = (i < dates.size()) ? formatGermanDate(dates[i]) : "???";
+		std::string timeStr = (i < startTimes.size()) ? startTimes[i] : "??:??";
+		print(row++, 2, "- %s, %s - %s", dateStr.c_str(), timeStr.c_str(), places[i].c_str());
 	}
 
 
@@ -104,11 +104,11 @@ void ConcertSummaryView::show() {
 MenuCommand ConcertSummaryView::getCommand() {
 	while (true) {
 		int ch = getch();
- 
+
 		if (auto cmd = matchSingleKeyShortcut(ch)) {
-return *cmd;
+			return *cmd;
 		}
-					if (isShortcutPrefix(ch)) {
+		if (isShortcutPrefix(ch)) {
 			// Riga in basso come status bar per il prompt della shortcut.
 			// Adatta promptRow/promptCol se preferisci un'altra posizione.
 			auto cmd = readShortcutSecondKey(static_cast<char>(ch), LINES - 1, 2);

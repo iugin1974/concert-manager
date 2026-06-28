@@ -16,7 +16,9 @@ inline const std::map<std::pair<char, char>, MenuCommand> mainMenuShortcuts = {
 	{ {'d', 'r'}, MenuCommand::DeleteRehearsal },
 	{ {'e', 'm'}, MenuCommand::EditMusician },
 	{ {'e', 'p'}, MenuCommand::EditPiece },
-	{ {'e', 'r'}, MenuCommand::EditRehearsal }
+	{ {'e', 'r'}, MenuCommand::EditRehearsal },
+	{ {'m', 'm'}, MenuCommand::MoveMusician },
+	{ {'m', 'p'}, MenuCommand::MovePiece }
 };
 
 // Da chiamare quando il primo tasto letto nel loop principale è 'a', 'd' o 'e'
@@ -58,7 +60,7 @@ inline const std::map<char, MenuCommand> mainMenuSingleKeyShortcuts = {
 // Ritorna true se 'ch' potrebbe essere l'inizio di una shortcut (a/d/e),
 // nel qual caso il chiamante deve poi invocare readShortcutSecondKey().
 inline bool isShortcutPrefix(int ch) {
-	return ch == 'a' || ch == 'd' || ch == 'e';
+	return ch == 'a' || ch == 'd' || ch == 'e' || ch == 'm';
 }
 
 // Controlla se 'ch' è uno shortcut completo a UN tasto solo.
