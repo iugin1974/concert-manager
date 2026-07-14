@@ -1,0 +1,3 @@
+[submodule "libs/utilities"]
+	path = libs/utilities
+	url = https://github.com/iugin1974/utilities

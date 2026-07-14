@@ -18,10 +18,13 @@
 #include "Utils.h"
 #include <optional> // per std::optional
 #include <cstdlib>  // per system()
-
 #include "ListSelectView.h"
 #include "HTML_Exporter.h"
 #include "CSV_Exporter.h"
+#include "ftp.h"
+void ConcertController::set_ftp() {
+	use_ftp = true;
+}
 
 void ConcertController::start() {
 	clear();
@@ -50,6 +53,7 @@ void ConcertController::start() {
 			case MainMenuView::EXIT:
 							save();
 							endwin();
+ftp::close();
 							return;  // esce dal cir  e dalla funzione
 		}
 		// Qui la finestra viene chiusa e ricreata a ogni ciclo (dipende da come show() funziona)
@@ -113,9 +117,9 @@ void ConcertController::manageConcerts() {
 		MenuCommand command = form.getCommand();
 		switch (command) {
 			case MenuCommand::SaveExit: {
-save();
-return;
-			}
+							    save();
+							    return;
+						    }
 			case MenuCommand::Quit: {
 							return;
 						}
@@ -460,9 +464,9 @@ void ConcertController::editPiece(Concert *concert) {
 	PieceForm form;
 	std::vector<std::string> menuTitles = { "File", "Score" };
 	std::vector<std::vector<MenuItem>> menuItems = { { { "Save and Exit", MenuCommand::SaveExit },
-			{ "Exit without saving", MenuCommand::Quit } }, {
-			{ "Add Score", MenuCommand::AddScore },
-			{ "Delete Score", MenuCommand::DeleteScore } } };
+		{ "Exit without saving", MenuCommand::Quit } }, {
+									{ "Add Score", MenuCommand::AddScore },
+									{ "Delete Score", MenuCommand::DeleteScore } } };
 	MenuBar menuBar(stdscr);
 	menuBar.setTitles(menuTitles);
 	menuBar.setItems(menuItems);
@@ -632,12 +636,20 @@ void ConcertController::sort() {
 }
 
 void ConcertController::save() {
+if (use_ftp) {
+model.saveToFTP("concerts.xml");
+} else {
 	model.saveToFile(FileIO::savePath + "/concerts.xml");
+}
 }
 
 void ConcertController::load() {
 	model.loadScorePaths();
+if (use_ftp) {
+model.loadFromFTP("concerts.xml");
+} else {
 	model.loadFromFile(FileIO::savePath + "/concerts.xml");
+}
 }
 
 void ConcertController::generateHTML(Concert *c) {

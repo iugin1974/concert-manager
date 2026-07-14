@@ -17,14 +17,15 @@
 #include "SelectionView.h"
 #include <algorithm>
 #include "MenuBar.h"
-
 class MusicianForm;
 
 class ConcertController {
 	public:
 		void start();
 		void autofillFromAbook(const std::string& name, MusicianForm& form);
+		void set_ftp();
 	private:
+		bool use_ftp = false;
 		bool createEditConcert(Concert *concert);
 		void manageConcerts();
 		template <typename T>

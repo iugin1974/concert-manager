@@ -5,7 +5,98 @@
 #include <algorithm> // std::sort, swap
 #include <stdexcept> // per std::out_of_range
 #include "FileIO.h"
+#include "ftp.h"
+#include "appconfig.h"
 namespace fs = std::filesystem;
+
+namespace {
+
+struct FtpCredentials {
+    std::string user;
+    std::string host;
+    std::string pass;
+};
+
+// Rilegge sempre da disco: niente cache, così load-da-file + save-su-FTP
+// funziona a prescindere da come sono arrivati i dati in memoria.
+bool readFtpCredentials(FtpCredentials& creds) {
+    AppConfig::init("concertmanager");
+
+    if (!AppConfig::read("user_ftp", &creds.user)) {
+        std::cerr << "The " << AppConfig::configFilePath()
+                  << " file was not found or the key 'user_ftp' does not exist.\n"
+                  << "Edit the .concertmanagerrc file by adding the string 'user_ftp=<username>'\n";
+        return false;
+    }
+    if (!AppConfig::read("host_ftp", &creds.host)) {
+        std::cerr << "The " << AppConfig::configFilePath()
+                  << " file was not found or the key 'host_ftp' does not exist.\n"
+                  << "Edit the .concertmanagerrc file by adding the string 'host_ftp=<hostname>'\n";
+        return false;
+    }
+    if (!AppConfig::read("pass_ftp", &creds.pass)) {
+        std::cerr << "The " << AppConfig::configFilePath()
+                  << " file was not found or the key 'pass_ftp' does not exist.\n"
+                  << "Edit the .concertmanagerrc file by adding the string 'pass_ftp=<password>'\n";
+        return false;
+    }
+    return true;
+}
+
+} // namespace
+
+bool Model::loadFromFile(const std::string &filename) {
+    FileIO f;
+    concerts = f.loadConcertsFromXML(filename);
+    return true; // TODO
+}
+
+bool Model::loadFromFTP(const std::string& filename) {
+    FtpCredentials creds;
+    if (!readFtpCredentials(creds)) return false;
+
+    ftp client;
+    client.setHost(creds.host);
+    client.setUserName(creds.user);
+    client.setPassword(creds.pass);
+
+    std::string tmpFile = "/tmp/" + filename;
+    if (client.downloadFile(filename, tmpFile) != 0) {
+        std::cerr << "Download FTP failed\n";
+        return false;
+    }
+
+    FileIO f;
+    concerts = f.loadConcertsFromXML(tmpFile);
+    return true;
+}
+
+bool Model::saveToFile(const std::string &filename) const {
+    FileIO f;
+    f.saveConcertsToXML(concerts, filename);
+    return true; // TODO
+}
+
+bool Model::saveToFTP(const std::string& filename) const {
+    FtpCredentials creds;
+    if (!readFtpCredentials(creds)) return false;
+
+    ftp client;
+    client.setHost(creds.host);
+    client.setUserName(creds.user);
+    client.setPassword(creds.pass);
+
+    std::string tmpFile = "/tmp/" + filename;
+    FileIO f;
+    f.saveConcertsToXML(concerts, tmpFile);
+
+    if (client.uploadFile(tmpFile) != 0) {
+        std::cerr << "Upload FTP failed\n";
+        return false;
+    }
+    return true;
+}
+
 
 bool compareConcertByFirstDate(const Concert &a, const Concert &b) {
 	const auto &datesA = a.getDatesAsTm();
@@ -33,19 +124,6 @@ void Model::sortConcerts() {
 	std::sort(concerts.begin(), concerts.end(), compareConcertByFirstDate);
 }
 
-// Caricamento da file
-bool Model::loadFromFile(const std::string &filename) {
-	FileIO f;
-	concerts = f.loadConcertsFromXML(filename);
-	return true; // TODO
-}
-
-// Salvataggio su file
-bool Model::saveToFile(const std::string &filename) const {
-	FileIO f;
-	f.saveConcertsToXML(concerts, filename);
-	return true; // TODO
-}
 
 // Accesso ai concerti
 const std::vector<Concert>& Model::getConcerts() const {

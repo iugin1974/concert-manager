@@ -92,6 +92,7 @@ void handle_crash(int sig) {
 }
 
 int main(int argc, char* argv[]) {
+bool use_ftp = false;
 
 if (!std::setlocale(LC_ALL, "de_DE.UTF-8")) {
         std::cerr << "Warning: locale de_DE.UTF-8 not available, using system default\n";
@@ -109,7 +110,9 @@ if (!std::setlocale(LC_ALL, "de_DE.UTF-8")) {
         std::string arg = argv[i];
         if (arg == "-R") {
             FileIO::dryRun = true;
-        }
+        } else if (arg == "--ftp") {
+use_ftp=true;
+		}
     }
     
 	load_config();
@@ -131,6 +134,7 @@ if (!std::setlocale(LC_ALL, "de_DE.UTF-8")) {
 	keypad(stdscr, TRUE);
 
 	ConcertController controller;
+if (use_ftp) controller.set_ftp();
 	controller.start();
 	endwin();
 	return 0;

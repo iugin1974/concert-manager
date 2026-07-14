@@ -19,6 +19,9 @@ project(concertmanager LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_subdirectory(libs/utilities/ftputil/)
+add_subdirectory(libs/utilities/kvutil/)
+add_subdirectory(libs/utilities/configutil/)
 # ---------------------------------------------------------------------------
 # Sorgenti
 # ---------------------------------------------------------------------------
@@ -80,6 +83,9 @@ target_link_libraries(concertmanager PRIVATE
     ${CURSES_LIBRARIES}
     menuw
     formw
+    ftputil
+    kvutil
+    configutil
 )
 target_include_directories(concertmanager PRIVATE ${CURSES_INCLUDE_DIRS})
 

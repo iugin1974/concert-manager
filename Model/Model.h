@@ -12,7 +12,10 @@ public:
 
     // Caricamento e salvataggio
     bool loadFromFile(const std::string& filename);
+bool loadFromFTP(const std::string& filename);
+
     bool saveToFile(const std::string& filename) const;
+bool saveToFTP(const std::string& filename) const;
 
     // Accesso ai concerti
     const std::vector<Concert>& getConcerts() const;
@@ -48,6 +51,5 @@ public:
 private:
     std::vector<Concert> concerts;
     std::vector<std::string> scorePaths;
-
 
 };
